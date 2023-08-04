@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2023.1.2),
-    on Thu Aug  3 15:07:37 2023
+    on Thu Aug  3 17:30:20 2023
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -328,7 +328,7 @@ for i in range(longestN):
         win=win, name='local%02d' % i,
         text='+', pos=[0, 0],
         font='Arial', letterHeight=localHeight,
-        alignment='center',
+        alignment='center', bold=True,
         color='red', opacity=1,
         autoDraw=False))
 
@@ -347,9 +347,9 @@ for i in range(longestN):
 # --- Initialize components for Routine "start_trial" ---
 trial_cue = visual.TextBox2(
      win, text='', placeholder='Type here...', font='Arial',
-     pos=(0, 0),     letterHeight=0.04,
+     pos=(0, 0),     letterHeight=0.025,
      size=(0.5, 0.5), borderWidth=2.0,
-     color='white', colorSpace='rgb',
+     color='black', colorSpace='rgb',
      opacity=None,
      bold=False, italic=False,
      lineSpacing=1.5, speechPoint=None,
@@ -384,9 +384,9 @@ stim1 = visual.TextStim(win=win, name='stim1',
 # --- Initialize components for Routine "t1_response" ---
 t1_response_prompt = visual.TextBox2(
      win, text='', placeholder='Type here...', font='Arial',
-     pos=(0, 0),     letterHeight=0.03,
+     pos=(0, 0),     letterHeight=0.025,
      size=(0.5, 0.5), borderWidth=2.0,
-     color='white', colorSpace='rgb',
+     color='black', colorSpace='rgb',
      opacity=None,
      bold=False, italic=False,
      lineSpacing=1.0, speechPoint=None,
@@ -403,7 +403,7 @@ t1_response_entry = keyboard.Keyboard()
 # --- Initialize components for Routine "t1_feedback" ---
 feedback = visual.TextBox2(
      win, text='', placeholder='Type here...', font='Arial',
-     pos=(0, 0),     letterHeight=0.05,
+     pos=(0, 0),     letterHeight=0.03,
      size=(0.5, 0.5), borderWidth=2.0,
      color='white', colorSpace='rgb',
      opacity=None,
@@ -831,7 +831,7 @@ for thisTrial in trials:
     continueRoutine = True
     # update component parameters for each repeat
     t1_response_prompt.reset()
-    t1_response_prompt.setText('What ' + t1_status_verb + ' the ' + t1_status + ' letter' + t1_status_plural + ' in the white stimulus\n\nType your answer\n(don\'t worry about upper or lower case)')
+    t1_response_prompt.setText('What ' + t1_status_verb + ' the ' + t1_status + ' letter' + t1_status_plural + ' in the white stimulus?\n\nType your answer\n(don\'t worry about upper or lower case)')
     t1_response_entry.keys = []
     t1_response_entry.rt = []
     _t1_response_entry_allKeys = []
