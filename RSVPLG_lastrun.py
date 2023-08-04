@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy3 Experiment Builder (v2023.1.2),
-    on Thu Aug  3 17:30:20 2023
+    on Thu Aug  3 17:44:55 2023
 If you publish work using this script the most relevant publication is:
 
     Peirce J, Gray JR, Simpson S, MacAskill M, Höchenberger R, Sogo H, Kastman E, Lindeløv JK. (2019) 
@@ -498,7 +498,7 @@ for thisTrial in trials:
     # --- Prepare to start Routine "start_trial" ---
     continueRoutine = True
     # update component parameters for each repeat
-    # Run 'Begin Routine' code from code
+    # Run 'Begin Routine' code from trial_setup
     # trial setup code
     n_rsvp_frames = 9
     t1pos = rng.choice(t1pos_list)
@@ -512,18 +512,24 @@ for thisTrial in trials:
     print(stream_global_letters)
     print(stream_local_letters)
     stream_colors = ['black'] * n_rsvp_frames
-    stream_colors[t1pos] = 'white'
+    stream_colors[t1pos - 1] = 'white'
     t1_status = rng.choice(global_local_list)
     if t1_status == 'local':
         print('T1 local')
         t1_status_plural = 's'
         t1_status_verb = 'were'
-        correct_t1_response = navon_letters[stream_local_letters[t1pos]].GetResponses()
+        correct_t1_response = navon_letters[stream_local_letters[t1pos-1]].GetResponses()
     else:
         print ('T1 global')
         t1_status_plural = ''
         t1_status_verb = 'was'
-        correct_t1_response = navon_letters[stream_global_letters[t1pos]].GetResponses()
+        correct_t1_response = navon_letters[stream_global_letters[t1pos-1]].GetResponses()
+    trials.addData('globalLetters', ''.join(stream_global_letters))
+    trials.addData('localLetters', ''.join(stream_local_letters))
+    trials.addData('t1global', stream_global_letters[t1pos-1])
+    trials.addData('t1local', stream_local_letters[t1pos-1])
+    trials.addData('t1pos', t1pos)
+    trials.addData('t1status', t1_status)
     
     rsvp_frame = -1
     rsvp_status = RSVP_ISI_START
@@ -962,6 +968,7 @@ for thisTrial in trials:
         feedback_text = 'ERROR'
         feedback_color = 'red'
     
+    trials.addData('t1acc', correct)
     # the Routine "t1_response" was not non-slip safe, so reset the non-slip timer
     routineTimer.reset()
     
