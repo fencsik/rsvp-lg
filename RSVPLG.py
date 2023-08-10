@@ -14,6 +14,7 @@ n_trials_per_cell = 1
 conditions_file = 'RSVPTrials.csv'
 feedback_color_correct = 'green'
 feedback_color_error = 'red'
+foreground_color = 'black'
 font = 'Arial'
 font_size = 20
 
@@ -97,7 +98,7 @@ class Fixation:
         self.center = [0, 0]
         self.half_length = 20
         thickness = 5
-        color = 'black'
+        color = foreground_color
         cx = self.center[0]
         cy = self.center[1]
         h = self.half_length
@@ -118,9 +119,7 @@ class Fixation:
 
 class Feedback:
     def __init__(self, win):
-        font = 'Arial'
-        font_size = 18
-        self.default_color='black'
+        self.default_color=foreground_color
         spacing = 100
         self.titleBox = visual.TextBox2(
             win, '', pos=(0, spacing),
