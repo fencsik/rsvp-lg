@@ -375,6 +375,17 @@ for thisTrial in trial_handler:
     trial_handler.addData('t2_acc', t2_response_dict['acc'])
     trial_handler.addData('t2_rt', t2_response_dict['rt'])
 
+    # feedback
+    feedback.prepare(trial,
+        t1AccText=t1_response_dict['fdbk'],
+        t1Color=t1_response_dict['fdbk_color'],
+        t2AccText=t2_response_dict['fdbk'],
+        t2Color=t2_response_dict['fdbk_color'])
+    win.clearBuffer()
+    feedback.draw()
+    win.flip()
+    core.wait(1.0)
+
     # post-trial pause
     win.clearBuffer()
     win.flip()
