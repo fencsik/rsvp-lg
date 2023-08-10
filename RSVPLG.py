@@ -85,7 +85,7 @@ class RSVP_Stream:
         else:
             return False
 
-    def next(self):
+    def nextFrame(self):
         self.frame_index += 1
         if self.frame_index < len(self.frames):
             return True
@@ -289,7 +289,7 @@ for thisTrial in trial_handler:
         win.clearBuffer()
         core.wait(.092)
         win.flip()
-        if not rsvp_stream.next():
+        if not rsvp_stream.nextFrame():
             break
 
     # response
