@@ -14,6 +14,8 @@ n_trials_per_cell = 1
 conditions_file = 'RSVPTrials.csv'
 feedback_color_correct = 'green'
 feedback_color_error = 'red'
+font = 'Arial'
+font_size = 20
 
 from psychopy import core, visual, data, gui, info
 from psychopy.hardware import keyboard
