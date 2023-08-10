@@ -161,6 +161,32 @@ class Feedback:
         self.t1Box.draw()
         self.t2Box.draw()
 
+# function to process responses
+def ProcessResponse(keys, correct_responses, allowed_responses):
+    rt = keys[0].rt
+    resp = keys[0].name
+    fdbk_color = feedback_color_error
+    if len(keys) > 1:
+        # multiple keys pressed
+        acc = -2
+        resp = 'multiple'
+        fdbk = 'MULTIPLE KEYS PRESSED'
+    elif resp in correct_responses:
+        # correct
+        acc = 1
+        fdbk = 'CORRECT'
+        fdbk_color = feedback_color_correct
+    elif resp in allowed_responses:
+        # error
+        acc = 0
+        fdbk = 'ERROR'
+    else:
+        # some other non-allowed response
+        acc = -1
+        fdbk = 'BAD KEY PRESS'
+    return {'acc': acc, 'rt': rt, 'resp': resp,
+        'fdbk': fdbk, 'fdbk_color': fdbk_color}
+
 # Present dialog box and process responses
 dlg_info = {
     'Participant': '',
@@ -204,10 +230,20 @@ trial_handler = data.TrialHandler(
     method='fullRandom')
 exp_handler.addLoop(trial_handler)
 
-# set up stimuli
+# set up stimuli and responses
 distractor_letters = list(distractor_letters)
 t1_letters = list(t1_letters)
 t2_letters = list(t2_letters)
+t1_allowed_responses = list()
+for c in t1_letters:
+    t1_allowed_responses.append(c)
+    if c.isalpha() and c.isupper():
+        t1_allowed_responses.append(c.lower())
+t2_allowed_responses = list()
+for c in t2_letters:
+    t2_allowed_responses.append(c)
+    if c.isalpha() and c.isupper():
+        t2_allowed_responses.append(c.lower())
 
 # set up screen based on computer
 rti = info.RunTimeInfo(win=False, refreshTest=None)
@@ -235,6 +271,16 @@ keyboard = keyboard.Keyboard()
 rsvp_stream = RSVP_Stream(win, stim_dir, stim_size, np.max(rsvp_stream_frames))
 fixation = Fixation(win)
 feedback = Feedback(win)
+t1_response_prompt = visual.TextBox2(
+    win, text='Did you see ' + ' or '.join(t1_letters),
+    font=font, letterHeight=font_size, alignment='center',
+    color=foreground_color)
+t1_response_prompt.setAutoDraw(False)
+t2_response_prompt = visual.TextBox2(
+    win, text='Did you see ' + ' or '.join(t2_letters),
+    font=font, letterHeight=font_size, alignment='center',
+    color=foreground_color)
+t2_response_prompt.setAutoDraw(False)
 
 trial = 0
 for thisTrial in trial_handler:
@@ -275,7 +321,7 @@ for thisTrial in trial_handler:
     trial_handler.addData('t2_corr', ''.join(t2_correct_resp))
 
     rsvp_stream.initializeStream(global_letters, local_letters)
-    
+
     # load stimuli and do pre-trial pause
     rsvp_stream.preLoadStream(clear=True)
     win.flip()
@@ -299,8 +345,35 @@ for thisTrial in trial_handler:
         if not rsvp_stream.nextFrame():
             break
 
-    # response
-    keys = keyboard.waitKeys()
+    # pause before response collection
+    core.wait(.1)
+    win.clearBuffer()
+
+    # T1 response
+    t1_response_prompt.draw()
+    win.flip()
+    keyboard.clock.reset()
+    keys = keyboard.waitKeys(keyList=t1_allowed_responses)
+    t1_response_dict = ProcessResponse(
+        keys, t1_correct_resp, t1_allowed_responses)
+    trial_handler.addData('t1_resp', t1_response_dict['resp'])
+    trial_handler.addData('t1_acc', t1_response_dict['acc'])
+    trial_handler.addData('t1_rt', t1_response_dict['rt'])
+
+    # pause before response 2 collection
+    core.wait(.1)
+    win.clearBuffer()
+
+    # T2 response
+    t2_response_prompt.draw()
+    win.flip()
+    keyboard.clock.reset()
+    keys = keyboard.waitKeys(keyList=t2_allowed_responses)
+    t2_response_dict = ProcessResponse(
+        keys, t2_correct_resp, t2_allowed_responses)
+    trial_handler.addData('t2_resp', t2_response_dict['resp'])
+    trial_handler.addData('t2_acc', t2_response_dict['acc'])
+    trial_handler.addData('t2_rt', t2_response_dict['rt'])
 
     # post-trial pause
     win.clearBuffer()
