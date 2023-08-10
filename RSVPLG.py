@@ -340,7 +340,7 @@ for thisTrial in trial_handler:
         core.wait(.125) # isi
         t = win.flip()
         win.clearBuffer()
-        core.wait(.092)
+        core.wait(.092) # stim dur
         win.flip()
         if not rsvp_stream.nextFrame():
             break
