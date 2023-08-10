@@ -253,7 +253,9 @@ for thisTrial in trial_handler:
     global_letters = rng.permutation(distractor_letters)[:n_frames]
     local_letters = rng.permutation(distractor_letters)[:n_frames]
     t1 = rng.choice(t1_letters)
+    trial_handler.addData('t1', t1)
     t2 = rng.choice(t2_letters)
+    trial_handler.addData('t2', t2)
     t1_pos = rng.choice(t1_pos_list)
     if t1_level == 'global':
         global_letters[t1_pos - 1] = t1
@@ -263,8 +265,14 @@ for thisTrial in trial_handler:
         global_letters[t1_pos + t2_lag - 1] = t2
     else:
         local_letters[t1_pos + t2_lag - 1] = t2
-    t1_resp = [t1.lower(), t1]
-    t2_resp = [t2.lower(), t2]
+    trial_handler.addData('global_letters', ''.join(global_letters))
+    trial_handler.addData('local_letters', ''.join(local_letters))
+    t1_correct_resp = [t1.lower(), t1]
+    t2_correct_resp = [t2.lower(), t2]
+    trial_handler.addData('global_letters', ''.join(global_letters))
+    trial_handler.addData('local_letters', ''.join(local_letters))
+    trial_handler.addData('t1_corr', ''.join(t1_correct_resp))
+    trial_handler.addData('t2_corr', ''.join(t2_correct_resp))
 
     rsvp_stream.initializeStream(global_letters, local_letters)
     
