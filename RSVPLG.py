@@ -98,6 +98,28 @@ class RSVP_Stream:
         else:
             return False
 
+class Cue:
+    def __init__(self, win):
+        center = [0, 0]
+        global_height = 200
+        local_height = 50
+        color = foreground_color
+        thickness = 5
+        # global
+        self.globalCue = visual.Rect(
+            win, pos=center, size=(global_height / 2, global_height),
+            lineWidth=thickness, lineColor=color, fillColor=None)
+        # local
+        self.localCue = visual.Rect(
+            win, pos=center, size=(local_height / 2, local_height),
+            lineWidth=thickness, lineColor=color, fillColor=None)
+
+    def draw(self, cue):
+        if cue[0].lower() == 'g':
+            self.globalCue.draw()
+        else:
+            self.localCue.draw()
+
 class Fixation:
     def __init__(self, win):
         self.center = [0, 0]
@@ -275,6 +297,7 @@ keyboard = keyboard.Keyboard()
 
 # set up other objects
 rsvp_stream = RSVP_Stream(win, stim_dir, stim_size, np.max(rsvp_stream_frames))
+trial_cue = Cue(win)
 fixation = Fixation(win)
 feedback = Feedback(win)
 t1_response_prompt = visual.TextBox2(
@@ -341,6 +364,12 @@ for thisTrial in trial_handler:
     rsvp_stream.preLoadStream(clear=True)
     win.flip()
     core.wait(0.25)
+
+    # draw cue
+    win.clearBuffer()
+    trial_cue.draw(t1_level)
+    win.flip()
+    core.wait(0.5)
 
     # draw fixation
     win.clearBuffer()
