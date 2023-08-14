@@ -4,12 +4,14 @@ EXPERIMENT = 'RSVPLG01'
 VERSION = '0.90'
 
 # Basic setup
-rsvp_stream_frames = 12
-distractor_letters = 'ABCDEFGJKLMNOPRTUVWXYZ'
-t1_letters = 'HS'
-t2_letters = '48'
+rsvp_stream_frames = 10
+distractor_letters = 'EFHLNSTUYZ'
+# t1_letters = 'HS'
+t1_color = 'white'
+distractor_color = 'black'
+t2_letters = 'X'
 t1_pos_list = [3, 4, 5]
-stim_size = [360, 360]
+stim_size = [306, 357]
 n_trials_per_cell = 1
 conditions_file = 'RSVPTrials.csv'
 feedback_color_correct = 'green'
@@ -26,17 +28,20 @@ import math, os, random, time
 # Set up stim dir
 stim_dir_options = [
     'stim',
+    os.path.join('..', 'Navon', 'WongChang'),
+    os.path.join('..', 'Navon', 'Hermann'),
     os.path.join(os.path.expanduser('~'), 'NavonStim', 'navon')
     ]
 stim_dir = None
 for d in stim_dir_options:
-    if os.path.isfile(os.path.join(d, 'A-A.png')):
+    if (os.path.isfile(os.path.join(d, 'E-E-black.jpg')) or
+        os.path.isfile(os.path.join(d, 'E-E-black.png'))):
         stim_dir = d
         break
 if stim_dir == None:
     print('Stimulus directory not found')
     core.quit()
-    
+
 # initialize random number generator
 rng = np.random.default_rng()
 
@@ -64,12 +69,12 @@ class RSVP_Stream:
             self.frames.append(f)
         self.frame_index = None
 
-    def initializeStream(self, global_letters, local_letters):
+    def initializeStream(self, global_letters, local_letters, colors):
         self.stream_length = len(global_letters)
         for i in range(self.stream_length):
             self.frames[i].setImage(os.path.join(
                 self.stim_dir,
-                '{}-{}.png'.format(global_letters[i], local_letters[i])))
+                '{}-{}-{}.png'.format(global_letters[i], local_letters[i], colors[i])))
         self.frame_index = 0
 
     def preLoadStream(self, clear=True):
@@ -234,18 +239,14 @@ exp_handler.addLoop(trial_handler)
 
 # set up stimuli and responses
 distractor_letters = list(distractor_letters)
-t1_letters = list(t1_letters)
+t1_letters = distractor_letters.copy()
 t2_letters = list(t2_letters)
 t1_allowed_responses = list()
 for c in t1_letters:
     t1_allowed_responses.append(c)
     if c.isalpha() and c.isupper():
         t1_allowed_responses.append(c.lower())
-t2_allowed_responses = list()
-for c in t2_letters:
-    t2_allowed_responses.append(c)
-    if c.isalpha() and c.isupper():
-        t2_allowed_responses.append(c.lower())
+t2_allowed_responses = list('yYnN')
 t1_allowed_responses.append('escape')
 t2_allowed_responses.append('escape')
 
@@ -265,7 +266,7 @@ else:
 win = visual.Window(
     size=screen_size, fullscr=True, screen=0, 
     winType='pyglet', allowStencil=False,
-    monitor='Default', color=[1, 1, 1], colorSpace='rgb',
+    monitor='Default', color=[0.29411] * 3, colorSpace='rgb',
     backgroundImage=None, backgroundFit=None,
     blendMode='avg', useFBO=True,
     units='pix')
@@ -277,7 +278,7 @@ rsvp_stream = RSVP_Stream(win, stim_dir, stim_size, np.max(rsvp_stream_frames))
 fixation = Fixation(win)
 feedback = Feedback(win)
 t1_response_prompt = visual.TextBox2(
-    win, text='Did you see ' + ' or '.join(t1_letters),
+    win, text='Which white letter did you see?',
     font=font, letterHeight=font_size, alignment='center',
     color=foreground_color)
 t1_response_prompt.setAutoDraw(False)
@@ -301,31 +302,42 @@ for thisTrial in trial_handler:
         n_frames = rsvp_stream_frames
 
     # set up stimuli
+    t1_pos = rng.choice(t1_pos_list)
     global_letters = rng.permutation(distractor_letters)[:n_frames]
     local_letters = rng.permutation(distractor_letters)[:n_frames]
-    t1 = rng.choice(t1_letters)
-    trial_handler.addData('t1', t1)
-    t2 = rng.choice(t2_letters)
-    trial_handler.addData('t2', t2)
-    t1_pos = rng.choice(t1_pos_list)
+    if global_letters[t1_pos - 1] == local_letters[t1_pos - 1]:
+        # t1 global and local are congruent
+        x = local_letters[t1_pos - 1]
+        local_letters[t1_pos - 1] = local_letters[t1_pos]
+        local_letters[t1_pos] = x
+    stream_colors = ['black'] * n_frames
+    stream_colors[t1_pos - 1] = 'white'
     if t1_level == 'global':
-        global_letters[t1_pos - 1] = t1
+        t1 = global_letters[t1_pos - 1]
     else:
-        local_letters[t1_pos - 1] = t1
-    if t2_level == 'global':
-        global_letters[t1_pos + t2_lag - 1] = t2
+        t1 = local_letters[t1_pos - 1]
+    if t2_lag > 0:
+        t2 = rng.choice(t2_letters)
+        t2_correct_resp = list('yY')
+        if t2_level == 'global':
+            global_letters[t1_pos + t2_lag - 1] = t2
+        else:
+            local_letters[t1_pos + t2_lag - 1] = t2
     else:
-        local_letters[t1_pos + t2_lag - 1] = t2
+        t2 = 'absent'
+        t2_correct_resp = list('nN')
+    trial_handler.addData('t1', t1)
+    trial_handler.addData('t2', t2)
+    trial_handler.addData('t1_pos', t1_pos)
     trial_handler.addData('global_letters', ''.join(global_letters))
     trial_handler.addData('local_letters', ''.join(local_letters))
     t1_correct_resp = [t1.lower(), t1]
-    t2_correct_resp = [t2.lower(), t2]
     trial_handler.addData('global_letters', ''.join(global_letters))
     trial_handler.addData('local_letters', ''.join(local_letters))
     trial_handler.addData('t1_corr', ''.join(t1_correct_resp))
     trial_handler.addData('t2_corr', ''.join(t2_correct_resp))
 
-    rsvp_stream.initializeStream(global_letters, local_letters)
+    rsvp_stream.initializeStream(global_letters, local_letters, stream_colors)
 
     # load stimuli and do pre-trial pause
     rsvp_stream.preLoadStream(clear=True)
