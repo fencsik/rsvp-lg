@@ -316,6 +316,7 @@ for thisTrial in trial_handler:
         t1 = global_letters[t1_pos - 1]
     else:
         t1 = local_letters[t1_pos - 1]
+    t1_correct_resp = [t1.lower(), t1]
     if t2_lag > 0:
         t2 = rng.choice(t2_letters)
         t2_correct_resp = list('yY')
@@ -326,14 +327,11 @@ for thisTrial in trial_handler:
     else:
         t2 = 'absent'
         t2_correct_resp = list('nN')
+    trial_handler.addData('global_letters', ''.join(global_letters))
+    trial_handler.addData('local_letters', ''.join(local_letters))
+    trial_handler.addData('t1_pos', t1_pos)
     trial_handler.addData('t1', t1)
     trial_handler.addData('t2', t2)
-    trial_handler.addData('t1_pos', t1_pos)
-    trial_handler.addData('global_letters', ''.join(global_letters))
-    trial_handler.addData('local_letters', ''.join(local_letters))
-    t1_correct_resp = [t1.lower(), t1]
-    trial_handler.addData('global_letters', ''.join(global_letters))
-    trial_handler.addData('local_letters', ''.join(local_letters))
     trial_handler.addData('t1_corr', ''.join(t1_correct_resp))
     trial_handler.addData('t2_corr', ''.join(t2_correct_resp))
 
