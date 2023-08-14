@@ -166,6 +166,8 @@ def ProcessResponse(keys, correct_responses, allowed_responses):
     rt = keys[0].rt
     resp = keys[0].name
     fdbk_color = feedback_color_error
+    if resp == 'escape':
+        core.quit()
     if len(keys) > 1:
         # multiple keys pressed
         acc = -2
@@ -244,6 +246,8 @@ for c in t2_letters:
     t2_allowed_responses.append(c)
     if c.isalpha() and c.isupper():
         t2_allowed_responses.append(c.lower())
+t1_allowed_responses.append('escape')
+t2_allowed_responses.append('escape')
 
 # set up screen based on computer
 rti = info.RunTimeInfo(win=False, refreshTest=None)
