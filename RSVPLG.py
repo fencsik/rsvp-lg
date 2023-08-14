@@ -248,12 +248,13 @@ for c in t2_letters:
 # set up screen based on computer
 rti = info.RunTimeInfo(win=False, refreshTest=None)
 comp = rti['systemHostName']
-if 'Yesun' in comp:
+if 'Yesun' in comp or 'A122580' in comp:
     screen_size = [1920, 1080]
 elif 'GoldenChild' in comp:
     screen_size = [1792, 1120]
 else:
-    # default; need to add testing computer
+    # default
+    print('COMPUTER NOT IDENTIFIED: DEFAULT RESOLUTION SET')
     screen_size = [800, 600]
 
 # open window and set up
