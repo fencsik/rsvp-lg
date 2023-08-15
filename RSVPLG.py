@@ -4,7 +4,7 @@ EXPERIMENT = 'RSVPLG01'
 VERSION = '0.91'
 
 # Basic setup
-rsvp_stream_frames = 10
+rsvp_stream_frames = 15
 distractor_letters = 'EFHLNSTUYZ'
 # t1_letters = 'HS'
 t1_color = 'white'
@@ -272,10 +272,9 @@ exp_handler.addLoop(trial_handler)
 
 # set up stimuli and responses
 distractor_letters = list(distractor_letters)
-t1_letters = distractor_letters.copy()
 t2_letters = list(t2_letters)
 t1_allowed_responses = list()
-for c in t1_letters:
+for c in distractor_letters:
     t1_allowed_responses.append(c)
     if c.isalpha() and c.isupper():
         t1_allowed_responses.append(c.lower())
@@ -343,19 +342,31 @@ for thisTrial in trial_handler:
 
     # set up stimuli
     t1_pos = rng.choice(t1_pos_list)
-    global_letters = rng.permutation(distractor_letters)[:n_frames]
-    local_letters = rng.permutation(distractor_letters)[:n_frames]
-    if global_letters[t1_pos - 1] == local_letters[t1_pos - 1]:
-        # t1 global and local are congruent
-        x = local_letters[t1_pos - 1]
-        local_letters[t1_pos - 1] = local_letters[t1_pos]
-        local_letters[t1_pos] = x
+    # select t1 from distractors, making sure to get 2 different letters
+    t1_list = rng.choice(distractor_letters, 2, replace=False)
+    t1_global = t1_list[0]
+    t1_local = t1_list[1]
+    # remove t1 letters from rest of stream
+    trial_letters = np.array(distractor_letters)
+    trial_letters = trial_letters[
+        (trial_letters != t1_global) & (trial_letters != t1_local)]
+    # extend letters if needed
+    if len(trial_letters) < n_frames:
+        trial_letters = np.tile(
+            trial_letters, math.ceil(n_frames / len(trial_letters)))
+    global_letters = rng.permutation(trial_letters)[:n_frames]
+    local_letters = rng.permutation(trial_letters)[:n_frames]
+    # insert T1
+    global_letters[t1_pos - 1] = t1_global
+    local_letters[t1_pos - 1] = t1_local
+    # set up colors
     stream_colors = ['black'] * n_frames
     stream_colors[t1_pos - 1] = 'white'
+    # store stimuli and responses
     if t1_level == 'global':
-        t1 = global_letters[t1_pos - 1]
+        t1 = t1_global
     else:
-        t1 = local_letters[t1_pos - 1]
+        t1 = t1_local
     t1_correct_resp = [t1.lower(), t1]
     if t2_lag > 0:
         t2 = rng.choice(t2_letters)
