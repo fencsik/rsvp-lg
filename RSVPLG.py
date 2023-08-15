@@ -201,6 +201,12 @@ class Feedback:
         self.t1Box.draw()
         self.t2Box.draw()
 
+def AdjustDurations(dur, frame_rate):
+    for k, d in dur.items():
+        nFrames = np.round(d / frame_rate)
+        dur[k] = frame_rate * (nFrames - .75)
+    return dur
+
 # function to process responses
 def ProcessResponse(keys, correct_responses, allowed_responses):
     rt = keys[0].rt
@@ -309,9 +315,7 @@ keyboard = keyboard.Keyboard()
 
 # update timings to get as close to frame rate as possible
 frame_rate = win.monitorFramePeriod
-for k, d in dur.items():
-    nFrames = np.round(d / frame_rate)
-    dur[k] = frame_rate * (nFrames - .75)
+dur = AdjustDurations(dur, frame_rate)
 
 # set up other objects
 rsvp_stream = RSVP_Stream(win, stim_dir, stim_size, np.max(rsvp_stream_frames))
