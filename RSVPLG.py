@@ -12,6 +12,7 @@ distractor_color = 'black'
 t2_letters = 'X'
 t1_pos_list = [3, 4, 5, 6]
 stim_size = [204, 238]
+stim_file_ext = 'jpg'
 n_trials_per_cell = 1
 conditions_file = 'RSVPLGTrials.csv'
 feedback_color_correct = 'green'
@@ -45,8 +46,7 @@ stim_dir_options = [
     ]
 stim_dir = None
 for d in stim_dir_options:
-    if (os.path.isfile(os.path.join(d, 'E-E-black.jpg')) or
-        os.path.isfile(os.path.join(d, 'E-E-black.png'))):
+    if os.path.isfile(os.path.join(d, 'E-E-black.{}'.format(stim_file_ext))):
         stim_dir = d
         break
 if stim_dir == None:
@@ -85,7 +85,9 @@ class RSVP_Stream:
         for i in range(self.stream_length):
             self.frames[i].setImage(os.path.join(
                 self.stim_dir,
-                '{}-{}-{}.png'.format(global_letters[i], local_letters[i], colors[i])))
+                '{}-{}-{}.{}'.format(
+                    global_letters[i], local_letters[i], colors[i],
+                    stim_file_ext)))
         self.frame_index = 0
 
     def preLoadStream(self, clear=True):
