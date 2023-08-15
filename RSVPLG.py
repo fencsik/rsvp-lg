@@ -18,7 +18,7 @@ feedback_color_correct = 'green'
 feedback_color_error = 'red'
 foreground_color = 'black'
 font = 'Arial'
-font_size = 20
+font_size = 24
 
 # timing setup
 dur = {
