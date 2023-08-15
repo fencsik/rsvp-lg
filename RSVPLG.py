@@ -20,6 +20,17 @@ foreground_color = 'black'
 font = 'Arial'
 font_size = 20
 
+# timing setup
+dur = {
+    'pre_trial': 0.25,
+    'cue': 0.5,
+    'fixation': 0.5,
+    'stim': 0.05,
+    'isi': 0.10,
+    'response_gaps': 0.10,
+    'feedback': 1.0,
+    'post_trial': 0.25}
+
 from psychopy import core, visual, data, gui, info
 from psychopy.hardware import keyboard
 import numpy as np
@@ -295,6 +306,12 @@ win = visual.Window(
 win.mouseVisible = False
 keyboard = keyboard.Keyboard()
 
+# update timings to get as close to frame rate as possible
+frame_rate = win.monitorFramePeriod
+for k, d in dur.items():
+    nFrames = np.round(d / frame_rate)
+    dur[k] = frame_rate * (nFrames - .75)
+
 # set up other objects
 rsvp_stream = RSVP_Stream(win, stim_dir, stim_size, np.max(rsvp_stream_frames))
 trial_cue = Cue(win)
@@ -363,34 +380,34 @@ for thisTrial in trial_handler:
     # load stimuli and do pre-trial pause
     rsvp_stream.preLoadStream(clear=True)
     win.flip()
-    core.wait(0.25)
+    core.wait(dur['pre_trial'])
 
     # draw cue
     win.clearBuffer()
     trial_cue.draw(t1_level)
     win.flip()
-    core.wait(0.5)
+    core.wait(dur['cue'])
 
     # draw fixation
     win.clearBuffer()
     fixation.draw()
     win.flip()
-    core.wait(0.5)
+    core.wait(dur['fixation'])
 
     # RSVP stream
     while True:
         win.clearBuffer()
         rsvp_stream.drawCurrent()
-        core.wait(.125) # isi
+        core.wait(dur['isi']) # isi
         t = win.flip()
         win.clearBuffer()
-        core.wait(.092) # stim dur
+        core.wait(dur['stim']) # stim dur
         win.flip()
         if not rsvp_stream.nextFrame():
             break
 
     # pause before response collection
-    core.wait(.1)
+    core.wait(dur['response_gaps'])
     win.clearBuffer()
 
     # T1 response
@@ -405,7 +422,7 @@ for thisTrial in trial_handler:
     trial_handler.addData('t1_rt', t1_response_dict['rt'])
 
     # pause before response 2 collection
-    core.wait(.1)
+    core.wait(dur['response_gaps'])
     win.clearBuffer()
 
     # T2 response
@@ -428,12 +445,12 @@ for thisTrial in trial_handler:
     win.clearBuffer()
     feedback.draw()
     win.flip()
-    core.wait(1.0)
+    core.wait(dur['feedback'])
 
     # post-trial pause
     win.clearBuffer()
     win.flip()
-    core.wait(0.25)
+    core.wait(dur['post_trial'])
 
     # advance trials
     exp_handler.nextEntry()
