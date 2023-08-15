@@ -285,7 +285,7 @@ t2_allowed_responses.append('escape')
 # set up screen based on computer
 rti = info.RunTimeInfo(win=False, refreshTest=None)
 comp = rti['systemHostName']
-if 'Yesun' in comp or 'A122580' in comp:
+if ('Yesun' in comp or comp in ('A122580', 'A126702')):
     screen_size = [1920, 1080]
 elif 'GoldenChild' in comp:
     screen_size = [1792, 1120]
