@@ -472,9 +472,6 @@ for thisTrial in trial_handler:
     # advance trials
     exp_handler.nextEntry()
 
-    if trial >= 5:
-        break
-
 exp_handler.saveAsWideText(data_file_basename, delim=',')
 exp_handler.abort()
 win.close()
