@@ -243,7 +243,7 @@ def ProcessResponse(keys=None, correct_responses=None, allowed_responses=None):
 dlg_info = {
     'Participant': '',
     'Session': '1',
-    'Block Type': ['practice', 'experiment'],
+    'Block Type': ['Practice1', 'Practice2', 'Experiment'],
     'Version': VERSION
     }
 dlg = gui.DlgFromDict(
@@ -258,8 +258,8 @@ SUBJECT = int(dlg_info['Participant'])
 SESSION = int(dlg_info['Session'])
 BLOCK_TYPE = dlg_info['Block Type']
 
-data_file_basename = os.path.join('data', u'%s-Data-%03d-%02d-%s' %
-                                  (EXPERIMENT, SUBJECT, SESSION, RUNTIME))
+data_file_basename = os.path.join('data', u'%s-Data-%03d-%s-%s' %
+                                  (EXPERIMENT, SUBJECT, BLOCK_TYPE, RUNTIME))
 extraInfo = {
     'exp': EXPERIMENT,
     'ver': VERSION,
@@ -268,6 +268,14 @@ extraInfo = {
     'sess': SESSION,
     'blocktyp': BLOCK_TYPE,
     'datetime': RUNTIME}
+
+test_t1 = True
+if BLOCK_TYPE == 'Practice1':
+    test_t2 = False
+elif BLOCK_TYPE == 'Practice2':
+    test_t2 = True
+else:
+    test_t2 = True
 
 # open experiment handler
 exp_handler = data.ExperimentHandler(name=EXPERIMENT, version=VERSION,
@@ -431,28 +439,37 @@ for thisTrial in trial_handler:
     core.wait(dur['response_gaps'])
     win.clearBuffer()
 
-    # T1 response
-    t1_response_prompt.draw()
-    win.flip()
-    keyboard.clock.reset()
-    keys = keyboard.waitKeys(keyList=t1_allowed_responses)
-    t1_response_dict = ProcessResponse(
-        keys, t1_correct_resp, t1_allowed_responses)
+    if test_t1:
+        # T1 response
+        t1_response_prompt.draw()
+        win.flip()
+        keyboard.clock.reset()
+        keys = keyboard.waitKeys(keyList=t1_allowed_responses)
+        t1_response_dict = ProcessResponse(
+            keys, t1_correct_resp, t1_allowed_responses)
+        # pause
+        core.wait(dur['response_gaps'])
+        win.clearBuffer()
+    else:
+        t1_response_dict = ProcessResponse(None)
+
+    if test_t2:
+        # T2 response
+        t2_response_prompt.draw()
+        win.flip()
+        keyboard.clock.reset()
+        keys = keyboard.waitKeys(keyList=t2_allowed_responses)
+        t2_response_dict = ProcessResponse(
+            keys, t2_correct_resp, t2_allowed_responses)
+        # pause
+        core.wait(dur['response_gaps'])
+        win.clearBuffer()
+    else:
+        t2_response_dict = ProcessResponse(None)
+
     trial_handler.addData('t1_resp', t1_response_dict['resp'])
     trial_handler.addData('t1_acc', t1_response_dict['acc'])
     trial_handler.addData('t1_rt', t1_response_dict['rt'])
-
-    # pause before response 2 collection
-    core.wait(dur['response_gaps'])
-    win.clearBuffer()
-
-    # T2 response
-    t2_response_prompt.draw()
-    win.flip()
-    keyboard.clock.reset()
-    keys = keyboard.waitKeys(keyList=t2_allowed_responses)
-    t2_response_dict = ProcessResponse(
-        keys, t2_correct_resp, t2_allowed_responses)
     trial_handler.addData('t2_resp', t2_response_dict['resp'])
     trial_handler.addData('t2_acc', t2_response_dict['acc'])
     trial_handler.addData('t2_rt', t2_response_dict['rt'])
