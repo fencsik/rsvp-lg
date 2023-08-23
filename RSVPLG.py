@@ -208,7 +208,11 @@ def AdjustDurations(dur, frame_rate):
     return dur
 
 # function to process responses
-def ProcessResponse(keys, correct_responses, allowed_responses):
+def ProcessResponse(keys=None, correct_responses=None, allowed_responses=None):
+    if keys == None:
+        return {
+            'acc': -5, 'rt': 0, 'resp': 'none',
+            'fdbk': None, 'fdbk_color': None}
     rt = keys[0].rt
     resp = keys[0].name
     fdbk_color = feedback_color_error
