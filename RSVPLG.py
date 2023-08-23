@@ -114,17 +114,17 @@ class RSVP_Stream:
 class Cue:
     def __init__(self, win):
         center = [0, 0]
-        global_height = 200
-        local_height = 50
+        global_size = stim_size
+        local_size = [25, 50]
         color = foreground_color
         thickness = 5
         # global
         self.globalCue = visual.Rect(
-            win, pos=center, size=(global_height / 2, global_height),
+            win, pos=center, size=global_size,
             lineWidth=thickness, lineColor=color, fillColor=None)
         # local
         self.localCue = visual.Rect(
-            win, pos=center, size=(local_height / 2, local_height),
+            win, pos=center, size=local_size,
             lineWidth=thickness, lineColor=color, fillColor=None)
 
     def draw(self, cue):
