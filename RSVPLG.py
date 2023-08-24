@@ -28,8 +28,8 @@ dur = {
     'pre_trial': 0.25,
     'cue': 0.5,
     'fixation': 0.5,
-    'stim': 0.067,
-    'isi': 0.083,
+    'stim': 0.05,
+    'isi': 0.067,
     'response_gaps': 0.10,
     'feedback': 1.0,
     'post_trial': 0.25}
