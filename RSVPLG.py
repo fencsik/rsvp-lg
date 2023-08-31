@@ -116,18 +116,17 @@ class RSVP_Stream:
 
 class Cue:
     def __init__(self, win):
-        center = [0, 0]
         global_size = stim_size
         local_size = [25, 50]
         color = cue_color
         thickness = 5
         # global
         self.globalCue = visual.Rect(
-            win, pos=center, size=global_size,
+            win, pos=[0, global_size[1]], size=global_size,
             lineWidth=thickness, lineColor=color, fillColor=None)
         # local
         self.localCue = visual.Rect(
-            win, pos=center, size=local_size,
+            win, pos=[0, local_size[1]], size=local_size,
             lineWidth=thickness, lineColor=color, fillColor=None)
 
     def draw(self, cue):
@@ -435,6 +434,7 @@ for trial_type in trial_type_list:
         # draw fixation
         win.clearBuffer()
         fixation.draw()
+        trial_cue.draw(t1_level)
         win.flip()
         core.wait(dur['fixation'])
 
