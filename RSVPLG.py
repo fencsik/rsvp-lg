@@ -20,6 +20,7 @@ conditions_file = 'RSVPLGTrials.csv'
 feedback_color_correct = 'green'
 feedback_color_error = 'red'
 foreground_color = 'black'
+cue_color = 'white'
 font = 'Arial'
 font_size = 24
 
@@ -118,7 +119,7 @@ class Cue:
         center = [0, 0]
         global_size = stim_size
         local_size = [25, 50]
-        color = foreground_color
+        color = cue_color
         thickness = 5
         # global
         self.globalCue = visual.Rect(
