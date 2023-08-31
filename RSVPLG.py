@@ -16,6 +16,7 @@ stim_file_ext = 'jpg'
 n_trials_per_cell = 1 # for exp blocks
 n_trials_practice = 10 # of trials in prac blocks
 n_trials_warmup = 5 # of warmup trials in exp blocks
+self_paced = True
 conditions_file = 'RSVPLGTrials.csv'
 feedback_color_correct = 'green'
 feedback_color_error = 'red'
@@ -353,6 +354,11 @@ t2_response_prompt = visual.TextBox2(
     font=font, letterHeight=font_size, alignment='center',
     color=foreground_color)
 t2_response_prompt.setAutoDraw(False)
+self_paced_prompt = visual.TextBox2(
+    win, text='Press any button to begin the next trial',
+    font=font, letterHeight=font_size, alignment='center',
+    color=foreground_color)
+self_paced_prompt.setAutoDraw(False)
 
 trial = 0
 for trial_type in trial_type_list:
@@ -424,6 +430,17 @@ for trial_type in trial_type_list:
         rsvp_stream.preLoadStream(clear=True)
         win.flip()
         core.wait(dur['pre_trial'])
+
+        # wait for input if self-paced
+        if self_paced:
+            win.clearBuffer()
+            self_paced_prompt.setText('Press any button to begin trial {}'.format(trial))
+            self_paced_prompt.draw()
+            trial_cue.draw(t1_level)
+            win.flip()
+            keys = keyboard.waitKeys()
+            if keys[0].name == 'escape':
+                core.quit()
 
         # draw cue
         win.clearBuffer()
