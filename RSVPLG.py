@@ -41,6 +41,8 @@ from psychopy.hardware import keyboard
 import numpy as np
 import math, os, random, time
 
+clock = core.Clock()
+
 # Set up stim dir
 stim_dir_options = [
     'stim',
@@ -338,6 +340,8 @@ keyboard = keyboard.Keyboard()
 # update timings to get as close to frame rate as possible
 frame_rate = win.monitorFramePeriod
 dur = AdjustDurations(dur, frame_rate)
+dur_isi = dur['isi']
+dur_stim = dur['stim']
 
 # set up other objects
 rsvp_stream = RSVP_Stream(win, stim_dir, stim_size, np.max(rsvp_stream_frames))
@@ -456,16 +460,28 @@ for trial_type in trial_type_list:
         core.wait(dur['fixation'])
 
         # RSVP stream
+        rsvp_ISI = True
+        last_frame = False
+        win.clearBuffer()
+        win.flip()
+        t_next = clock.getTime()
         while True:
-            win.clearBuffer()
-            rsvp_stream.drawCurrent()
-            core.wait(dur['isi']) # isi
-            t = win.flip()
-            win.clearBuffer()
-            core.wait(dur['stim']) # stim dur
-            win.flip()
-            if not rsvp_stream.nextFrame():
-                break
+            if clock.getTime() >= t_next:
+                win.flip()
+                t_flip = clock.getTime()
+                win.clearBuffer()
+                if last_frame:
+                    break
+                elif rsvp_ISI:
+                    t_next = t_flip + dur_isi
+                    rsvp_stream.drawCurrent()
+                    rsvp_ISI = False
+                else:
+                    t_next = t_flip + dur_stim
+                    rsvp_ISI = True
+                    if not rsvp_stream.nextFrame():
+                        last_frame = True
+            core.wait(.001) # 1 ms break to give the OS time
 
         # pause before response collection
         core.wait(dur['response_gaps'])
