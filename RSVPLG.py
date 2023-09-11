@@ -24,6 +24,7 @@ foreground_color = 'black'
 cue_color = 'white'
 font = 'Arial'
 font_size = 24
+rsvp_loop_granularity = .001 # break during loop for OS (milliseconds)
 
 # timing setup
 dur = {
@@ -481,7 +482,7 @@ for trial_type in trial_type_list:
                     rsvp_ISI = True
                     if not rsvp_stream.nextFrame():
                         last_frame = True
-            core.wait(.001) # 1 ms break to give the OS time
+            core.wait(rsvp_loop_granularity) # break for the OS
 
         # pause before response collection
         core.wait(dur['response_gaps'])
