@@ -17,6 +17,7 @@ n_trials_per_cell = 20 # for exp blocks
 n_trials_practice = 10 # of trials in prac blocks
 n_trials_warmup = 5 # of warmup trials in exp blocks
 self_paced = True
+break_every = 40 # break every X trials
 conditions_file = 'RSVPLGTrials.csv'
 feedback_color_correct = 'green'
 feedback_color_error = 'red'
@@ -207,6 +208,24 @@ class Feedback:
         self.t1Box.draw()
         self.t2Box.draw()
 
+class BreakDialog:
+    def __init__(self, win):
+        self.default_color=foreground_color
+        self.textBox = visual.TextBox2(
+            win, '', pos=(0, 0),
+            font=font, letterHeight=font_size, color=self.default_color,
+            alignment='center', autoDraw=False)
+
+    def draw(self, trial, totalTrials=None):
+        text = 'You have completed {}'.format(trial)
+        if totalTrials != None:
+            text += ' out of {}'.format(totalTrials)
+        text += ' trials\n\n'
+        text += 'Please take a break\n\n'
+        text += 'Press any button to continue'
+        self.textBox.setText(text)
+        self.textBox.draw()
+
 def AdjustDurations(dur, frame_rate):
     for k, d in dur.items():
         nFrames = np.round(d / frame_rate)
@@ -349,6 +368,7 @@ rsvp_stream = RSVP_Stream(win, stim_dir, stim_size, np.max(rsvp_stream_frames))
 trial_cue = Cue(win)
 fixation = Fixation(win)
 feedback = Feedback(win)
+breakDialog = BreakDialog(win)
 t1_response_prompt = visual.TextBox2(
     win, text='Which white letter did you see?',
     font=font, letterHeight=font_size, alignment='center',
@@ -545,6 +565,14 @@ for trial_type in trial_type_list:
             (BLOCK_TYPE in ['Practice1', 'Practice2'] and trial >= n_trials_practice)):
             # end warmup
             break
+
+        if trial % break_every == 0:
+            win.clearBuffer()
+            breakDialog.draw(trial)
+            win.flip()
+            keys = keyboard.waitKeys()
+            if keys[0].name == 'escape':
+                core.quit()
 
     exp_handler.loopEnded(trial_handler)
 
