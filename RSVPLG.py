@@ -355,7 +355,7 @@ t1_response_prompt = visual.TextBox2(
     color=foreground_color)
 t1_response_prompt.setAutoDraw(False)
 t2_response_prompt = visual.TextBox2(
-    win, text='Did you see ' + ' or '.join(t2_letters),
+    win, text='Did you see ' + ' or '.join(t2_letters) + '?',
     font=font, letterHeight=font_size, alignment='center',
     color=foreground_color)
 t2_response_prompt.setAutoDraw(False)
