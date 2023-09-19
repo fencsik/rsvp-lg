@@ -1,5 +1,6 @@
 # Explicit rules
 
+all : AllData.rda AllData.txt
 # all : fig0201.pdf fig0301.pdf fig0302.pdf tab0303.txt \
 # 	fig0401.pdf fig0402.pdf tab0402.txt tab0403.txt \
 # 	fig0501.pdf fig0502.pdf tab0504.txt \
@@ -8,7 +9,8 @@
 # 	fig0801.pdf fig0802.pdf tab0801.txt tab0802.txt tab0803.txt \
 # 	Exp2-ModelFits.txt
 
-rawdata.rda : data/*
+AllData.rda : data/*
+AllData.txt : data/*
 # data00.rda : rawdata.rda
 # data01.rda : data00.rda
 # data02.rda : data01.rda ComputeDprime.r
