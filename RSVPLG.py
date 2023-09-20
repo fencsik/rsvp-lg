@@ -344,7 +344,7 @@ elif 'GoldenChild' in comp:
 else:
     # default
     print('COMPUTER NOT IDENTIFIED: DEFAULT RESOLUTION SET')
-    screen_size = [800, 600]
+    screen_size = [1920, 1080]
 
 # open window and set up
 win = visual.Window(
