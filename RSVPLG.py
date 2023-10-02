@@ -4,7 +4,7 @@ EXPERIMENT = 'RSVPLG01'
 VERSION = '0.94'
 
 # Basic setup
-rsvp_stream_frames = 15
+rsvp_stream_frames = 12
 distractor_letters = 'EFHLNSTUYZ'
 # t1_letters = 'HS'
 t1_color = 'white'
