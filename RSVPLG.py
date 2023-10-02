@@ -385,6 +385,10 @@ self_paced_prompt = visual.TextBox2(
     color=foreground_color)
 self_paced_prompt.setAutoDraw(False)
 
+# set up accuracy tracking
+t1_correct_count = 0
+t2_correct_count = 0
+
 trial = 0
 for trial_type in trial_type_list:
     exec('trial_handler = {}_trial_handler'.format(trial_type))
@@ -522,6 +526,9 @@ for trial_type in trial_type_list:
         else:
             t1_response_dict = ProcessResponse(None)
 
+        if t1_response_dict['acc'] == 1:
+            t1_correct_count += 1
+
         if test_t2:
             # T2 response
             t2_response_prompt.draw()
@@ -535,6 +542,9 @@ for trial_type in trial_type_list:
             win.clearBuffer()
         else:
             t2_response_dict = ProcessResponse(None)
+
+        if t2_response_dict['acc'] == 1:
+            t2_correct_count += 1
 
         trial_handler.addData('t1_resp', t1_response_dict['resp'])
         trial_handler.addData('t1_acc', t1_response_dict['acc'])
@@ -575,6 +585,24 @@ for trial_type in trial_type_list:
                 core.quit()
 
     exp_handler.loopEnded(trial_handler)
+
+# Feedback/exit screen
+end_of_block_feedback_text = 'Completed {} trials'.format(trial)
+if test_t1:
+    end_of_block_feedback_text += '\n\nTarget 1 Accuracy = {}%'.format(
+        np.round(1000.0 * t1_correct_count / trial) / 10.0)
+if test_t2:
+    end_of_block_feedback_text += '\n\nTarget 2 Accuracy = {}%'.format(
+        np.round(1000.0 * t2_correct_count / trial) / 10.0)
+end_of_block_feedback_text += '\n\nThank you!'
+end_of_block_feedback = visual.TextBox2(
+    win, text=end_of_block_feedback_text,
+    font=font, letterHeight=font_size, alignment='center',
+    color=foreground_color)
+win.clearBuffer()
+end_of_block_feedback.draw()
+win.flip()
+keyboard.waitKeys()
 
 exp_handler.saveAsWideText(data_file_basename, delim=',')
 exp_handler.abort()
