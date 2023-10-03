@@ -267,29 +267,36 @@ def ProcessResponse(keys=None, correct_responses=None, allowed_responses=None):
 # Present dialog box and process responses
 dlg_info = {
     'Participant': '',
+    'Experimenter Initials': '',
     'Session': '1',
     'Block Type': ['Practice1', 'Practice2', 'Experiment'],
     'Version': VERSION
     }
 dlg = gui.DlgFromDict(
     dlg_info, title=EXPERIMENT,
-    order=['Participant', 'Session', 'Block Type'],
+    order=['Participant', 'Experimenter Initials', 'Session', 'Block Type'],
     fixed='Version')
 if not dlg.OK:
     print('Dialog box canceled')
     core.quit()
 
+if ((dlg_info['Participant'] == '') or (dlg_info['Experimenter Initials'] == '')):
+    print('Participant or Experimenter info missing')
+    core.quit()
+
 SUBJECT = int(dlg_info['Participant'])
+EXPERIMENTER = dlg_info['Experimenter Initials']
 SESSION = int(dlg_info['Session'])
 BLOCK_TYPE = dlg_info['Block Type']
 
-data_file_basename = os.path.join('data', u'%s-Data-%03d-%s-%s' %
-                                  (EXPERIMENT, SUBJECT, BLOCK_TYPE, RUNTIME))
+data_file_basename = os.path.join('data', u'%s-Data-%03d-%s-%s-%s' %
+                                  (EXPERIMENT, SUBJECT, EXPERIMENTER, BLOCK_TYPE, RUNTIME))
 extraInfo = {
     'exp': EXPERIMENT,
     'ver': VERSION,
     'mod-utc': MODTIME,
     'sub': SUBJECT,
+    'experimenter': EXPERIMENTER,
     'sess': SESSION,
     'blocktyp': BLOCK_TYPE,
     'datetime': RUNTIME}
