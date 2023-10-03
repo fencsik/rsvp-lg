@@ -397,6 +397,7 @@ for trial_type in trial_type_list:
         trial += 1
         trial_handler.addData('trial', trial)
         trial_handler.addData('trial_type', trial_type)
+        trial_handler.addData('trial_time', data.getDateStr())
         # set factor levels for this trial
         t1_level = thisTrial['t1_level']
         t2_level = thisTrial['t2_level']
