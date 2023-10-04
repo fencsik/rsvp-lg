@@ -495,9 +495,12 @@ for trial_type in trial_type_list:
         # RSVP stream
         rsvp_ISI = True
         last_frame = False
+        frame_counter = -1
+        frame_durations = np.empty(n_frames)
         win.clearBuffer()
         win.flip()
         t_next = clock.getTime()
+        t_last_timestamp = t_next
         while True:
             if clock.getTime() >= t_next:
                 win.flip()
@@ -506,9 +509,15 @@ for trial_type in trial_type_list:
                 if last_frame:
                     break
                 elif rsvp_ISI:
+                    # just started ISI
                     t_next = t_flip + dur_isi
                     rsvp_stream.drawCurrent()
                     rsvp_ISI = False
+                    # last flip was when we cleared the last stimulus
+                    if frame_counter >= 0:
+                        frame_durations[frame_counter] = t_flip - t_last_flip
+                        t_last_flip = t_flip
+                    frame_counter += 1
                 else:
                     t_next = t_flip + dur_stim
                     rsvp_ISI = True
