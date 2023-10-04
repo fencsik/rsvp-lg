@@ -288,6 +288,8 @@ SUBJECT = int(dlg_info['Participant'])
 EXPERIMENTER = dlg_info['Experimenter Initials']
 SESSION = int(dlg_info['Session'])
 BLOCK_TYPE = dlg_info['Block Type']
+rti = info.RunTimeInfo(win=False, refreshTest=None)
+ROOM = rti['systemHostName']
 
 data_file_basename = os.path.join('data', u'%s-Data-%03d-%s-%s-%s' %
                                   (EXPERIMENT, SUBJECT, EXPERIMENTER, BLOCK_TYPE, RUNTIME))
@@ -297,6 +299,7 @@ extraInfo = {
     'mod-utc': MODTIME,
     'sub': SUBJECT,
     'experimenter': EXPERIMENTER,
+    'room': ROOM,
     'sess': SESSION,
     'blocktyp': BLOCK_TYPE,
     'datetime': RUNTIME}
@@ -342,11 +345,9 @@ t1_allowed_responses.append('escape')
 t2_allowed_responses.append('escape')
 
 # set up screen based on computer
-rti = info.RunTimeInfo(win=False, refreshTest=None)
-comp = rti['systemHostName']
-if ('Yesun' in comp or comp in ('A122580', 'A126702', 'A124932', 'A124933', 'A122590')):
+if (ROOM in ('A122580', 'A126702', 'A124932', 'A124933', 'A122590', 'Yesun.local')):
     screen_size = [1920, 1080]
-elif 'GoldenChild' in comp:
+elif 'GoldenChild' in ROOM:
     screen_size = [1792, 1120]
 else:
     # default
