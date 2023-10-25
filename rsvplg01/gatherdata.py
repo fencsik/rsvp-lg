@@ -55,7 +55,9 @@ def ProcessDataDirectory(dirname):
                     ProcessDataFile(f)
                 except HeaderMismatch:
                     print('header mismatch in {}'.format(f))
-                    sys.exit()
+                    global warn_on_mismatch
+                    if not warn_on_mismatch:
+                        sys.exit()
     else:
         print('directory {} not found'.format(dirname))
 
