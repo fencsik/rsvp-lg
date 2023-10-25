@@ -11,7 +11,7 @@ output_headers = False
 def ProcessHeader(header_line):
     global header
     header_items = header_line.rstrip(', \n').split(',')
-    if header = None:
+    if header == None:
         header = header_items
     else:
 
