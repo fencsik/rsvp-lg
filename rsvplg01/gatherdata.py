@@ -8,12 +8,16 @@ first_file = True
 warn_on_mismatch = False
 output_headers = False
 
+class HeaderMismatch(Exception):
+    pass
+
 def ProcessHeader(header_line):
     global header
     header_items = header_line.rstrip(', \n').split(',')
     if header == None:
         header = header_items
-    else:
+    elif header != header_items:
+        raise HeaderMismatch()
 
 def ProcessDataFile(infile):
     global output_file
@@ -47,7 +51,11 @@ def ProcessDataDirectory(dirname):
                 print('{}/'.format(f))
                 ProcessDataDirectory(f)
             elif os.path.isfile(f):
-                ProcessDataFile(f)
+                try:
+                    ProcessDataFile(f)
+                except HeaderMismatch:
+                    print('header mismatch in {}'.format(f))
+                    sys.exit()
     else:
         print('directory {} not found'.format(dirname))
 
