@@ -50,7 +50,7 @@ def ProcessDataDirectory(dirname):
             if os.path.isdir(f):
                 print('{}/'.format(f))
                 ProcessDataDirectory(f)
-            elif os.path.isfile(f):
+            elif os.path.isfile(f) and (os.path.splitext(f)[1] == ".csv"):
                 try:
                     ProcessDataFile(f)
                 except HeaderMismatch:
