@@ -4,20 +4,34 @@ import os, sys, argparse
 
 output_file = 'alldata.csv'
 header_template = None
+variable_index = None
 first_file = True
 warn_on_mismatch = False
 output_headers = False
 
-class HeaderMismatch(Exception):
+class ListMismatch(Exception):
     pass
 
-def ProcessHeader(header_line):
-    global header_template
-    header_items = header_line.rstrip(', \n').split(',')
+def MatchListOrder(original_list, new_list):
+    # indentify an ordering for new_list that matches sequence of original_list
+    index = [-1] * len(original_list)
+    for i in range(len(index)):
+        try:
+            j = new_list.index(original_list[i])
+        except ValueError as err:
+            raise ListMismatch(original_list[i])
+        index[i] = j
+    return index
+
+def ProcessHeader(header_items):
+    global header_template, variable_index
     if header_template == None:
         header_template = header_items
-    elif header_template != header_items:
-        raise HeaderMismatch()
+        variable_index = list(range(len(header_template)))
+    elif header_template == header_items:
+        variable_index = list(range(len(header_template)))
+    else:
+        variable_index = MatchListOrder(header_template, header_items)
 
 def OutputHeaders(infile):
     with open(infile, 'r') as f:
@@ -28,20 +42,22 @@ def ProcessDataFile(infile):
     global output_file
     global first_file
     first_line = True
+    print(infile)
     with open(infile, 'r') as fin:
         with open(output_file, 'a') as fout:
             for line in fin:
+                line_items = line.rstrip(', \n').split(',')
                 if first_line:
                     # current line is the 1st line
-                    ProcessHeader(line)
+                    ProcessHeader(line_items)
                     first_line = False
                     if first_file:
                         # save the first line the first time
-                        fout.write(line)
+                        fout.write(','.join([line_items[i] for i in variable_index]) + '\n')
                         first_file = False
                 else:
                     # we've handled the 1st line already
-                    fout.write(line)
+                    fout.write(','.join([line_items[i] for i in variable_index]) + '\n')
 
 def ProcessDataDirectory(dirname):
     if os.path.exists(dirname):
@@ -60,9 +76,8 @@ def ProcessDataDirectory(dirname):
                     continue
                 try:
                     ProcessDataFile(f)
-                except HeaderMismatch:
-                    print('header mismatch in {}'.format(f))
-                    global warn_on_mismatch
+                except ListMismatch as err:
+                    print("Cannot find variable '{}' in {}".format(err, f))
                     if not warn_on_mismatch:
                         sys.exit()
     else:
