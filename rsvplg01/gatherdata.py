@@ -3,7 +3,7 @@
 import os, sys, argparse
 
 output_file = 'alldata.csv'
-header = None
+header_template = None
 first_file = True
 warn_on_mismatch = False
 output_headers = False
@@ -12,11 +12,11 @@ class HeaderMismatch(Exception):
     pass
 
 def ProcessHeader(header_line):
-    global header
+    global header_template
     header_items = header_line.rstrip(', \n').split(',')
-    if header == None:
-        header = header_items
-    elif header != header_items:
+    if header_template == None:
+        header_template = header_items
+    elif header_template != header_items:
         raise HeaderMismatch()
 
 def OutputHeaders(infile):
