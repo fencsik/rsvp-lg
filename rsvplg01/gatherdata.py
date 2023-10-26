@@ -71,7 +71,9 @@ def ProcessDataDirectory(dirname):
 def Main():
     parser = argparse.ArgumentParser(
         prog='gatherdata.py',
-        description="gather data files")
+        description="""
+        gather data files into one csv file, making sure variable names match across files.
+        """)
     parser.add_argument("dirname", nargs="?",
                         default=".",
                         help="directory name with data files (required)")
