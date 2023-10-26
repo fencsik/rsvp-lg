@@ -48,7 +48,6 @@ def ProcessDataDirectory(dirname):
             else:
                 f = os.path.join(dirname, f)
             if os.path.isdir(f):
-                print('{}/'.format(f))
                 ProcessDataDirectory(f)
             elif os.path.isfile(f) and (os.path.splitext(f)[1] == ".csv"):
                 try:
