@@ -83,7 +83,7 @@ def Main():
                         action="store_true")
     parser.add_argument("-o", "--output",
                         help="override default output file name")
-    parser.add_argument("--warn-on-mismatch",
+    parser.add_argument("-w", "--warn-on-mismatch",
                         help="issue warning instead of exiting when headers mismatch",
                         action="store_true")
     args = parser.parse_args()
