@@ -19,6 +19,11 @@ def ProcessHeader(header_line):
     elif header != header_items:
         raise HeaderMismatch()
 
+def OutputHeaders(infile):
+    with open(infile, 'r') as f:
+        header_line = f.readline()
+        print('{},{}'.format(infile, header_line), end="")
+
 def ProcessDataFile(infile):
     global output_file
     global first_file
@@ -50,6 +55,9 @@ def ProcessDataDirectory(dirname):
             if os.path.isdir(f):
                 ProcessDataDirectory(f)
             elif os.path.isfile(f) and (os.path.splitext(f)[1] == ".csv"):
+                if output_headers:
+                    OutputHeaders(f)
+                    continue
                 try:
                     ProcessDataFile(f)
                 except HeaderMismatch:
