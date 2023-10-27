@@ -1,65 +1,70 @@
 #!/usr/bin/env python3
 
 import os, sys, argparse
+import numpy as np
+import pandas as pd
 
+# variables to save
+variables = [
+    'exp',
+    'ver',
+    'mod-utc',
+    'sub',
+    'experimenter',
+    'datetime',
+    'blocktyp',
+    'sess',
+    'trial',
+    'trial_type',
+    'trial_time',
+    't1_level',
+    't2_level',
+    't2_lag',
+    'global_letters',
+    'local_letters',
+    't1_pos',
+    't1',
+    't1_corr',
+    't1_resp',
+    't1_acc',
+    't2',
+    't2_corr',
+    't2_resp',
+    't2_acc',
+    't1_rt',
+    't2_rt'
+    ]
+variables_set = set(variables)
+
+# other global variables
 output_file = 'alldata.csv'
-header_template = None
-variable_index = None
 first_file = True
-warn_on_mismatch = False
-output_headers = False
+warn_missing = False
+output_var_names = False
 
 class ListMismatch(Exception):
     pass
 
-def MatchListOrder(original_list, new_list):
-    # indentify an ordering for new_list that matches sequence of original_list
-    index = [-1] * len(original_list)
-    for i in range(len(index)):
-        try:
-            j = new_list.index(original_list[i])
-        except ValueError as err:
-            raise ListMismatch(original_list[i])
-        index[i] = j
-    return index
-
-def ProcessHeader(header_items):
-    global header_template, variable_index
-    if header_template == None:
-        header_template = header_items
-        variable_index = list(range(len(header_template)))
-    elif header_template == header_items:
-        variable_index = list(range(len(header_template)))
-    else:
-        variable_index = MatchListOrder(header_template, header_items)
-
-def OutputHeaders(infile):
+def OutputVarNames(infile):
     with open(infile, 'r') as f:
         header_line = f.readline()
         print('{},{}'.format(infile, header_line), end="")
 
 def ProcessDataFile(infile):
-    global output_file
-    global first_file
-    first_line = True
+    global first_file, all_data
     print(infile)
-    with open(infile, 'r') as fin:
-        with open(output_file, 'a') as fout:
-            for line in fin:
-                line_items = line.rstrip(', \n').split(',')
-                if first_line:
-                    # current line is the 1st line
-                    ProcessHeader(line_items)
-                    first_line = False
-                    if first_file:
-                        # save the first line the first time
-                        fout.write(','.join([line_items[i] for i in variable_index]) + '\n')
-                        first_file = False
-                else:
-                    # we've handled the 1st line already
-                    fout.write(','.join([line_items[i] for i in variable_index]) + '\n')
+    d = pd.read_csv(infile)
+    if variables_set <= set(d.columns):
+        if first_file:
+            first_file = False
+            all_data = d[variables]
+        else:
+            all_data = pd.concat([all_data, d[variables]])
+    else:
+        raise ListMismatch(variables_set - set(d.columns))
 
 def ProcessDataDirectory(dirname):
+    global output_var_names
     if os.path.exists(dirname):
         files = os.listdir(dirname)
         files.sort()
@@ -71,14 +76,14 @@ def ProcessDataDirectory(dirname):
             if os.path.isdir(f):
                 ProcessDataDirectory(f)
             elif os.path.isfile(f) and (os.path.splitext(f)[1] == ".csv"):
-                if output_headers:
-                    OutputHeaders(f)
+                if output_var_names:
+                    OutputVarNames(f)
                     continue
                 try:
                     ProcessDataFile(f)
                 except ListMismatch as err:
-                    print("Cannot find variable '{}' in {}".format(err, f))
-                    if not warn_on_mismatch:
+                    print("file {} is missing these variables: {}".format(f, err))
+                    if not warn_missing:
                         sys.exit()
     else:
         print('directory {} not found'.format(dirname))
@@ -92,31 +97,27 @@ def Main():
     parser.add_argument("dirname", nargs="?",
                         default=".",
                         help="directory name with data files (required)")
-    parser.add_argument("-a", "--append",
-                        help="append to output file instead of overwriting",
-                        action="store_true")
-    parser.add_argument("--headers",
-                        help="output headers prefaced by filename",
+    parser.add_argument("-v", "--var-names",
+                        help="output variable names prefaced by filename",
                         action="store_true")
     parser.add_argument("-o", "--output",
                         help="override default output file name")
-    parser.add_argument("-w", "--warn-on-mismatch",
-                        help="issue warning instead of exiting when headers mismatch",
+    parser.add_argument("-w", "--warn-missing",
+                        help="issue warning instead of exiting when a variable name is missing",
                         action="store_true")
     args = parser.parse_args()
-    global output_file
     if args.output != None:
+        global output_file
         output_file = args.output
-    if (not args.append) and os.path.isfile(output_file):
-        os.remove(output_file)
-    if args.warn_on_mismatch:
-        global warn_on_mismatch
-        warn_on_mismatch = True
-    if args.headers:
-        global output_headers
-        output_headers = True
+    if args.warn_missing:
+        global warn_missing
+        warn_missing = True
+    if args.var_names:
+        global output_var_names
+        output_var_names = True
     ProcessDataDirectory(args.dirname)
-
+    if not output_var_names:
+        all_data.to_csv(output_file, index=False)
 
 if __name__ == '__main__':
     Main()
