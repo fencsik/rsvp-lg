@@ -595,6 +595,10 @@ for trial_type in trial_type_list:
 
     exp_handler.loopEnded(trial_handler)
 
+# save data
+exp_handler.saveAsWideText(data_file_basename, delim=',')
+exp_handler.abort()
+
 # Feedback/exit screen
 end_of_block_feedback_text = 'Completed {} trials'.format(trial)
 if test_t1:
@@ -613,7 +617,5 @@ end_of_block_feedback.draw()
 win.flip()
 keyboard.waitKeys()
 
-exp_handler.saveAsWideText(data_file_basename, delim=',')
-exp_handler.abort()
 win.close()
 core.quit()
