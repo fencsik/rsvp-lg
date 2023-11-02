@@ -44,6 +44,7 @@ import numpy as np
 import math, os, random, time
 
 clock = core.Clock()
+end_experiment = False
 
 # Set up stim dir
 stim_dir_options = [
@@ -238,11 +239,15 @@ def ProcessResponse(keys=None, correct_responses=None, allowed_responses=None):
         return {
             'acc': -5, 'rt': 0, 'resp': 'none',
             'fdbk': None, 'fdbk_color': None}
+    elif keys[0].name == 'escape':
+        global end_experiment
+        end_experiment = True
+        return {
+            'acc': -6, 'rt': 0, 'resp': 'none',
+            'fdbk': None, 'fdbk_color': None}
     rt = keys[0].rt
     resp = keys[0].name
     fdbk_color = feedback_color_error
-    if resp == 'escape':
-        core.quit()
     if len(keys) > 1:
         # multiple keys pressed
         acc = -2
@@ -478,7 +483,8 @@ for trial_type in trial_type_list:
             win.flip()
             keys = keyboard.waitKeys()
             if keys[0].name == 'escape':
-                core.quit()
+                end_experiment = True
+                break
 
         # draw cue
         win.clearBuffer()
@@ -538,6 +544,13 @@ for trial_type in trial_type_list:
         if t1_response_dict['acc'] == 1:
             t1_correct_count += 1
 
+        trial_handler.addData('t1_resp', t1_response_dict['resp'])
+        trial_handler.addData('t1_acc', t1_response_dict['acc'])
+        trial_handler.addData('t1_rt', t1_response_dict['rt'])
+
+        if end_experiment:
+            break
+
         if test_t2:
             # T2 response
             t2_response_prompt.draw()
@@ -555,12 +568,12 @@ for trial_type in trial_type_list:
         if t2_response_dict['acc'] == 1:
             t2_correct_count += 1
 
-        trial_handler.addData('t1_resp', t1_response_dict['resp'])
-        trial_handler.addData('t1_acc', t1_response_dict['acc'])
-        trial_handler.addData('t1_rt', t1_response_dict['rt'])
         trial_handler.addData('t2_resp', t2_response_dict['resp'])
         trial_handler.addData('t2_acc', t2_response_dict['acc'])
         trial_handler.addData('t2_rt', t2_response_dict['rt'])
+
+        if end_experiment:
+            break
 
         # feedback
         feedback.prepare(trial,
@@ -591,9 +604,12 @@ for trial_type in trial_type_list:
             win.flip()
             keys = keyboard.waitKeys()
             if keys[0].name == 'escape':
-                core.quit()
+                end_experiment = True
+                break
 
     exp_handler.loopEnded(trial_handler)
+    if end_experiment:
+        break
 
 # save data
 exp_handler.saveAsWideText(data_file_basename, delim=',')
