@@ -1,0 +1,33 @@
+---
+title: "RSVPLG01 Analysis"
+author: "David Fencsik"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Load Data
+
+```{r loaddata}
+  dt = read.csv("alldata.csv")
+  summary(dt)
+  #with(dt, tapply(trial, list(sub, blocktyp), length))
+```
+
+# Clean Data
+
+```{r cleandata}
+  # remove data lines from a crash
+  dt = dt[!is.na(dt$sub), ]
+  # correct subject ID typos
+  dt$sub[dt$sub == 317 & dt$experimenter == "SN"] = 137
+  dt$sub[dt$sub == 514 & dt$experimenter == "AGM"] = 154
+  dt$sub[dt$sub == 157 & dt$experimenter == "ng"] = 156
+  #with(dt, tapply(trial, list(sub, blocktyp), length))
+```
