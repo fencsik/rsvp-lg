@@ -50,10 +50,14 @@ variables = c(
 Gathers all the data files together, selecting a common set of headings
 
 ```{r loadrsvp}
-datadir = rstudioapi::selectDirectory(caption="Select RSVP Data Files Directory",
-                                      label="Select",
-                                      path=getwd())
-#datadir = "/Users/fencsik/PsychoPy/RSVPLG/rsvplg01/data"
+testmode = TRUE
+if (testmode) {
+  dataDir = "/Users/fencsik/PsychoPy/RSVPLG/rsvplg01/data"
+} else {
+  dataDir = rstudioapi::selectDirectory(caption="Select RSVP Data Files Directory",
+                                        label="Select",
+                                        path=getwd())
+}
 source("gatherdata.r")
 rsvpData = GatherData(datadir, variables)
 summary(rsvpData)
@@ -64,11 +68,16 @@ summary(rsvpData)
 Load the survey CSV file
 
 ```{r loadsurvey}
-surveyFile = rstudioapi::selectFile(caption="Select Survey Data File",
-                                    label="Select",
-                                    path=getwd(),
-                                    filter="CSV Files (*.csv)",
-                                    existing=TRUE)
+if (testmode) {
+  surveyFile = "/Users/fencsik/PsychoPy/RSVPLG/rsvplg01/SurveyData2023-11-25.csv"
+} else {
+  surveyFile = rstudioapi::selectFile(caption="Select Survey Data File",
+                                      label="Select",
+                                      path=getwd(),
+                                      filter="CSV Files (*.csv)",
+                                      existing=TRUE)
+}
+
 if(!is.null(surveyFile)) {
   surveyData = read.csv(surveyFile)
   summary(surveyData)
