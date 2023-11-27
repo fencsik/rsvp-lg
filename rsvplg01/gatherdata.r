@@ -11,7 +11,7 @@ GatherData = function(dir=NULL, columns=NULL) {
             columns = names(df)
         }
         if (!all(columns %in% names(df))) {
-            warning("missing columns in file ", fileName)
+            warning("Skipping file due to missing columns: ", fileName)
             next
         }
         if (is.null(allData)) {
