@@ -149,6 +149,6 @@ surveyData = surveyData[surveyData$sub %in% subCommon, ]
 
 # Randomize IDs
 
-Generate randomly mapped subjet IDs and removes exp ID and run time for full anonymity
+Generate randomly mapped subject IDs and removes exp ID and run time for full anonymity
 
 # Save Data
