@@ -92,6 +92,10 @@ if(!is.null(surveyFile)) {
 
 3. Removes minors
 
+4. Recode gender to labeled factors
+
+5. Create a common set of subjects across the two data sets
+
 
 ```{r cleandata}
 
@@ -130,6 +134,17 @@ if (any(remainingMinors)) {
 surveyData$gender = factor(surveyData$gender, levels=as.character(0:6),
                            labels=c("male", "female", "transmale", "transfemale",
                                     "nonbinary", "agender", "other"))
+
+# create a common set of subjects
+subRSVP = sort(unique(rsvpData$sub))
+subSurvey = sort(unique(surveyData$sub))
+subCommon = intersect(subRSVP, subSurvey)
+sprintf("Subjects in RSVP data set but not Survey data set: %s",
+        paste(setdiff(subRSVP, subSurvey), collapse=", "))
+sprintf("Subjects in Survey data set but not RSVP data set: %s",
+        paste(setdiff(subSurvey, subRSVP), collapse=", "))
+rsvpData = rsvpData[rsvpData$sub %in% subCommon, ]
+surveyData = surveyData[surveyData$sub %in% subCommon, ]
 ```
 
 # Randomize IDs
