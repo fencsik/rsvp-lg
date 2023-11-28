@@ -70,7 +70,7 @@ Load the survey CSV file
 
 ```{r loadsurvey}
 if (testmode) {
-  surveyFile = "/Users/fencsik/PsychoPy/RSVPLG/rsvplg01/SurveyData2023-11-25.csv"
+  surveyFile = "/Users/fencsik/PsychoPy/RSVPLG/rsvplg01/SurveyDataRaw.csv"
 } else {
   surveyFile = rstudioapi::selectFile(caption="Select Survey Data File",
                                       label="Select",
