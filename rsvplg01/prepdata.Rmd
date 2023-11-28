@@ -115,9 +115,16 @@ rsvpData$sub[with(rsvpData, sub == 157 & experimenter == "ng")] = 156
 surveyData$sub[with(surveyData, sub == 157 & startdate == "10/26/23 16:16")] = 156
 
 # remove known minors
-minors = c(106, 125, 126, 136, 145, 150, 214, 217, 218)
+minors = c(106, 125, 126, 136, 145, 150, 214, 216, 217, 218)
 rsvpData = rsvpData[!(rsvpData$sub %in% minors), ]
-surveyData = surveyData[with(surveyData, age >= 18 | is.na(age)), ]
+surveyData = surveyData[!(surveyData$sub %in% minors), ]
+
+# check remaining subject ages in survey data
+remainingMinors = !with(surveyData, age >= 18 | is.na(age))
+if (any(remainingMinors)) {
+  warning("survey data still has some minors:\n",
+          paste(sort(unique(surveyData$sub[remainingMinors])), collapse=", "))
+}
 
 # recode gender (0->male, 1->female, 2->transmale, 3->transfemale, 4->nonbinary, 5->agender, 6->other)
 surveyData$gender = factor(surveyData$gender, levels=as.character(0:6),
