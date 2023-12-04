@@ -61,7 +61,7 @@ if (testmode) {
 source("gatherdata.r")
 rsvpData = GatherData(dataDir, variables)
 write.csv(rsvpData, sprintf("RSVPLG01-RawData-%s.csv", Sys.Date()),
-          row.names=FALSE, quote=FALSE)
+          row.names=FALSE)
 ```
 
 ## Load Survey Data
