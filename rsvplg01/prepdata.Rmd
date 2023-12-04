@@ -147,6 +147,27 @@ rsvpData = rsvpData[rsvpData$sub %in% subCommon, ]
 surveyData = surveyData[surveyData$sub %in% subCommon, ]
 ```
 
+# Extract Fall 2023 PSYC 491C Dataset
+
+Extract a data set with just the subjects run in my Fall 2023 PSYC 491C class so I can compare the statistics we computed in JASP with the same analyses in R.
+
+```{r}
+sub20239 = c(101, 103, 104, 105, 107, 108, 110, 111, 112, 113, 114, 115,
+             116, 117, 118, 119, 120, 121, 122, 123, 127, 128, 129, 130,
+             131, 132, 133, 134, 135, 137, 138, 139, 140, 141, 142, 143,
+             144, 146, 147, 148, 149, 151, 152, 153, 154, 155, 156, 157,
+             158, 160, 161, 162, 163, 164, 201, 202, 203, 204, 205, 206,
+             207, 208, 209, 210, 211, 212, 213, 215, 217, 220, 221, 222)
+
+rsvp20239 = rsvpData[rsvpData$sub %in% sub20239, ]
+survey20239 = surveyData[surveyData$sub %in% sub20239, ]
+
+write.csv(rsvp20239, "RSVPLG01-Experiment-20239-491C.csv",
+          row.names=FALSE)
+write.csv(survey20239, "RSVPLG01-Survey-20239-491C.csv",
+          row.names=FALSE)
+```
+
 # Randomize IDs
 
 Generate randomly mapped subject IDs and removes exp ID and run time for full anonymity
