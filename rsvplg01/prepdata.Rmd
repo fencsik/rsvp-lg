@@ -172,4 +172,24 @@ write.csv(survey20239, "RSVPLG01-Survey-20239-491C.csv",
 
 Generate randomly mapped subject IDs and removes exp ID and run time for full anonymity
 
+```{r}
+originalSubjects = sort(unique(rsvpData$sub))
+n = length(originalSubjects)
+newmin = 100
+newmax = n * 2 + 100
+mapper = data.frame(orig=originalSubjects,
+                    new=sample(100:(100+n*2), n))
+rsvpDataAnon = rsvpData
+surveyDataAnon = surveyData
+unique(surveyDataAnon$sub)
+attach(mapper)
+for (i in 1:n) {
+  rsvpDataAnon$sub[rsvpData$sub == orig[i]] = new[i]
+  surveyDataAnon$sub[surveyData$sub == orig[i]] = new[i]
+}
+detach(mapper)
+unique(surveyDataAnon$sub)
+```
+
+
 # Save Data
