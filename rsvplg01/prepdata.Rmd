@@ -52,7 +52,7 @@ Gathers all the data files together, selecting a common set of headings
 ```{r loadrsvp}
 testmode = TRUE
 if (testmode) {
-  dataDir = "/Users/fencsik/PsychoPy/RSVPLG/rsvplg01/data"
+  dataDir = "data"
 } else {
   dataDir = rstudioapi::selectDirectory(caption="Select RSVP Data Files Directory",
                                         label="Select",
@@ -70,7 +70,7 @@ Load the survey CSV file
 
 ```{r loadsurvey}
 if (testmode) {
-  surveyFile = "/Users/fencsik/PsychoPy/RSVPLG/rsvplg01/SurveyDataRaw.csv"
+  surveyFile = "SurveyDataRaw.csv"
 } else {
   surveyFile = rstudioapi::selectFile(caption="Select Survey Data File",
                                       label="Select",
