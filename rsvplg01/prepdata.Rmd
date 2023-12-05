@@ -101,7 +101,7 @@ if(!is.null(surveyFile)) {
 
 # create new column names for survey data
 names(surveyData) = tolower(names(surveyData))
-surveyData$sub = surveyData$id
+names(surveyData)[names(surveyData) == "id"] = "sub"
 
 # remove data lines from a crash or empty survey responses
 rsvpData = rsvpData[!is.na(rsvpData$sub), ]
