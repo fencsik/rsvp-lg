@@ -119,7 +119,7 @@ rsvpData$sub[with(rsvpData, sub == 157 & experimenter == "ng")] = 156
 surveyData$sub[with(surveyData, sub == 157 & startdate == "10/26/23 16:16")] = 156
 
 # remove known minors
-minors = c(106, 125, 126, 136, 145, 150, 214, 216, 217, 218)
+minors = c(106, 125, 126, 136, 145, 150, 214, 216, 218)
 rsvpData = rsvpData[!(rsvpData$sub %in% minors), ]
 surveyData = surveyData[!(surveyData$sub %in% minors), ]
 
