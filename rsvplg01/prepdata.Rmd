@@ -49,7 +49,7 @@ variables = c(
 
 Gathers all the data files together, selecting a common set of headings
 
-```{r loadrsvp}
+```{r loadrsvp1, echo=FALSE}
 testmode = TRUE
 if (testmode) {
   dataDir = "data"
@@ -58,17 +58,31 @@ if (testmode) {
                                         label="Select",
                                         path=getwd())
 }
+if (is.null(dataDir)) {
+  print("Canceled")
+  knitr::knit_exit()
+}
+```
+
+```{r loadrsvp2, echo=FALSE}
 source("gatherdata.r")
 rsvpData = GatherData(dataDir, variables)
+sprintf("Gathered data files in %s together", dataDir)
+sprintf("Data consists of %d rows and %d columns",
+        dim(rsvpData)[1], dim(rsvpData)[2])
+print("Columns:")
+colnames(rsvpData)
 write.csv(rsvpData, sprintf("RSVPLG01-RawData-%s.csv", Sys.Date()),
           row.names=FALSE)
+print("Saved raw combined data")
+
 ```
 
 ## Load Survey Data
 
 Load the survey CSV file
 
-```{r loadsurvey}
+```{r loadsurvey1, echo=FALSE}
 if (testmode) {
   surveyFile = "SurveyDataRaw.csv"
 } else {
@@ -78,10 +92,19 @@ if (testmode) {
                                       filter="CSV Files (*.csv)",
                                       existing=TRUE)
 }
-
-if(!is.null(surveyFile)) {
-  surveyData = read.csv(surveyFile)
+if(is.null(surveyFile)) {
+  print("Cancelled")
+  knitr::knit_exit()
 }
+```
+
+```{r loadsurvey2, echo=FALSE}
+surveyData = read.csv(surveyFile)
+sprintf("Loaded survey data file %s", surveyFile)
+sprintf("Data consists of %d rows and %d columns",
+        dim(surveyData)[1], dim(surveyData)[2])
+print("Columns:")
+colnames(surveyData)
 ```
 
 # Clean Data
