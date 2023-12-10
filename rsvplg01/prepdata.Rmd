@@ -9,7 +9,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo=FALSE)
 
 # set variables to select from RSVP data file
 variables = c(
@@ -49,7 +49,7 @@ variables = c(
 
 Gathers all the data files together, selecting a common set of headings
 
-```{r loadrsvp1, echo=FALSE}
+```{r loadrsvp1}
 testmode = TRUE
 if (testmode) {
   dataDir = "data"
@@ -64,7 +64,7 @@ if (is.null(dataDir)) {
 }
 ```
 
-```{r loadrsvp2, echo=FALSE}
+```{r loadrsvp2}
 source("gatherdata.r")
 rsvpData = GatherData(dataDir, variables)
 sprintf("Gathered data files in %s together", dataDir)
@@ -82,7 +82,7 @@ print("Saved raw combined data")
 
 Load the survey CSV file
 
-```{r loadsurvey1, echo=FALSE}
+```{r loadsurvey1}
 if (testmode) {
   surveyFile = "SurveyDataRaw.csv"
 } else {
@@ -98,7 +98,7 @@ if(is.null(surveyFile)) {
 }
 ```
 
-```{r loadsurvey2, echo=FALSE}
+```{r loadsurvey2}
 surveyData = read.csv(surveyFile)
 sprintf("Loaded survey data file %s", surveyFile)
 sprintf("Data consists of %d rows and %d columns",
