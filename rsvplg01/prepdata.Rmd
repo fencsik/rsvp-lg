@@ -109,56 +109,67 @@ colnames(surveyData)
 
 # Clean Data
 
-1. Remove incomplete data due to crashes
+1. Lowercase and rename survey data columns
 
-2. Correct subject ID typos
-
-3. Removes minors
-
-4. Recode gender to labeled factors
-
-5. Create a common set of subjects across the two data sets
-
-
-```{r cleandata}
-
-# create new column names for survey data
+```{r cleandata1}
 names(surveyData) = tolower(names(surveyData))
 names(surveyData)[names(surveyData) == "id"] = "sub"
+```
 
-# remove data lines from a crash or empty survey responses
+2. Remove data lines that have NA values from a crash or empty survey responses
+
+```{r cleandata2}
 rsvpData = rsvpData[!is.na(rsvpData$sub), ]
 surveyData = surveyData[!is.na(surveyData$sub), ]
+```
 
-# remove subjects w/ ID >= 900 (these were test runs)
+3. Remove test runs (Subjects w/ IDs >= 900)
+
+```{r cleandata3}
 rsvpData = rsvpData[rsvpData$sub < 900, ]
 surveyData = surveyData[surveyData$sub < 900, ]
+```
 
-# correct subject ID typos
+4. Correct subject ID typos
+
+```{r cleandata4}
+print("317 -> 137")
 rsvpData$sub[with(rsvpData, sub == 317 & experimenter == "SN")] = 137
+print("514 -> 154")
 rsvpData$sub[with(rsvpData, sub == 514 & experimenter == "AGM")] = 154
 surveyData$sub[with(surveyData, sub == 514 & startdate == "10/24/23 17:10")] = 154
+print("One of the subjects labeled 157 -> 156")
 rsvpData$sub[with(rsvpData, sub == 157 & experimenter == "ng")] = 156
 surveyData$sub[with(surveyData, sub == 157 & startdate == "10/26/23 16:16")] = 156
+```
 
-# remove known minors
-minors = c(106, 125, 126, 136, 145, 150, 214, 216, 218)
-rsvpData = rsvpData[!(rsvpData$sub %in% minors), ]
-surveyData = surveyData[!(surveyData$sub %in% minors), ]
+5. Remove minors
 
-# check remaining subject ages in survey data
-remainingMinors = !with(surveyData, age >= 18 | is.na(age))
-if (any(remainingMinors)) {
-  warning("survey data still has some minors:\n",
-          paste(sort(unique(surveyData$sub[remainingMinors])), collapse=", "))
+```{r cleandata5}
+nonminors = with(surveyData, is.na(age) | age >= 18)
+if (any(!nonminors)) {
+  print("Minors detected in data and will be removed:")
+  print(sort(surveyData[!nonminors, "sub"]))
+  surveyData = surveyData[nonminors, ]
+  # these subjects will be automatically removed from the RSVP data set when we merge the two
+} else {
+  print("No minors detected in data")
 }
+```
 
+6. Recode gender to labeled factors
+
+```{r, cleandata6}
 # recode gender (0->male, 1->female, 2->transmale, 3->transfemale, 4->nonbinary, 5->agender, 6->other)
 surveyData$gender = factor(surveyData$gender, levels=as.character(0:6),
                            labels=c("male", "female", "transmale", "transfemale",
                                     "nonbinary", "agender", "other"))
+```
 
-# create a common set of subjects
+
+7. Create a common set of subjects across the two data sets
+
+```{r, cleandata7}
 subRSVP = sort(unique(rsvpData$sub))
 subSurvey = sort(unique(surveyData$sub))
 subCommon = intersect(subRSVP, subSurvey)
