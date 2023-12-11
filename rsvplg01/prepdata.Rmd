@@ -151,7 +151,7 @@ if (any(!nonminors)) {
   print("Minors detected in data and will be removed:")
   print(sort(surveyData[!nonminors, "sub"]))
   surveyData = surveyData[nonminors, ]
-  # these subjects will be automatically removed from the RSVP data set when we merge the two
+  # these subjects will be removed automatically from the RSVP data set when we merge the two
 } else {
   print("No minors detected in data")
 }
