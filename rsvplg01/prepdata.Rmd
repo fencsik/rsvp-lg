@@ -71,7 +71,7 @@ sprintf("Gathered data files in %s together", dataDir)
 sprintf("Data consists of %d rows and %d columns",
         dim(rsvpData)[1], dim(rsvpData)[2])
 print("Columns:")
-colnames(rsvpData)
+cat(sprintf("\"%s\"", paste(colnames(rsvpData), collapse="\", \"")))
 write.csv(rsvpData, sprintf("RSVPLG01-RawData-%s.csv", Sys.Date()),
           row.names=FALSE)
 print("Saved raw combined data")
@@ -104,7 +104,7 @@ sprintf("Loaded survey data file %s", surveyFile)
 sprintf("Data consists of %d rows and %d columns",
         dim(surveyData)[1], dim(surveyData)[2])
 print("Columns:")
-colnames(surveyData)
+cat(sprintf("\"%s\"", paste(colnames(surveyData), collapse="\", \"")))
 ```
 
 # Clean Data
