@@ -246,4 +246,11 @@ surveyDataAnon = surveyDataAnon[, survCols2Keep]
 
 # Save Data
 
-# Save Data
+Save to CSV files
+
+```{r savedata}
+write.csv(rsvpDataAnon, "RSVPLG01-Experiment-Anon.csv",
+          row.names=FALSE)
+write.csv(surveyDataAnon, "RSVPLG01-Survey-Anon.csv",
+          row.names=FALSE)
+```
