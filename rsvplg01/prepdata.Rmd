@@ -185,7 +185,7 @@ surveyData = surveyData[surveyData$sub %in% subCommon, ]
 
 Extract a data set with just the subjects run in my Fall 2023 PSYC 491C class so I can compare the statistics we computed in JASP with the same analyses in R.
 
-```{r}
+```{r extract2023fa}
 sub20239 = c(101, 103, 104, 105, 107, 108, 110, 111, 112, 113, 114, 115,
              116, 117, 118, 119, 120, 121, 122, 123, 127, 128, 129, 130,
              131, 132, 133, 134, 135, 137, 138, 139, 140, 141, 142, 143,
@@ -206,7 +206,7 @@ write.csv(survey20239, "RSVPLG01-Survey-20239-491C.csv",
 
 Generate randomly mapped subject IDs and removes exp ID and run time for full anonymity
 
-```{r}
+```{r anonymize1}
 originalSubjects = sort(unique(rsvpData$sub))
 n = length(originalSubjects)
 newmin = 100
