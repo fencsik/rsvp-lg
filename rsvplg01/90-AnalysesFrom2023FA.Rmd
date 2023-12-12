@@ -1,0 +1,44 @@
+---
+title: "Analyze Data from Fall 2023 PSYC 491C"
+author: "David Fencsik"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r, setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE)
+library(tidyverse)
+rsvpDataFile = "RSVPLG01-Experiment-20239-491C.csv"
+surveyDataFile = "RSVPLG01-Survey-Anon.csv"
+```
+
+# Load data files
+
+```{r, loaddata1}
+if(!file.exists(rsvpDataFile)) {
+  sprintf("Cannot find file %s", rsvpDataFile)
+  knitr::knit_exit()
+}
+dfRSVP = read.csv(rsvpDataFile)
+```
+
+```{r, loaddata2}
+if(!file.exists(surveyDataFile)) {
+  sprintf("Cannot find file %s", surveyDataFile)
+  knitr::knit_exit()
+}
+dfSurvey = read.csv(surveyDataFile)
+```
+
+# Clean data
+
+```{r, cleanRSVPdata}
+  summary(dfRSVP)
+  dfRSVP = dfRSVP |>
+    filter(blocktyp == "Experiment" & trial_type == "exp") |>
+    filter(t1_acc >= 0 & t2_acc >= 0)
+  dfRSVP$blocktyp = factor(dfRSVP$blocktyp)
+  dfRSVP$trial_type = factor(dfRSVP$trial_type)
+  summary(dfRSVP)
+```
+
