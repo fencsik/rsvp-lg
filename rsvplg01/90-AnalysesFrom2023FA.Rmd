@@ -19,7 +19,6 @@ if(!file.exists(rsvpDataFile)) {
   sprintf("Cannot find file %s", rsvpDataFile)
   knitr::knit_exit()
 }
-dfRSVP = read.csv(rsvpDataFile)
 ```
 
 ```{r, loaddata2}
@@ -27,6 +26,10 @@ if(!file.exists(surveyDataFile)) {
   sprintf("Cannot find file %s", surveyDataFile)
   knitr::knit_exit()
 }
+```
+
+```{r, loaddata3}
+dfRSVP = read.csv(rsvpDataFile)
 dfSurvey = read.csv(surveyDataFile)
 ```
 
