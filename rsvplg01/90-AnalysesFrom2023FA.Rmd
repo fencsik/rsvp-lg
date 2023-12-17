@@ -49,3 +49,22 @@ dfSurvey = read.csv(surveyDataFile)
   summary(dfRSVP)
   summary(dfSurvey)
 ```
+
+Generate data summary and run ANOVA from Fall 2023 PSYC 491C
+
+```{r, datasummary}
+rsvp = dfRSVP |>
+  filter(t1_acc == 1 & t2_lag > 0) |>
+  group_by(sub, t1_level, t2_level, t2_lag) |>
+  summarize(t2acc=mean(t2_acc, na.rm=TRUE)) |>
+  ungroup()
+rsvp$anxiety = ""
+for (i in 1:nrow(dfSurvey)) {
+  rsvp$anxiety[rsvp$sub == dfSurvey$sub[i]] = dfSurvey$anxiety[i]
+}
+
+library(rstatix)
+rsvp |>
+  anova_test(t2acc ~ t1_level*t2_level*t2_lag*anxiety +
+             Error(sub/(t1_level*t2_level*t2_lag)), effect.size="pes")
+```
