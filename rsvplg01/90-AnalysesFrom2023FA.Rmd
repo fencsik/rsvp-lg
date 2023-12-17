@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo=FALSE)
 library(tidyverse)
 rsvpDataFile = "RSVPLG01-Experiment-20239-491C.csv"
-surveyDataFile = "RSVPLG01-Survey-Anon.csv"
+surveyDataFile = "RSVPLG01-Survey-20239-491C.csv"
 ```
 
 # Load data files
