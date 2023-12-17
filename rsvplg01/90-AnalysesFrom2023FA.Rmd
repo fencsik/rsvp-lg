@@ -36,12 +36,19 @@ dfSurvey = read.csv(surveyDataFile)
 # Clean data
 
 ```{r, cleanRSVPdata}
-  summary(dfRSVP)
   dfRSVP = dfRSVP |>
     filter(blocktyp == "Experiment" & trial_type == "exp") |>
     filter(t1_acc >= 0 & t2_acc >= 0)
   dfRSVP$blocktyp = factor(dfRSVP$blocktyp)
   dfRSVP$trial_type = factor(dfRSVP$trial_type)
+  dfSurvey$gender = factor(dfSurvey$gender)
+  # create sum of PROMIS-A scores'
+  dfSurvey = dfSurvey |>
+    rowwise() |> mutate(sumpromisa=sum(c_across(starts_with("promisa"))))
+  x = median(dfSurvey$sumpromisa)
+  dfSurvey = dfSurvey |>
+    rowwise() |> mutate(anxiety=if_else(sumpromisa <= x, "low", "high"))
+  dfSurvey$anxiety = factor(dfSurvey$anxiety)
   summary(dfRSVP)
+  summary(dfSurvey)
 ```
-
