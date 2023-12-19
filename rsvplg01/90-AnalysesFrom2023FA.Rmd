@@ -68,3 +68,18 @@ rsvp |>
   anova_test(t2acc ~ t1_level*t2_level*t2_lag*anxiety +
              Error(sub/(t1_level*t2_level*t2_lag)), effect.size="pes")
 ```
+
+Output data file for JASP
+
+```{r, output4jasp}
+rsvp = rsvp |>
+  mutate(t1_level = ifelse(t1_level == "global", "G", "L")) |>
+  mutate(t2_level = ifelse(t2_level == "global", "G", "L"))
+rsvp$combo = with(rsvp, paste(t1_level, t2_level, t2_lag, sep=""))
+rsvpw = rsvp |>
+  pivot_wider(names_from=combo,
+              values_from=t2acc,
+              id_cols=c("sub", "anxiety"))
+write.csv(rsvpw, "RSVPLG01-Experiment-20239-491C-JASP.csv",
+          row.names=FALSE)
+```
