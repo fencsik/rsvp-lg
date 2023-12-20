@@ -1,0 +1,151 @@
+---
+title: "Create Useful Data Files"
+author: "David Fencsik"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r, setup, include=FALSE}
+knitr::opts_chunk$set(echo=TRUE)
+library(tidyverse)
+dataFile = "RSVPLG01-Data-Anon.RData"
+```
+
+# Purpose
+
+Generate useful data files
+
+# Load Data File
+
+```{r, loaddata1}
+if(!file.exists(dataFile)) {
+  sprintf("Cannot find file %s", dataFile)
+  knitr::knit_exit()
+}
+```
+
+```{r, loaddata2}
+load(dataFile)
+dfRSVP = rsvpDataAnon
+dfSurvey = surveyDataAnon
+```
+
+# Survey Totals
+
+Do any necessary recoding, then create sums for each survey.
+
+```{r, surveys}
+dfSurvey$gender = factor(dfSurvey$gender)
+
+# reverse code BSAM items (1, 2 and 4)
+dfSurvey$bsam1 = 5 - dfSurvey$bsam1
+dfSurvey$bsam2 = 5 - dfSurvey$bsam2
+dfSurvey$bsam4 = 5 - dfSurvey$bsam4
+
+# create sum of survey's scores'
+# Brief State Anxiety Measure (BSAM)
+dfSurvey = dfSurvey |>
+  rowwise() |> mutate(sumbsam=sum(c_across(starts_with("bsam"))))
+# Social Interaction Anxiety Scale (SIAS)
+dfSurvey = dfSurvey |>
+  rowwise() |> mutate(sumsias6=sum(c_across(starts_with("sias6"))))
+# Patient-Reported Outcomes Measurement Information System - Depression (PROMIS-D)
+dfSurvey = dfSurvey |>
+  rowwise() |> mutate(sumpromisd=sum(c_across(starts_with("promisd"))))
+# Patient-Reported Outcomes Measurement Information System - Anxiety (PROMIS-A)
+dfSurvey = dfSurvey |>
+  rowwise() |> mutate(sumpromisa=sum(c_across(starts_with("promisa"))))
+length(unique(dfSurvey$sub))
+dim(dfSurvey)
+```
+
+# Generate Data Sets
+
+## Extract Data
+
+Remove non-experimental trials and weird responses (acc < 0), then extract overall T1 and T2 accuracy, and T2 accuracy conditional on T1, for each cell.
+
+```{r, rsvp1}
+# filter out non-experimental trials and any with weird responses
+dfRSVP2 = dfRSVP |>
+  filter(blocktyp == "Experiment" & trial_type == "exp") |>
+  filter(t1_acc >= 0 & t2_acc >= 0)
+# get T1 accuracy and overall T2 hit rate
+rsvp1 = dfRSVP2 |> 
+  group_by(sub, t1_level, t2_level, t2_lag, .drop=FALSE) |>
+  summarize(t1acc = mean(t1_acc, na.rm=TRUE),
+            t2acc=mean(t2_acc, na.rm=TRUE),
+            .groups = "drop_last") |>
+  ungroup()
+
+# get T2 hit rate conditional on correct T1 responses
+rsvpt2t1 = dfRSVP2 |>
+  group_by(sub, t1_level, t2_level, t2_lag, .drop=FALSE) |>
+  filter(t1_acc == 1, .preserve=FALSE) |>
+  summarize(t2t1acc = mean(t2_acc, na.rm=TRUE),
+            .groups = "drop_last") |>
+  ungroup()
+```
+
+## Sanity Check
+
+Do a sanity check to make sure the overall and conditional data sets have the same factors and levels.
+
+```{r, sanitycheck}
+rsvp2 = rsvp1
+# check that these columns match
+col2fac = c("sub", "t1_level", "t2_level", "t2_lag")
+# convert those columns to factors
+rsvp2[col2fac] = lapply(rsvp2[col2fac], factor)
+rsvpt2t1[col2fac] = lapply(rsvpt2t1[col2fac], factor)
+summary(rsvp2)
+print(length(levels(rsvp2$sub)))
+summary(rsvpt2t1)
+print(length(levels(rsvpt2t1$sub)))
+# combine the levels in those columns
+labels1 = rsvp2 |>
+  unite("vars", all_of(col2fac), remove=TRUE, sep="-")
+labels2 = rsvpt2t1 |>
+  unite("vars", all_of(col2fac), remove=TRUE, sep="-")
+# make sure the factor combos match in the two datasets
+print(length(labels1$vars))
+print(length(labels2$vars))
+if (!all(labels1$vars == labels2$vars)) {
+  print("mismatch")
+  knitr::knit_exit()
+} else {
+  print("good")
+}
+```
+
+## Add Conditional Accuracy
+
+Add the conditional T2 accuracy to the first data set.
+
+```{r, rsvp2}
+rsvp1$t2t1acc = rsvpt2t1$t2t1acc
+```
+
+## Add Survey Data
+
+```{r, addsurvey}
+rsvp1$bsam = -1
+rsvp1$sias6 = -1
+rsvp1$promisa = -1
+rsvp1$promisd = -1
+for (i in 1:nrow(dfSurvey)) {
+  index = rsvp1$sub == dfSurvey$sub[i]
+  rsvp1$bsam[index] = dfSurvey$sumbsam[i]
+  rsvp1$sias6[index] = dfSurvey$sumsias6[i]
+  rsvp1$promisa[index] = dfSurvey$sumpromisa[i]
+  rsvp1$promisd[index] = dfSurvey$sumpromisd[i]
+}
+summary(rsvp1)
+```
+
+## Save Data
+
+```{r, savedata}
+rsvpAggregate = rsvp1
+save(rsvpAggregate, file="RSVPLG01-Aggregate-Anon.RData")
+```
