@@ -202,10 +202,7 @@ sub20239 = c(101, 103, 104, 105, 107, 108, 110, 111, 112, 113, 114, 115,
 rsvp20239 = rsvpData[rsvpData$sub %in% sub20239, ]
 survey20239 = surveyData[surveyData$sub %in% sub20239, ]
 
-write.csv(rsvp20239, "RSVPLG01-Experiment-20239-491C.csv",
-          row.names=FALSE)
-write.csv(survey20239, "RSVPLG01-Survey-20239-491C.csv",
-          row.names=FALSE)
+save(rsvp20239, survey20239, file="RSVPLG01-20239-491C.RData")
 ```
 
 # Anonymize Participants
@@ -252,11 +249,8 @@ surveyDataAnon = surveyDataAnon[, survCols2Keep]
 
 # Save Data
 
-Save to CSV files
+Save anonymized data
 
 ```{r savedata}
-write.csv(rsvpDataAnon, "RSVPLG01-Experiment-Anon.csv",
-          row.names=FALSE)
-write.csv(surveyDataAnon, "RSVPLG01-Survey-Anon.csv",
-          row.names=FALSE)
+save(rsvpDataAnon, surveyDataAnon, file="RSVPLG01-Data-Anon.RData")
 ```

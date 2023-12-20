@@ -8,29 +8,22 @@ output: html_document
 ```{r, setup, include=FALSE}
 knitr::opts_chunk$set(echo=FALSE)
 library(tidyverse)
-rsvpDataFile = "RSVPLG01-Experiment-20239-491C.csv"
-surveyDataFile = "RSVPLG01-Survey-20239-491C.csv"
+dataFile = "RSVPLG01-20239-491C.RData"
 ```
 
 # Load data files
 
 ```{r, loaddata1}
-if(!file.exists(rsvpDataFile)) {
+if(!file.exists(dataFile)) {
   sprintf("Cannot find file %s", rsvpDataFile)
   knitr::knit_exit()
 }
 ```
 
 ```{r, loaddata2}
-if(!file.exists(surveyDataFile)) {
-  sprintf("Cannot find file %s", surveyDataFile)
-  knitr::knit_exit()
-}
-```
-
-```{r, loaddata3}
-dfRSVP = read.csv(rsvpDataFile)
-dfSurvey = read.csv(surveyDataFile)
+load(dataFile)
+dfRSVP = rsvp20239
+dfSurvey = survey20239
 ```
 
 # Clean data
