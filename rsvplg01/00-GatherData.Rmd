@@ -50,7 +50,7 @@ variables = c(
 Gathers all the data files together, selecting a common set of headings
 
 ```{r loadrsvp1}
-testmode = TRUE
+testmode = FALSE
 if (testmode) {
   dataDir = "data"
 } else {
