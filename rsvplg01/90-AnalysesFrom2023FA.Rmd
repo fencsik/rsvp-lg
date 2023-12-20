@@ -43,6 +43,8 @@ dfSurvey = survey20239
   summary(dfSurvey)
 ```
 
+# ANOVA
+
 Generate data summary and run ANOVA from Fall 2023 PSYC 491C
 
 ```{r, datasummary}
@@ -55,14 +57,32 @@ rsvp$anxiety = ""
 for (i in 1:nrow(dfSurvey)) {
   rsvp$anxiety[rsvp$sub == dfSurvey$sub[i]] = dfSurvey$anxiety[i]
 }
+```
 
+Run the main anova I ran in class: T2 hit rate as a function of T1 level, T2 level, T2 lag, and anxiety, with all possible interactions
+
+```{r anova1}
 library(rstatix)
 rsvp |>
   anova_test(t2acc ~ t1_level*t2_level*t2_lag*anxiety +
              Error(sub/(t1_level*t2_level*t2_lag)), effect.size="pes")
 ```
 
-Output data file for JASP
+These numbers don't quite match what I got from the JASP analysis in class, though they are qualitatively the same. All the main effects are significant, and the only test with a different outcome is the interaction between T2 level and T2 lag, which is reliable in this analysis but not in the class data set.
+
+One difference between the two datasets is that the one I had for class, which Morrison generated in SPSS, had all the accuracy data rounded off to two digits, so let's try that next...
+
+
+```{r anova2}
+rsvp |>
+  mutate(t2accR = round(t2acc, digits=2)) |>
+  anova_test(t2accR ~ t1_level*t2_level*t2_lag*anxiety +
+             Error(sub/(t1_level*t2_level*t2_lag)), effect.size="pes")
+```
+
+The numbers are different from the first analysis above and also still different from the class analysis. The one promising difference is that now only the main effects are significant, so this analysis qualitatively matches the class analysis.
+
+# Output data file for JASP
 
 ```{r, output4jasp}
 rsvp = rsvp |>
