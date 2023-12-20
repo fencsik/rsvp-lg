@@ -81,8 +81,7 @@ print("Columns:")
 cat(sprintf("\"%s\"", paste(colnames(rsvpData), collapse="\", \"")))
 write.csv(rsvpData, sprintf("RSVPLG01-RawData-%s.csv", Sys.Date()),
           row.names=FALSE)
-print("Saved raw combined data")
-
+print("Saved raw combined data for collaborators")
 ```
 
 ## Load Survey Data
