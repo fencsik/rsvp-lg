@@ -43,6 +43,10 @@ variables = c(
 )
 ```
 
+# Purpose
+
+Gather all the various RSVP data files and the survey data, do some basic cleaning and correction, then save them
+
 # Load Data Files
 
 ## Combine Individual RSVP Data Files
