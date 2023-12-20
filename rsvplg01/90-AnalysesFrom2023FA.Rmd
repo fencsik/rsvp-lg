@@ -15,7 +15,7 @@ dataFile = "RSVPLG01-20239-491C.RData"
 
 ```{r, loaddata1}
 if(!file.exists(dataFile)) {
-  sprintf("Cannot find file %s", rsvpDataFile)
+  sprintf("Cannot find file %s", dataFile)
   knitr::knit_exit()
 }
 ```
