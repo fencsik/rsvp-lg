@@ -191,6 +191,18 @@ rsvpData = rsvpData[rsvpData$sub %in% subCommon, ]
 surveyData = surveyData[surveyData$sub %in% subCommon, ]
 ```
 
+8. Get a list of subject IDs sorted by start date/time
+
+```{r, sortedsubjectids}
+orderedSurvey = surveyData |>
+  mutate(starttime = strptime(startdate, "%m/%d/%y %H:%M")) |>
+  arrange(starttime) |>
+  select(sub)
+orderedSub = orderedSurvey$sub
+print("test for duplicate subject ids (if TRUE then there are no duplicates)")
+length(orderedSub) == length(unique(orderedSub))
+```
+
 # Extract Fall 2023 PSYC 491C Dataset
 
 Extract a data set with just the subjects run in my Fall 2023 PSYC 491C class so I can compare the statistics we computed in JASP with the same analyses in R.
@@ -214,12 +226,11 @@ save(rsvp20239, survey20239, file="RSVPLG01-20239-491C.RData")
 Generate randomly mapped subject IDs to anonymize subjects
 
 ```{r anonymize1}
-originalSubjects = sort(unique(rsvpData$sub))
-n = length(originalSubjects)
-newmin = 100
-newmax = n * 2 + 100
-mapper = data.frame(orig=originalSubjects,
-                    new=sample(100:(100+n*2), n))
+n = length(orderedSub)
+set.seed(1140)
+randomSub = sample(100:899)
+mapper = data.frame(orig=orderedSub,
+                    new=randomSub[1:n])
 rsvpDataAnon = rsvpData
 surveyDataAnon = surveyData
 attach(mapper)
