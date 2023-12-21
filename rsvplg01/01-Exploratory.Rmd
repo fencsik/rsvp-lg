@@ -1,0 +1,77 @@
+---
+title: "Exploratory Data Analysis"
+author: "David Fencsik"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(GGally)
+library(viridis)
+dataFile="RSVPLG01-Data.RData"
+```
+
+# Load data files
+
+```{r, loaddata1}
+if(!file.exists(dataFile)) {
+  sprintf("Cannot find file %s", dataFile)
+  knitr::knit_exit()
+}
+```
+
+```{r, loaddata2}
+load(dataFile)
+```
+
+# Survey Distributions
+
+Violin plots of the summed survey scores with quantile lines and the black X marking the mean, and individual subject scores marked by points and jittered.
+
+```{r, surveydistr}
+rsvpAggregate |>
+  pivot_longer(bsam:promisd, names_to = "survey", values_to = "x") |>
+  group_by(sub, survey) |>
+  summarize(sum=max(x), .groups="drop") |>
+  drop_na(sum) |> 
+  ggplot(aes(factor(survey), sum, color=survey)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_jitter(width=.15, height=.15) +
+  theme(legend.position = "none") +
+  stat_summary(fun=mean, geom="point", color="black", shape="cross", size=5) +
+  #scale_color_viridis(discrete=TRUE) +
+  labs(x="Survey", y="Sum of responses")
+```
+
+# Survey Correlations
+
+Check for correlations among the four surveys.
+
+```{r, surveycorrelations1}
+columns = c("bsam", "promisa", "promisd", "sias6")
+rsvpAggregate |>
+  select(all_of(columns)) |>
+  drop_na(everything()) |>
+  ggpairs()
+```
+
+Check for that one outlier in SIAS6.
+
+```{r, surveycorrelations2}
+rsvpAggregate |>
+  arrange(sias6) |>
+  tail(15)
+```
+
+Rerun the correlations without the subject whose SIAS6 score of 23 is higher than everyone else (514).
+
+```{r, surveycorrelations3}
+
+rsvpAggregate |>
+  filter(sias6 != 23) |>
+  select(all_of(columns)) |>
+  drop_na(everything()) |>
+  ggpairs()
+```
