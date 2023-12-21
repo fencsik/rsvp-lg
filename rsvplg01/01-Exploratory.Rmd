@@ -75,3 +75,19 @@ rsvpAggregate |>
   drop_na(everything()) |>
   ggpairs()
 ```
+
+# Effects of Anxiety on Attention Measures
+
+Plot of various accuracies as a function of PROMIS-A.
+
+```{r, attentionbyanxiety, fig.height=5, fig.width=10}
+rsvpAggregate |>
+  drop_na(t2t1acc) |>
+  filter(t2_lag > 0) |>
+  unite("cell", t1_level, t2_level) |>
+  ggplot(aes(x=promisa, y=t2t1acc, color=cell)) +
+  geom_point() +
+  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+  coord_cartesian(ylim = c(0.25, 0.75)) +
+  facet_wrap(~t2_lag)
+```
