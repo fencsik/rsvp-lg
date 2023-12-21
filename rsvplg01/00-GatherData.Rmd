@@ -203,6 +203,24 @@ print("test for duplicate subject ids (if TRUE then there are no duplicates)")
 length(orderedSub) == length(unique(orderedSub))
 ```
 
+# Basic Sanity Checks
+
+Check for min and max counts on numbers of trials in each condition. Some subjects were run with code that had 20 trials per cell, but we decided that was taking too long so we reduced it to 15 trials per cell. Some subjects were then run under the old version of the code with 20, but most were run with 15. Two subjects were cut off 5 trials early due to an RA's misunderstanding, so they are missing trials in various conditions.
+
+Here are two tables that count the number of trials in each cell, sort by that number, then show the highest and lowest ones.
+
+```{r, trialcount}
+x = rsvpData |>
+  filter(blocktyp == "Experiment" & trial_type == "exp") |>
+  group_by(sub, t1_level, t2_level, t2_lag) |>
+  summarize(n=n()) |>
+  ungroup() |>
+  select(sub, t1_level, t2_level, t2_lag, n) |>
+  arrange(n)
+x |> head(10)
+x |> tail()
+```
+
 # Extract Fall 2023 PSYC 491C Dataset
 
 Extract a data set with just the subjects run in my Fall 2023 PSYC 491C class so I can compare the statistics we computed in JASP with the same analyses in R.
