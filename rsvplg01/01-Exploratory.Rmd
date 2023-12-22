@@ -94,4 +94,22 @@ rsvpAggregate |>
   geom_smooth(method="lm", formula=y~x, se=FALSE) +
   coord_cartesian(ylim = c(0.25, 0.75)) +
   facet_wrap(~t2_lag)
+
+doModel = function(dat) lm(t2t1acc ~ promisa, dat)
+getSlope = function(mod) coef(mod)[2]
+getSig = function(mod) summary(mod)$coef[2, 4]
+getRsq = function(mod) summary(mod)$r.squared
+
+rsvpAggregate |>
+  group_by(t2_lag, t1_level, t2_level) |>
+  nest() |>
+  mutate(model = map(data, doModel)) |>
+  mutate(beta = map(model, getSlope),
+         sig = map(model, getSig),
+         r2 = map(model, getRsq)) |>
+  select(!model) |>
+  unnest(col=everything()) |>
+  summarize(slope=mean(beta),
+            p = mean(sig),
+            rsq = mean(r2))
 ```
