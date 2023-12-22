@@ -76,11 +76,15 @@ rsvpAggregate |>
   ggpairs()
 ```
 
+# Summaries of Accuracy
+
+
+
 # Effects of Anxiety on Attention Measures
 
 Plot of various accuracies as a function of PROMIS-A.
 
-```{r, attentionbyanxiety, fig.height=5, fig.width=10}
+```{r, attentionbyanxiety, fig.height=4.5, fig.width=11}
 rsvpAggregate |>
   drop_na(t2t1acc) |>
   filter(t2_lag > 0) |>
