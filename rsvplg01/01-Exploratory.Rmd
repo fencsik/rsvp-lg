@@ -157,3 +157,44 @@ rsvpAggregate |>
             p = mean(sig),
             rsq = mean(r2))
 ```
+
+# Random Analyses
+
+T1 accuracy as a function of the letter. Letters E and S were much easier to detect locally than globally, and Z and to some Y and L were much easier to detect globally than locally. It looks like E was somewhat more frequently presented as the global letter than the local letter, at least for the first 88 subjects.
+
+```{r, random1, fig.height=4.5, fig.width=11}
+x = rsvpDataAnon |>
+  group_by(t1_level, t1) |>
+  summarize(t1acc = mean(t1_acc), .groups="drop") |>
+  ungroup()
+
+x |>
+  ggplot(mapping=aes(t1, t1acc, group=t1_level, fill=t1_level)) +
+  coord_cartesian(ylim = c(0.5, 1.0)) +
+  geom_col(position = "dodge")
+
+y = x |>
+  pivot_wider(names_from = t1_level, values_from = t1acc) |>
+  mutate(local_adv = local - global)
+
+y
+
+y |>
+  summarize(avg_local_adv = mean(local_adv),
+            sum_local_adv = sum(local_adv))
+
+x = rsvpDataAnon |>
+  group_by(t1_level, t1) |>
+  summarize(freq = n(), .groups="drop") |>
+  ungroup() |>
+  pivot_wider(names_from = t1_level, values_from = freq) |>
+  mutate(local_adv = local - global)
+
+x
+
+x |>
+  summarize(gmean = mean(global),
+            gsd = sqrt(var(global)),
+            lmean = mean(local),
+            lsd = sqrt(var(global)))
+```
