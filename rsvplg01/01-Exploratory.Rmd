@@ -251,14 +251,18 @@ rsvpDataAnon |>
 
 Compare T1 accuracy as a function of T1 position and T2 lag
 
-```{r, t1accbyposandlag}
+```{r, t1accbyposandlag, fig.height=4.5, fig.width=11}
 rsvpDataAnon |>
   filter(blocktyp == "Experiment" & trial_type == "exp") |>
   filter(t1_acc >= 0 & t2_acc >= 0) |>
-  group_by(t1_pos, t2_lag) |>
-  summarize(t1acc = mean(t1_acc), .groups="drop") |>
-  ggplot(mapping = aes(x=factor(t1_pos), y=t1acc, group=factor(t2_lag), color=factor(t2_lag))) +
-  coord_cartesian(ylim = c(0.5, 1.0)) +
-  geom_line() +
-  geom_point()
+  mutate(t1_pos = factor(t1_pos),
+         t2_lag = factor(t2_lag),
+         t1_level = factor(t1_level)) |>
+  group_by(t1_level, t1_pos, t2_lag) |>
+  summarize(t1acc = mean(t1_acc), .groups="keep") |>
+  ggplot(mapping = aes(x=t1_pos, y=t1acc, color=t2_lag)) +
+  geom_line(mapping=aes(group=t2_lag)) +
+  geom_point() +
+  facet_wrap(~ t1_level) +
+  coord_cartesian(ylim = c(0.5, 1.0))
 ```
