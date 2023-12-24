@@ -26,6 +26,14 @@ if(!file.exists(dataFile)) {
 load(dataFile)
 ```
 
+Shorten "global" and "local" to "G" and "L", respectively.
+
+```{r, shortenlabels}
+rsvpAggregate = rsvpAggregate |>
+  mutate(t1_level = toupper(substr(t1_level, 1, 1)),
+         t2_level = toupper(substr(t2_level, 1, 1)))
+```
+
 # Survey Distributions
 
 Violin plots of the summed survey scores with quantile lines and the black X marking the mean, and individual subject scores marked by points and jittered.
