@@ -88,6 +88,7 @@ Number of correct T1 responses in each condition to measure the number of trials
 ```{r, lowT1acc1}
 x = rsvpDataAnon |>
   filter(blocktyp == "Experiment" & trial_type == "exp") |>
+  filter(t1_acc >= 0 & t2_acc >= 0) |>
   group_by(sub, t1_level, t2_level, t2_lag) |>
   summarize(numcor = sum(t1_acc), .groups="drop") |>
   ungroup()
@@ -197,6 +198,7 @@ T1 accuracy as a function of the letter. Letters E and S were much easier to det
 ```{r, random1, fig.height=4.5, fig.width=11}
 x = rsvpDataAnon |>
   filter(blocktyp == "Experiment" & trial_type == "exp") |>
+  filter(t1_acc >= 0 & t2_acc >= 0) |>
   group_by(t1_level, t1) |>
   summarize(t1acc = mean(t1_acc), .groups="drop") |>
   ungroup()
@@ -218,6 +220,7 @@ y |>
 
 x = rsvpDataAnon |>
   filter(blocktyp == "Experiment" & trial_type == "exp") |>
+  filter(t1_acc >= 0 & t2_acc >= 0) |>
   group_by(t1_level, t1) |>
   summarize(freq = n(), .groups="drop") |>
   ungroup() |>
@@ -238,6 +241,7 @@ Confusion matrix where the rows are the stimulus and the columns show the respon
 ```{r, random2}
 rsvpDataAnon |>
   filter(blocktyp == "Experiment" & trial_type == "exp") |>
+  filter(t1_acc >= 0 & t2_acc >= 0) |>
   mutate(t1_resp = toupper(t1_resp)) |>
   group_by(t1_level, t1, t1_resp) |>
   summarize(n = n(), .groups="drop") |>
