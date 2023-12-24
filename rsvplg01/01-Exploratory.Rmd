@@ -248,3 +248,17 @@ rsvpDataAnon |>
   ungroup() |>
   pivot_wider(names_from = t1_resp, values_from = n)
 ```
+
+Compare T1 accuracy as a function of T1 position and T2 lag
+
+```{r, t1accbyposandlag}
+rsvpDataAnon |>
+  filter(blocktyp == "Experiment" & trial_type == "exp") |>
+  filter(t1_acc >= 0 & t2_acc >= 0) |>
+  group_by(t1_pos, t2_lag) |>
+  summarize(t1acc = mean(t1_acc), .groups="drop") |>
+  ggplot(mapping = aes(x=factor(t1_pos), y=t1acc, group=factor(t2_lag), color=factor(t2_lag))) +
+  coord_cartesian(ylim = c(0.5, 1.0)) +
+  geom_line() +
+  geom_point()
+```
