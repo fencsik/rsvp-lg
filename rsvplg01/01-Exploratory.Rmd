@@ -81,16 +81,6 @@ rsvpAggregate |>
   tail(15)
 ```
 
-Rerun the correlations without the subject whose SIAS6 score of 23 is higher than everyone else (514).
-
-```{r, surveycorrelations3}
-rsvpAggregate |>
-  filter(sias6 != 23 & promisa != 38) |>
-  select(all_of(columns)) |>
-  drop_na(everything()) |>
-  ggpairs()
-```
-
 # Summaries of Accuracy
 
 T1 Accuracy across the 12 cells
