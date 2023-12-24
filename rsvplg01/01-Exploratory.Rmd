@@ -162,6 +162,7 @@ T1 accuracy as a function of the letter. Letters E and S were much easier to det
 
 ```{r, random1, fig.height=4.5, fig.width=11}
 x = rsvpDataAnon |>
+  filter(blocktyp == "Experiment" & trial_type == "exp") |>
   group_by(t1_level, t1) |>
   summarize(t1acc = mean(t1_acc), .groups="drop") |>
   ungroup()
@@ -182,6 +183,7 @@ y |>
             sum_local_adv = sum(local_adv))
 
 x = rsvpDataAnon |>
+  filter(blocktyp == "Experiment" & trial_type == "exp") |>
   group_by(t1_level, t1) |>
   summarize(freq = n(), .groups="drop") |>
   ungroup() |>
