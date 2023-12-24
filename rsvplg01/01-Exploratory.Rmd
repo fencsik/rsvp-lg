@@ -232,3 +232,15 @@ x |>
             lmean = mean(local),
             lsd = sqrt(var(global)))
 ```
+
+Confusion matrix where the rows are the stimulus and the columns show the response
+
+```{r, random2}
+rsvpDataAnon |>
+  filter(blocktyp == "Experiment" & trial_type == "exp") |>
+  mutate(t1_resp = toupper(t1_resp)) |>
+  group_by(t1_level, t1, t1_resp) |>
+  summarize(n = n(), .groups="drop") |>
+  ungroup() |>
+  pivot_wider(names_from = t1_resp, values_from = n)
+```
