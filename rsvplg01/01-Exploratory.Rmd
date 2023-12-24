@@ -83,6 +83,40 @@ rsvpAggregate |>
 
 # Summaries of Accuracy
 
+Number of correct T1 responses in each condition to measure the number of trials going into calculations of T2|T1 accuracy.
+
+```{r, lowT1acc1}
+x = rsvpDataAnon |>
+  filter(blocktyp == "Experiment" & trial_type == "exp") |>
+  group_by(sub, t1_level, t2_level, t2_lag) |>
+  summarize(numcor = sum(t1_acc), .groups="drop") |>
+  ungroup()
+
+x |>
+  arrange(numcor) |>
+  head(15)
+
+cutoff = 5
+
+x |>
+  group_by(sub) |>
+  summarize(nlowacc = sum(numcor < cutoff), .groups="drop") |>
+  select(sub, nlowacc) |>
+  arrange(nlowacc) |>
+  tail(10)
+```
+
+Subjects with fewer than *cutoff* correct T1 responses in any of the conditions
+
+```{r, lowT1acc2}
+subsWithLowT1Acc = x |>
+  filter(numcor < cutoff) |>
+  select(sub) |>
+  distinct()
+
+subsWithLowT1Acc$sub
+```
+
 T1 Accuracy across the 12 cells
 
 ```{r, accuracysummaries1, fig.height=4.5, fig.width=11}
