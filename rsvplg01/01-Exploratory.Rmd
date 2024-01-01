@@ -69,6 +69,7 @@ Check for that one outlier in SIAS6...
 
 ```{r, surveycorrelations2}
 rsvpAggregate |>
+  distinct(sub, .keep_all=TRUE) |>
   arrange(sias6) |>
   tail(15)
 ```
@@ -77,6 +78,7 @@ rsvpAggregate |>
 
 ```{r, surveycorrelations2.5}
 rsvpAggregate |>
+  distinct(sub, .keep_all=TRUE) |>
   arrange(promisa) |>
   tail(15)
 ```
