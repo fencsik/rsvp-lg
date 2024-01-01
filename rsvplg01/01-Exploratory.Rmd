@@ -34,6 +34,25 @@ rsvpAggregate = rsvpAggregate |>
          t2_level = toupper(substr(t2_level, 1, 1)))
 ```
 
+# Optional Outlier Removal
+
+Remove SIAS6 outlier
+
+```{r, outlierSIAS6}
+filterSIAS6 = FALSE
+if (filterSIAS6) {
+  x = rsvpAggregate |>
+    filter(sias6 >= 23) |>
+    distinct(sub)
+  if (!is_empty(x$sub)) {
+    rsvpAggregate = rsvpAggregate |>
+      filter(!(sub %in% x$sub))
+    rsvpDataAnon = rsvpDataAnon |>
+      filter(!(sub %in% x$sub))
+  }
+}
+```
+
 # Survey Distributions
 
 Violin plots of the summed survey scores with quantile lines and the black X marking the mean, and individual subject scores marked by points and jittered.
