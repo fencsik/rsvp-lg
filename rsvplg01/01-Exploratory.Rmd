@@ -99,6 +99,7 @@ x |>
   arrange(numcor) |>
   head(15)
 
+# Count cells with fewer than this many correct T1 responses
 cutoff = 5
 
 x |>
