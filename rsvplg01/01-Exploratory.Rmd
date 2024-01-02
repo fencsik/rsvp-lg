@@ -62,6 +62,19 @@ if (filterPROMISA) {
 }
 ```
 
+Remove subjects w/ fewer than 5 correct T1 responses in any cell
+
+```{r, outliert1acc}
+filtert1acc = FALSE
+if (filtert1acc) {
+  outlierSubs = c(109, 127, 132, 149, 162, 212, 217)
+  rsvpAggregate = rsvpAggregate |>
+    filter(!(sub %in% outlierSubs))
+  rsvpDataAnon = rsvpDataAnon |>
+    filter(!(sub %in% outlierSubs))
+}
+```
+
 # Survey Distributions
 
 Violin plots of the summed survey scores with quantile lines and the black X marking the mean, and individual subject scores marked by points and jittered.
