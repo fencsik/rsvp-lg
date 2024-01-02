@@ -239,25 +239,7 @@ survey20239 = surveyData[surveyData$sub %in% sub20239, ]
 save(rsvp20239, survey20239, file="RSVPLG01-20239-491C.RData")
 ```
 
-# Anonymize Participants
-
-Generate randomly mapped subject IDs to anonymize subjects
-
-```{r anonymize1}
-n = length(orderedSub)
-set.seed(1140)
-randomSub = sample(100:899)
-mapper = data.frame(orig=orderedSub,
-                    new=randomSub[1:n])
-rsvpDataAnon = rsvpData
-surveyDataAnon = surveyData
-attach(mapper)
-for (i in 1:n) {
-  rsvpDataAnon$sub[rsvpData$sub == orig[i]] = new[i]
-  surveyDataAnon$sub[surveyData$sub == orig[i]] = new[i]
-}
-detach(mapper)
-```
+# Anonymize Data
 
 Remove any columns that could be used to identify subjects
 
@@ -274,8 +256,8 @@ survCols2Keep = c("sub", "age", "gender",  "gender_6_text",
                   "promisd6", "promisd7", "promisd8", "promisa1", "promisa2",
                   "promisa3", "promisa4", "promisa5", "promisa6", "promisa7",
                   "promisa8", "progress", "finished")
-rsvpDataAnon = rsvpDataAnon[, rsvpCols2Keep]
-surveyDataAnon = surveyDataAnon[, survCols2Keep]
+rsvpDataAnon = rsvpData[, rsvpCols2Keep]
+surveyDataAnon = surveyData[, survCols2Keep]
 ```
 
 # Generate Aggregated Data Set
