@@ -49,6 +49,19 @@ if (filterSIAS6) {
 }
 ```
 
+Remove PROMIS-A outlier(s)
+
+```{r, outlierPROMISA}
+filterPROMISA = FALSE
+if (filterPROMISA) {
+  outlierSubs = c(237)
+  rsvpAggregate = rsvpAggregate |>
+    filter(!(sub %in% outlierSubs))
+  rsvpDataAnon = rsvpDataAnon |>
+    filter(!(sub %in% outlierSubs))
+}
+```
+
 # Survey Distributions
 
 Violin plots of the summed survey scores with quantile lines and the black X marking the mean, and individual subject scores marked by points and jittered.
