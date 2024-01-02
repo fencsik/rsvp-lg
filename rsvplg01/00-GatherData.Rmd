@@ -72,8 +72,34 @@ if (is.null(dataDir)) {
 }
 ```
 
+```{r, gatherdatacode, echo=FALSE}
+GatherData = function(dir=NULL, columns=NULL) {
+
+    if (is.null(dir) || !dir.exists(dir)) return (NULL)
+
+    fileList = list.files(path=dir, pattern="\\.csv$", full.names=TRUE,
+                          recursive=TRUE, ignore.case=TRUE, no..=TRUE)
+    allData = NULL
+    for (fileName in fileList) {
+        df = read.csv(fileName)
+        if (is.null(columns)) {
+            columns = names(df)
+        }
+        if (!all(columns %in% names(df))) {
+            warning("Skipping file due to missing columns: ", fileName)
+            next
+        }
+        if (is.null(allData)) {
+            allData = df[columns]
+        } else {
+            allData = rbind(allData, df[columns])
+        }
+    }
+    return(allData)
+}
+```
+
 ```{r loadrsvp2}
-source("gatherdata.r")
 rsvpData = GatherData(dataDir, variables)
 sprintf("Gathered data files in %s together", dataDir)
 sprintf("Data consists of %d rows and %d columns",
