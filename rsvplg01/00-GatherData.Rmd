@@ -393,17 +393,23 @@ rsvp1$t2t1acc = rsvpt2t1$t2t1acc
 ## Add Survey Data
 
 ```{r, addsurvey}
+rsvp1$age = -1
+rsvp1$gender = ""
 rsvp1$bsam = -1
 rsvp1$sias6 = -1
 rsvp1$promisa = -1
 rsvp1$promisd = -1
+dfSurvey$gender = as.character(dfSurvey$gender)
 for (i in 1:nrow(dfSurvey)) {
   index = rsvp1$sub == dfSurvey$sub[i]
+  rsvp1$age[index] = dfSurvey$age[i]
+  rsvp1$gender[index] = dfSurvey$gender[i]
   rsvp1$bsam[index] = dfSurvey$sumbsam[i]
   rsvp1$sias6[index] = dfSurvey$sumsias6[i]
   rsvp1$promisa[index] = dfSurvey$sumpromisa[i]
   rsvp1$promisd[index] = dfSurvey$sumpromisd[i]
 }
+rsvp1$gender = factor(rsvp1$gender)
 summary(rsvp1)
 rsvpAggregate = rsvp1
 ```
