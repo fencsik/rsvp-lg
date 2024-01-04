@@ -1,0 +1,63 @@
+---
+title: "Prepare and Analyze Data for Spring 2024 PSYC 300"
+author: "David Fencsik"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(GGally)
+library(viridis)
+library(rstatix)
+dataFile="RSVPLG01-Data.RData"
+```
+
+# Load data files
+
+```{r, loaddata1}
+if(!file.exists(dataFile)) {
+  sprintf("Cannot find file %s", dataFile)
+  knitr::knit_exit()
+}
+```
+
+```{r, loaddata2}
+load(dataFile)
+```
+
+# Simplify Data
+
+Extract a simplified data set that removes the local/global distinction
+
+```{r, extractdata}
+x = rsvpAggregate |>
+  filter(t2_lag > 0) |>
+  group_by(sub, t2_lag) |>
+  summarize(t1acc = mean(t1acc),
+            t2acc = mean(t2acc),
+            t2t1acc = mean(t2t1acc),
+            promisa = mean(promisa),
+            promisd = mean(promisd),
+            .groups = "drop") |>
+  drop_na(t2t1acc) |>
+  mutate(anxiety = ifelse(promisa > 20, "high", "low"))
+```
+
+Conduct an ANOVA on the effects of T2 lag and anxiety on T2|T1 accuracy.
+
+```{r, anova}
+x |>
+  anova_test(t2t1acc ~ t2_lag*anxiety +
+             Error(sub/(t2_lag)), effect.size="pes")
+```
+
+Plot T2|T1 accuracy as a function of anxiety.
+
+```{r, plot1}
+x |>
+  ggplot(aes(x=promisa, y=t2t1acc, color=factor(t2_lag), group=t2_lag)) +
+  geom_point() +
+  geom_smooth(method="lm", formula=y~x, se=FALSE)
+```
