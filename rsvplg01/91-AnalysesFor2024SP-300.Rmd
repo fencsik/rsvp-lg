@@ -43,8 +43,13 @@ x = rsvpAggregate |>
             sias6 = mean(sias6),
             bsam = mean(bsam),
             .groups = "drop") |>
-  drop_na(t2t1acc) |>
-  mutate(anxiety = ifelse(promisa > 20, "high", "low"))
+  drop_na(t2t1acc)
+medians = x |>
+  distinct(sub, .keep_all = TRUE) |>
+  summarize(across(c(promisa, promisd), ~median(.x, na.rm=TRUE)))
+x = x |>
+  mutate(anxiety    = ifelse(promisa > medians$promisa, "high", "low"),
+         depression = ifelse(promisd > medians$promisd, "high", "low"))
 ```
 
 # Analysis
