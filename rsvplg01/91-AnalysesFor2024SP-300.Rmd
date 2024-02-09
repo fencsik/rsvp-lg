@@ -70,3 +70,23 @@ x |>
   geom_point() +
   geom_smooth(method="lm", formula=y~x, se=FALSE)
 ```
+
+# Data Export
+
+Export a wide data set for import into JASP
+
+```{r, exportJASP}
+jasp_export = x |>
+  select(!t2acc) |>
+  rename(t2acc = t2t1acc) |>
+  pivot_wider(names_from=t2_lag,
+              values_from=c(t1acc, t2acc),
+              id_cols=c("sub", "gender", "age",
+                        "bsam", "sias6", "promisa", "promisd",
+                        "anxiety", "depression")) |>
+  mutate(anxiety = factor(anxiety),
+         depression = factor(depression))
+summary(jasp_export)
+write.csv(jasp_export, sprintf("RSVPLG01-JASP-%s.csv", Sys.Date()),
+          row.names=FALSE)
+```
