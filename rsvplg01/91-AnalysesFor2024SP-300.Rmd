@@ -47,6 +47,8 @@ x = rsvpAggregate |>
   mutate(anxiety = ifelse(promisa > 20, "high", "low"))
 ```
 
+# Analysis
+
 Conduct an ANOVA on the effects of T2 lag and anxiety on T2|T1 accuracy.
 
 ```{r, anova}
