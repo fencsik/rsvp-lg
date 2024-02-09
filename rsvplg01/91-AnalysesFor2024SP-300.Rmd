@@ -34,12 +34,14 @@ Extract a simplified data set that removes the local/global distinction
 ```{r, extractdata}
 x = rsvpAggregate |>
   filter(t2_lag > 0) |>
-  group_by(sub, t2_lag) |>
+  group_by(sub, gender, age, t2_lag) |>
   summarize(t1acc = mean(t1acc),
             t2acc = mean(t2acc),
             t2t1acc = mean(t2t1acc),
             promisa = mean(promisa),
             promisd = mean(promisd),
+            sias6 = mean(sias6),
+            bsam = mean(bsam),
             .groups = "drop") |>
   drop_na(t2t1acc) |>
   mutate(anxiety = ifelse(promisa > 20, "high", "low"))
