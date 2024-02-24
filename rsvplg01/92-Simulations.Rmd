@@ -1,0 +1,28 @@
+---
+title: "Simulations"
+author: "David Fencsik"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#library(tidyverse)
+```
+
+# T2 Guessing Accuracy
+
+Simulate T2 trial guessing strategy. T2 is present 2/3 of the time and absent 1/3 of the time.
+
+What will accuracy be if people guess blindly, 50% yes and 50% no?
+
+Simulate trials
+
+```{r, simulate5050}
+n = 100000
+trials = sample(c(1, 1, 0), n, replace=TRUE)
+responses = sample(c(1, 0), n, replace=TRUE)
+sum(trials == responses) / n
+```
+
+Seems to be about 50%. If the probability of guessing yes increases from 50%, the probably correct will approach 66.667%, and if it decreases below 50% it will approach 33.333%.
