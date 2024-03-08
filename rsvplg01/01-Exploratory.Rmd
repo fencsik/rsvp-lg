@@ -106,13 +106,19 @@ rsvpAggregate |>
   ggpairs()
 ```
 
-Check for that one outlier in SIAS6...
+Check for outliers in each survey...
 
-```{r, surveycorrelations2}
-rsvpAggregate |>
-  distinct(sub, .keep_all=TRUE) |>
-  arrange(sias6) |>
-  tail(15)
+```{r, surveyoutliers}
+x = rsvpAggregate |>
+  group_by(sub) |>
+  summarize(bsam=mean(bsam),
+            promisa=mean(promisa),
+            promisd=mean(promisd),
+            sias6=mean(sias6))
+x |> arrange(bsam) |> tail(10)
+x |> arrange(promisa) |> tail(10)
+x |> arrange(promisd) |> tail(10)
+x |> arrange(sias6) |> tail(10)
 ```
 
 ...and the other outlier in PROMIS-A.
