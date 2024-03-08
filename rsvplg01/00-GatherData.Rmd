@@ -241,10 +241,12 @@ x = rsvpData |>
   group_by(sub, t1_level, t2_level, t2_lag) |>
   summarize(n=n()) |>
   ungroup() |>
-  select(sub, t1_level, t2_level, t2_lag, n) |>
-  arrange(n)
-x |> head(10)
-x |> tail()
+  group_by(sub) |>
+  summarize(max=max(n),
+            min=min(n)) |>
+  ungroup()
+x |> arrange(min) |> select(sub, min) |> head(20)
+x |> arrange(max) |> select(sub, max) |> tail(20)
 ```
 
 # Extract Fall 2023 PSYC 491C Dataset
