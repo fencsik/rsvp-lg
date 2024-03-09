@@ -123,15 +123,6 @@ x |> arrange(promisd) |> tail(10)
 x |> arrange(sias6) |> tail(10)
 ```
 
-...and the other outlier in PROMIS-A.
-
-```{r, surveycorrelations2.5}
-rsvpAggregate |>
-  distinct(sub, .keep_all=TRUE) |>
-  arrange(promisa) |>
-  tail(15)
-```
-
 # Summaries of Accuracy
 
 Number of correct T1 responses in each condition to measure the number of trials going into calculations of T2|T1 accuracy.
