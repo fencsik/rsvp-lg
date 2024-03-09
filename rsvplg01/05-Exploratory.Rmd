@@ -10,7 +10,9 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(GGally)
 library(viridis)
-dataFile="RSVPLG01-Data.RData"
+this_file = "05-Exploratory"
+source_file = "01-CleanData"
+dataFile = sprintf("%s.RData", source_file)
 ```
 
 # Load data files
