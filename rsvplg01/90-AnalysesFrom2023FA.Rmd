@@ -8,7 +8,8 @@ output: html_document
 ```{r, setup, include=FALSE}
 knitr::opts_chunk$set(echo=FALSE)
 library(tidyverse)
-dataFile = "RSVPLG01-20239-491C.RData"
+source_file = "01-CleanData"
+dataFile = sprintf("%s.RData", source_file)
 ```
 
 # Load data files
@@ -22,8 +23,22 @@ if(!file.exists(dataFile)) {
 
 ```{r, loaddata2}
 load(dataFile)
-dfRSVP = rsvp20239
-dfSurvey = survey20239
+```
+
+# Extract Fall 2023 PSYC 491C Dataset
+
+Extract a data set with just the subjects run in my Fall 2023 PSYC 491C class so I can compare the statistics we computed in JASP with the same analyses in R.
+
+```{r extract2023fa}
+sub20239 = c(101, 103, 104, 105, 107, 108, 110, 111, 112, 113, 114, 115,
+             116, 117, 118, 119, 120, 121, 122, 123, 127, 128, 129, 130,
+             131, 132, 133, 134, 135, 137, 138, 139, 140, 141, 142, 143,
+             144, 146, 147, 148, 149, 151, 152, 153, 154, 155, 156, 157,
+             158, 160, 161, 162, 163, 164, 201, 202, 203, 204, 205, 206,
+             207, 208, 209, 210, 211, 212, 213, 215, 217, 220, 221, 222)
+
+dfRSVP = rsvpDataAnon[rsvpDataAnon$sub %in% sub20239, ]
+dfSurvey = surveyDataAnon[surveyDataAnon$sub %in% sub20239, ]
 ```
 
 # Clean data
