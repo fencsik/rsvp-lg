@@ -64,11 +64,38 @@ x |>
              Error(sub/(t2_lag)), effect.size="pes")
 ```
 
-Plot T2|T1 accuracy as a function of anxiety.
+Plot T2|T1 accuracy as a function of PROMIS-A.
 
-```{r, plot1}
+```{r, plotpromisa}
 x |>
   ggplot(aes(x=promisa, y=t2t1acc, color=factor(t2_lag), group=t2_lag)) +
+  geom_point() +
+  geom_smooth(method="lm", formula=y~x, se=FALSE)
+```
+
+Plot T2|T1 accuracy as a function of PROMIS-D.
+
+```{r, plotpromisd}
+x |>
+  ggplot(aes(x=promisd, y=t2t1acc, color=factor(t2_lag), group=t2_lag)) +
+  geom_point() +
+  geom_smooth(method="lm", formula=y~x, se=FALSE)
+```
+
+Plot T2|T1 accuracy as a function of BSAM.
+
+```{r, plotbsam}
+x |>
+  ggplot(aes(x=bsam, y=t2t1acc, color=factor(t2_lag), group=t2_lag)) +
+  geom_point() +
+  geom_smooth(method="lm", formula=y~x, se=FALSE)
+```
+
+Plot T2|T1 accuracy as a function of SIAS6.
+
+```{r, plotsias6}
+x |>
+  ggplot(aes(x=sias6, y=t2t1acc, color=factor(t2_lag), group=t2_lag)) +
   geom_point() +
   geom_smooth(method="lm", formula=y~x, se=FALSE)
 ```
