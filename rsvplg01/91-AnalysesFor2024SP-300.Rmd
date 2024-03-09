@@ -11,7 +11,9 @@ library(tidyverse)
 library(GGally)
 library(viridis)
 library(rstatix)
-dataFile="RSVPLG01-Data.RData"
+this_file = "91-AnalysesFor2024SP-300"
+source_file = "01-CleanData"
+dataFile = sprintf("%s.RData", source_file)
 ```
 
 # Load data files
