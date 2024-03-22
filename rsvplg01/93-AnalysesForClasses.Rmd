@@ -1,0 +1,68 @@
+---
+title: "Prepare and Analyze Data for Classes"
+author: "David Fencsik"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(GGally)
+library(viridis)
+library(rstatix)
+this_file = "93-AnalysesForClasses.Rmd"
+source_file = "01-CleanData"
+dataFile = sprintf("%s.RData", source_file)
+```
+
+# Load data files
+
+```{r, loaddata2}
+load(dataFile)
+```
+
+# Simplify Data
+
+Extract a simplified data set that removes the local/global distinction
+
+```{r, extractdata}
+x = rsvpAggregate |>
+  filter(t2_lag > 0) |>
+  group_by(sub, gender, age, t2_lag) |>
+  summarize(t1acc = mean(t1acc),
+            t2acc = mean(t2acc),
+            t2t1acc = mean(t2t1acc),
+            promisa = mean(promisa),
+            promisd = mean(promisd),
+            sias6 = mean(sias6),
+            bsam = mean(bsam),
+            .groups = "drop") |>
+  drop_na(t2t1acc)
+medians = x |>
+  distinct(sub, .keep_all = TRUE) |>
+  summarize(across(c(promisa, promisd), ~median(.x, na.rm=TRUE)))
+x = x |>
+  mutate(anxiety    = ifelse(promisa > medians$promisa, "high", "low"),
+         depression = ifelse(promisd > medians$promisd, "high", "low"))
+```
+
+# Data Export
+
+Generate a wide data set for import into JASP
+
+```{r, exportJASP}
+jasp_export = x |>
+  select(!t2acc) |>
+  rename(t2acc = t2t1acc) |>
+  pivot_wider(names_from=t2_lag,
+              values_from=c(t1acc, t2acc),
+              id_cols=c("sub", "gender", "age",
+                        "bsam", "sias6", "promisa", "promisd",
+                        "anxiety", "depression")) |>
+  mutate(anxiety = factor(anxiety),
+         depression = factor(depression))
+summary(jasp_export)
+write.csv(jasp_export, sprintf("RSVPLG01-JASP-%s.csv", Sys.Date()),
+          row.names=FALSE)
+```
