@@ -11,7 +11,7 @@ library(tidyverse)
 library(GGally)
 library(viridis)
 library(rstatix)
-this_file = "93-AnalysesForClasses.Rmd"
+this_file = "93-AnalysesForClasses"
 source_file = "01-CleanData"
 dataFile = sprintf("%s.RData", source_file)
 ```
@@ -22,47 +22,97 @@ dataFile = sprintf("%s.RData", source_file)
 load(dataFile)
 ```
 
-# Simplify Data
+# Create Wide Data Set
 
-Extract a simplified data set that removes the local/global distinction
+Generate a wide data set for import into JASP that has columns for T2 accuracy for each of the 8 cells in the factorial table of T1 level (local, global), T2 level (local, global), and T2 lag (300, 750)
 
-```{r, extractdata}
-x = rsvpAggregate |>
-  filter(t2_lag > 0) |>
-  group_by(sub, gender, age, t2_lag) |>
-  summarize(t1acc = mean(t1acc),
-            t2acc = mean(t2acc),
-            t2t1acc = mean(t2t1acc),
-            promisa = mean(promisa),
-            promisd = mean(promisd),
-            sias6 = mean(sias6),
-            bsam = mean(bsam),
-            .groups = "drop") |>
-  drop_na(t2t1acc)
-medians = x |>
-  distinct(sub, .keep_all = TRUE) |>
-  summarize(across(c(promisa, promisd), ~median(.x, na.rm=TRUE)))
-x = x |>
-  mutate(anxiety    = ifelse(promisa > medians$promisa, "high", "low"),
-         depression = ifelse(promisd > medians$promisd, "high", "low"))
-```
-
-# Data Export
-
-Generate a wide data set for import into JASP
-
-```{r, exportJASP}
-jasp_export = x |>
+```{r, generate1}
+jasp_export = rsvpAggregate |>
   select(!t2acc) |>
   rename(t2acc = t2t1acc) |>
-  pivot_wider(names_from=t2_lag,
-              values_from=c(t1acc, t2acc),
+  filter(t2_lag > 0) |>
+  mutate(t1_level = ifelse(t1_level == "global", "G", "L"),
+         t2_level = ifelse(t2_level == "global", "G", "L"),
+         t2_lag = t2_lag * 150,
+         iv_names = paste("t2acc", t1_level, t2_level, t2_lag, sep="")) |>
+  pivot_wider(names_from=iv_names,
+              values_from=t2acc,
               id_cols=c("sub", "gender", "age",
-                        "bsam", "sias6", "promisa", "promisd",
-                        "anxiety", "depression")) |>
-  mutate(anxiety = factor(anxiety),
-         depression = factor(depression))
+                        "bsam", "promisa", "promisd", "sias6")) |>
+  drop_na()
+```
+
+Create median splits for all columns
+
+```{r, generate2}
+medians = jasp_export |>
+  distinct(sub, .keep_all = TRUE) |>
+  summarize(across(c(bsam, promisa, promisd, sias6),
+                   ~median(.x, na.rm=TRUE)))
+jasp_export = jasp_export |>
+  mutate(anxiety_bsam = factor(ifelse(bsam >= medians$bsam, "high", "low")),
+         anxiety_pa = factor(ifelse(promisa >= medians$promisa, "high", "low")),
+         depression = factor(ifelse(promisd > medians$promisd, "high", "low")),
+         anxiety_sias6 = factor(ifelse(sias6 > medians$sias6, "high", "low"))) |>
+  relocate(sub, gender, age,
+           bsam, promisa, promisd, sias6,
+           anxiety_bsam, anxiety_pa, anxiety_sias6, depression)
+```
+
+Add columns with in T2 accuracy collapsing across all the local/global columns
+
+```{r, generate3}
+jasp_export = jasp_export |>
+  rowwise() |>
+  mutate(t2acc300 = mean(c_across(ends_with("300"))),
+         t2acc750 = mean(c_across(ends_with("750")))) |>
+  relocate(t2acc300, t2acc750, .after=depression) |>
+  ungroup()
 summary(jasp_export)
+```
+
+Add columns comparing switch (GL and LG) to no-switch trials for each lag
+
+```{r generate4}
+jasp_export = jasp_export |>
+  rowwise() |>
+  mutate(t2acc300noswitch =
+           mean(c_across(ends_with("300") & contains(c("GG", "LL")))),
+         t2acc300switch =
+           mean(c_across(ends_with("300") & contains(c("GL", "LG")))),
+         t2acc750noswitch =
+           mean(c_across(ends_with("750") & contains(c("GG", "LL")))),
+         t2acc750switch =
+           mean(c_across(ends_with("300") & contains(c("GL", "LG")))))
+```
+
+Generate and add columns with T1 accuracy at each level of T1, collapsing across T2 variables`
+
+```{r, generate5}
+t1 = rsvpAggregate |>
+  mutate(t1_level = ifelse(t1_level == "global", "G", "L")) |>
+  group_by(sub, t1_level) |>
+  summarize(t1acc=mean(t1acc), .groups="drop") |>
+  pivot_wider(names_from=t1_level,
+              values_from=t1acc,
+              id_cols=sub) |>
+  drop_na()
+jasp_export$t1accG = rep(NA, nrow(jasp_export))
+jasp_export$t1accL = rep(NA, nrow(jasp_export))
+for (sub in jasp_export$sub) {
+  if (sub %in% t1$sub) {
+    i1 = jasp_export$sub == sub
+    i2 = t1$sub == sub
+    jasp_export$t1accG[i1] = t1$G[i2]
+    jasp_export$t1accL[i1] = t1$L[i2]
+  }
+}
+summary(jasp_export)
+```
+
+# Export Data
+
+```{r, savefile}
 write.csv(jasp_export, sprintf("RSVPLG01-JASP-%s.csv", Sys.Date()),
           row.names=FALSE)
 ```
