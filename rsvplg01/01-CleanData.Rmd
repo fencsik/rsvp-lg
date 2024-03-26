@@ -100,7 +100,14 @@ rsvpData = rsvpData[rsvpData$sub %in% subCommon, ]
 surveyData = surveyData[surveyData$sub %in% subCommon, ]
 ```
 
-8. Get a list of subject IDs sorted by start date/time
+8. Remove duplicate survey data (subject 320)
+
+```{r, removedups}
+surveyData = surveyData |>
+  filter(!(sub == 320 & is.na(age)))
+```
+
+9. Get a list of subject IDs sorted by start date/time
 
 ```{r, sortedsubjectids}
 orderedSurvey = surveyData |>
