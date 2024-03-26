@@ -108,8 +108,14 @@ orderedSurvey = surveyData |>
   arrange(starttime) |>
   select(sub)
 orderedSub = orderedSurvey$sub
-print("test for duplicate subject ids (if TRUE then there are no duplicates)")
-length(orderedSub) == length(unique(orderedSub))
+print("test for duplicate subject ids")
+if (length(orderedSub) != length(unique(orderedSub))) {
+  print("there are duplicated subjects")
+  print(orderedSub[duplicated(orderedSub)])
+} else {
+  print("no duplicates detected")
+}
+
 ```
 
 # Sanity Checks
