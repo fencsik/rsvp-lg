@@ -86,7 +86,7 @@ surveyData$gender = factor(surveyData$gender, levels=as.character(0:6),
 ```
 
 
-7. Create a common set of subjects across the two data sets. Note that subject 124 was run through the RSVP task, but the RA forgot to run them through the survey. It seems the same may have happened with 312.
+7. Create a common set of subjects across the two data sets. Note that subject 124 was run through the RSVP task, but the RA forgot to run them through the survey.
 
 ```{r, cleandata7}
 subRSVP = sort(unique(rsvpData$sub))
