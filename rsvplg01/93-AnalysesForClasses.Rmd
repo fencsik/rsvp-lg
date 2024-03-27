@@ -50,8 +50,8 @@ medians = jasp_export |>
   summarize(across(c(bsam, promisa, promisd, sias6),
                    ~median(.x, na.rm=TRUE)))
 jasp_export = jasp_export |>
-  mutate(anxiety_bsam = factor(ifelse(bsam >= medians$bsam, "high", "low")),
-         anxiety_pa = factor(ifelse(promisa >= medians$promisa, "high", "low")),
+  mutate(anxiety_bsam = factor(ifelse(bsam > medians$bsam, "high", "low")),
+         anxiety_pa = factor(ifelse(promisa > medians$promisa, "high", "low")),
          depression = factor(ifelse(promisd > medians$promisd, "high", "low")),
          anxiety_sias6 = factor(ifelse(sias6 > medians$sias6, "high", "low"))) |>
   relocate(sub, gender, age,
