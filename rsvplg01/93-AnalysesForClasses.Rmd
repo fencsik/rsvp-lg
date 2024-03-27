@@ -39,7 +39,7 @@ jasp_export = rsvpAggregate |>
               values_from=t2acc,
               id_cols=c("sub", "gender", "age",
                         "bsam", "promisa", "promisd", "sias6")) |>
-  drop_na()
+  drop_na(starts_with("t2acc"))
 ```
 
 Create median splits for all columns
