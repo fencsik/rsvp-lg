@@ -42,14 +42,7 @@ rsvpData = rsvpData[!is.na(rsvpData$sub), ]
 surveyData = surveyData[!is.na(surveyData$sub), ]
 ```
 
-3. Remove test runs (Subjects w/ IDs >= 900)
-
-```{r cleandata3}
-rsvpData = rsvpData[rsvpData$sub < 900, ]
-surveyData = surveyData[surveyData$sub < 900, ]
-```
-
-4. Correct subject ID typos
+3. Correct subject ID typos
 
 ```{r cleandata4}
 print("317 -> 137")
@@ -60,6 +53,15 @@ surveyData$sub[with(surveyData, sub == 514 & startdate == "10/24/23 17:10")] = 1
 print("One of the subjects labeled 157 -> 156")
 rsvpData$sub[with(rsvpData, sub == 157 & experimenter == "ng")] = 156
 surveyData$sub[with(surveyData, sub == 157 & startdate == "10/26/23 16:16")] = 156
+print("I mislabeled one practice block of subject 196")
+rsvpData$sub[with(rsvpData, sub == 1096 & experimenter == "def")] = 196
+```
+
+4. Remove test runs (Subjects w/ IDs >= 900)
+
+```{r cleandata3}
+rsvpData = rsvpData[rsvpData$sub < 900, ]
+surveyData = surveyData[surveyData$sub < 900, ]
 ```
 
 5. Remove minors
