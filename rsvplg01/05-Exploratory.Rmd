@@ -38,6 +38,12 @@ rsvpAggregate = rsvpAggregate |>
 
 # Optional Outlier Removal
 
+Number of participants before outlier removal
+
+```{r, preOutlierRemovalSummary}
+print(length(unique(rsvpDataAnon$sub)))
+```
+
 Remove SIAS6 outlier
 
 ```{r, outlierSIAS6}
@@ -92,6 +98,12 @@ if (filtert1accextreme) {
   rsvpDataAnon = rsvpDataAnon |>
     filter(sub %in% subToKeep)
 }
+```
+
+Number of participants after outlier removal
+
+```{r, postOutlierRemovalSummary}
+print(length(unique(rsvpDataAnon$sub)))
 ```
 
 # Survey Distributions
