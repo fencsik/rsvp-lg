@@ -66,7 +66,7 @@ if (filterPROMISA) {
 
 Remove subjects w/ fewer than 5 correct T1 responses in any cell
 
-```{r, outliert1acc}
+```{r, outliert1accbasic}
 filtert1acc = FALSE
 if (filtert1acc) {
   outlierSubs = c(109, 127, 132, 149, 162, 212, 217)
@@ -74,6 +74,23 @@ if (filtert1acc) {
     filter(!(sub %in% outlierSubs))
   rsvpDataAnon = rsvpDataAnon |>
     filter(!(sub %in% outlierSubs))
+}
+```
+
+Remove subjects below the median T1 accuracy
+
+```{r outliert1accextreme}
+filtert1accextreme = FALSE
+if (filtert1accextreme) {
+  x = rsvpAggregate |>
+    group_by(sub) |>
+    summarize(t1acc = mean(t1acc), .groups="drop")
+  t1acc_median = median(x$t1acc)
+  subToKeep = x$sub[x$t1acc >= t1acc_median]
+  rsvpAggregate = rsvpAggregate |>
+    filter(sub %in% subToKeep)
+  rsvpDataAnon = rsvpDataAnon |>
+    filter(sub %in% subToKeep)
 }
 ```
 
