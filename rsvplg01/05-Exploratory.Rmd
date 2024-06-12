@@ -262,7 +262,8 @@ rsvpAggregate |>
   unnest(col=everything()) |>
   summarize(slope=mean(beta),
             p = mean(sig),
-            rsq = mean(r2))
+            rsq = mean(r2),
+            .groups = "drop")
 ```
 
 # Random Analyses
