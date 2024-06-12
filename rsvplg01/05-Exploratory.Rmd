@@ -233,6 +233,43 @@ rsvpAggregate |>
 
 # Effects of Anxiety on Attention Measures
 
+## BSAM
+
+Plot of various accuracies as a function of BSAM.
+
+```{r, attentionbybsam, fig.height=4.5, fig.width=11}
+rsvpAggregate |>
+  drop_na(t2t1acc) |>
+  filter(t2_lag > 0) |>
+  unite("cell", t1_level, t2_level) |>
+  ggplot(aes(x=bsam, y=t2t1acc, color=cell)) +
+  geom_point() +
+  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+  coord_cartesian(ylim = c(0.25, 0.75)) +
+  facet_wrap(~t2_lag)
+
+doModel = function(dat) lm(t2t1acc ~ bsam, dat)
+getSlope = function(mod) coef(mod)[2]
+getSig = function(mod) summary(mod)$coef[2, 4]
+getRsq = function(mod) summary(mod)$r.squared
+
+rsvpAggregate |>
+  group_by(t2_lag, t1_level, t2_level) |>
+  nest() |>
+  mutate(model = map(data, doModel)) |>
+  mutate(beta = map(model, getSlope),
+         sig = map(model, getSig),
+         r2 = map(model, getRsq)) |>
+  select(!model) |>
+  unnest(col=everything()) |>
+  summarize(slope=mean(beta),
+            p = mean(sig),
+            rsq = mean(r2),
+            .groups = "drop")
+```
+
+## PROMIS-A
+
 Plot of various accuracies as a function of PROMIS-A.
 
 ```{r, attentionbyanxiety, fig.height=4.5, fig.width=11}
@@ -247,6 +284,76 @@ rsvpAggregate |>
   facet_wrap(~t2_lag)
 
 doModel = function(dat) lm(t2t1acc ~ promisa, dat)
+getSlope = function(mod) coef(mod)[2]
+getSig = function(mod) summary(mod)$coef[2, 4]
+getRsq = function(mod) summary(mod)$r.squared
+
+rsvpAggregate |>
+  group_by(t2_lag, t1_level, t2_level) |>
+  nest() |>
+  mutate(model = map(data, doModel)) |>
+  mutate(beta = map(model, getSlope),
+         sig = map(model, getSig),
+         r2 = map(model, getRsq)) |>
+  select(!model) |>
+  unnest(col=everything()) |>
+  summarize(slope=mean(beta),
+            p = mean(sig),
+            rsq = mean(r2),
+            .groups = "drop")
+```
+
+## SIAS-6
+
+Plot of various accuracies as a function of SIAS-6.
+
+```{r, attentionbysias6, fig.height=4.5, fig.width=11}
+rsvpAggregate |>
+  drop_na(t2t1acc) |>
+  filter(t2_lag > 0) |>
+  unite("cell", t1_level, t2_level) |>
+  ggplot(aes(x=sias6, y=t2t1acc, color=cell)) +
+  geom_point() +
+  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+  coord_cartesian(ylim = c(0.25, 0.75)) +
+  facet_wrap(~t2_lag)
+
+doModel = function(dat) lm(t2t1acc ~ sias6, dat)
+getSlope = function(mod) coef(mod)[2]
+getSig = function(mod) summary(mod)$coef[2, 4]
+getRsq = function(mod) summary(mod)$r.squared
+
+rsvpAggregate |>
+  group_by(t2_lag, t1_level, t2_level) |>
+  nest() |>
+  mutate(model = map(data, doModel)) |>
+  mutate(beta = map(model, getSlope),
+         sig = map(model, getSig),
+         r2 = map(model, getRsq)) |>
+  select(!model) |>
+  unnest(col=everything()) |>
+  summarize(slope=mean(beta),
+            p = mean(sig),
+            rsq = mean(r2),
+            .groups = "drop")
+```
+
+## PROMIS-D
+
+Plot of various accuracies as a function of PROMIS-D.
+
+```{r, attentionbypromisd, fig.height=4.5, fig.width=11}
+rsvpAggregate |>
+  drop_na(t2t1acc) |>
+  filter(t2_lag > 0) |>
+  unite("cell", t1_level, t2_level) |>
+  ggplot(aes(x=promisd, y=t2t1acc, color=cell)) +
+  geom_point() +
+  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+  coord_cartesian(ylim = c(0.25, 0.75)) +
+  facet_wrap(~t2_lag)
+
+doModel = function(dat) lm(t2t1acc ~ promisd, dat)
 getSlope = function(mod) coef(mod)[2]
 getSig = function(mod) summary(mod)$coef[2, 4]
 getRsq = function(mod) summary(mod)$r.squared
