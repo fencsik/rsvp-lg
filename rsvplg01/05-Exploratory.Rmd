@@ -75,7 +75,9 @@ Remove subjects w/ fewer than 5 correct T1 responses in any cell
 ```{r, outliert1accbasic}
 filtert1acc = FALSE
 if (filtert1acc) {
-  outlierSubs = c(109, 127, 132, 149, 162, 212, 217)
+  outlierSubs = c(109, 127, 132, 149, 162, 167, 180, 184, 187, 189,
+                  194, 212, 217, 245, 248, 251, 255, 260, 261, 269,
+                  277, 302, 304, 308, 312, 316, 325)
   rsvpAggregate = rsvpAggregate |>
     filter(!(sub %in% outlierSubs))
   rsvpDataAnon = rsvpDataAnon |>
