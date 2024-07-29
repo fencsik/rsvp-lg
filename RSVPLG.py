@@ -38,6 +38,8 @@ dur = {
     'feedback': 1.0,
     'post_trial': 0.25}
 
+import psychopy
+psychopy.useVersion('2023.2.3')
 from psychopy import core, visual, data, gui, info
 from psychopy.hardware import keyboard
 import numpy as np
