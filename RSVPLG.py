@@ -276,7 +276,7 @@ dlg_info = {
     'Participant': '',
     'Experimenter Initials': '',
     'Session': '1',
-    'Block Type': ['Practice1', 'Practice2', 'Experiment'],
+    'Block Type': ['Practice T1', 'Practice T2', 'Practice Both', 'Experiment'],
     'Version': VERSION
     }
 dlg = gui.DlgFromDict(
@@ -311,14 +311,16 @@ extraInfo = {
     'blocktyp': BLOCK_TYPE,
     'datetime': RUNTIME}
 
-test_t1 = True
-if BLOCK_TYPE == 'Practice1':
+if BLOCK_TYPE == 'Practice T1':
+    test_t1 = True
     test_t2 = False
     trial_type_list = ['exp']
-elif BLOCK_TYPE == 'Practice2':
+elif BLOCK_TYPE == 'Practice T2':
+    test_t1 = False
     test_t2 = True
     trial_type_list = ['exp']
 else:
+    test_t1 = True
     test_t2 = True
     trial_type_list = ['warmup', 'exp']
 
@@ -596,7 +598,7 @@ for trial_type in trial_type_list:
         # advance trials
         exp_handler.nextEntry()
         if ((trial_type == 'warmup' and trial >= n_trials_warmup) or
-            (BLOCK_TYPE in ['Practice1', 'Practice2'] and trial >= n_trials_practice)):
+            ('Practice' in BLOCK_TYPE and trial >= n_trials_practice)):
             # end warmup
             break
 
