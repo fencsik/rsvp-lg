@@ -606,7 +606,7 @@ for trial_type in trial_type_list:
         # advance trials
         exp_handler.nextEntry()
         if ((trial_type == 'warmup' and trial >= n_trials_warmup) or
-            ('Practice' in BLOCK_TYPE and trial >= n_trials_practice)):
+            (trial_type == 'prac' and trial >= n_trials_practice)):
             # end warmup
             break
 
