@@ -314,11 +314,15 @@ extraInfo = {
 if BLOCK_TYPE == 'Practice T1':
     test_t1 = True
     test_t2 = False
-    trial_type_list = ['exp']
+    trial_type_list = ['prac']
 elif BLOCK_TYPE == 'Practice T2':
     test_t1 = False
     test_t2 = True
-    trial_type_list = ['exp']
+    trial_type_list = ['prac']
+elif BLOCK_TYPE == 'Practice Both':
+    test_t1 = True
+    test_t2 = True
+    trial_type_list = ['prac']
 else:
     test_t1 = True
     test_t2 = True
@@ -335,6 +339,10 @@ conditions_list = data.importConditions(conditions_file)
 warmup_trial_handler = data.TrialHandler(
     conditions_list,
     nReps=np.ceil(n_trials_warmup / len(conditions_list)),
+    method='fullRandom')
+prac_trial_handler = data.TrialHandler(
+    conditions_list,
+    nReps=np.ceil(n_trials_practice / len(conditions_list)),
     method='fullRandom')
 exp_trial_handler = data.TrialHandler(
     conditions_list,
