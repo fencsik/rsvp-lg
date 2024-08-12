@@ -5,14 +5,15 @@ VERSION = '1.1'
 
 # Basic setup
 rsvp_stream_frames = 12
-distractor_letters = 'EFHLNSTUYZ'
-# t1_letters = 'HS'
-t1_color = 'white'
+distractor_letters = 'ACEFHLMNPSTUXYZ'
 distractor_color = 'black'
-t2_letters = 'X'
+t1_letters = 'HS'
+t1_color = 'white'
+t2_letters = 'HS'
+t2_color = 'white'
 t1_pos_list = [4, 5, 6]
-stim_size = [204, 238]
-stim_file_ext = 'jpg'
+stim_size = [250, 250]
+stim_file_ext = 'png'
 n_trials_per_cell = 15 # for exp blocks
 n_trials_practice = 10 # of trials in prac blocks
 n_trials_warmup = 5 # of warmup trials in exp blocks
@@ -351,14 +352,29 @@ exp_trial_handler = data.TrialHandler(
 
 # set up stimuli and responses
 distractor_letters = list(distractor_letters)
+t1_letters = list(t1_letters)
 t2_letters = list(t2_letters)
 t1_allowed_responses = list()
-for c in distractor_letters:
-    t1_allowed_responses.append(c)
-    if c.isalpha() and c.isupper():
-        t1_allowed_responses.append(c.lower())
-t2_allowed_responses = list('yYnN')
+t2_allowed_responses = list()
+for c in t1_letters:
+    # add response keys
+    if c.lower() == c.upper():
+        t1_allowed_responses.append(c)
+    else:
+        t1_allowed_responses.extend([c.lower(), c.upper()])
+    # remove letters from distractors if present
+    if c in distractor_letters:
+        distractor_letters.remove(c)
 t1_allowed_responses.append('escape')
+for c in t2_letters:
+    # add response keys
+    if c.lower() == c.upper():
+        t2_allowed_responses.append(c)
+    else:
+        t2_allowed_responses.extend([c.lower(), c.upper()])
+    # remove letters from distractors if present
+    if c in distractor_letters:
+        distractor_letters.remove(c)
 t2_allowed_responses.append('escape')
 
 # set up screen based on computer
@@ -395,12 +411,12 @@ fixation = Fixation(win)
 feedback = Feedback(win)
 breakDialog = BreakDialog(win)
 t1_response_prompt = visual.TextBox2(
-    win, text='Which white letter did you see?',
+    win, text='1st target: Did you see ' + ' or '.join(t1_letters) + '?',
     font=font, letterHeight=font_size, alignment='center',
     color=foreground_color)
 t1_response_prompt.setAutoDraw(False)
 t2_response_prompt = visual.TextBox2(
-    win, text='Did you see ' + ' or '.join(t2_letters) + '?',
+    win, text='2nd target: Did you see ' + ' or '.join(t2_letters) + '?',
     font=font, letterHeight=font_size, alignment='center',
     color=foreground_color)
 t2_response_prompt.setAutoDraw(False)
@@ -435,42 +451,40 @@ for trial_type in trial_type_list:
 
         # set up stimuli
         t1_pos = rng.choice(t1_pos_list)
-        # select t1 from distractors, making sure to get 2 different letters
-        t1_list = rng.choice(distractor_letters, 2, replace=False)
-        t1_global = t1_list[0]
-        t1_local = t1_list[1]
-        # remove t1 letters from rest of stream
         trial_letters = np.array(distractor_letters)
-        trial_letters = trial_letters[
-            (trial_letters != t1_global) & (trial_letters != t1_local)]
         # extend letters if needed
         if len(trial_letters) < n_frames:
             trial_letters = np.tile(
                 trial_letters, math.ceil(n_frames / len(trial_letters)))
         global_letters = rng.permutation(trial_letters)[:n_frames]
         local_letters = rng.permutation(trial_letters)[:n_frames]
-        # insert T1
-        global_letters[t1_pos - 1] = t1_global
-        local_letters[t1_pos - 1] = t1_local
-        # set up colors
-        stream_colors = ['black'] * n_frames
-        stream_colors[t1_pos - 1] = 'white'
-        # store stimuli and responses
+        # select t1 and t2
+        t1 = rng.choice(t1_letters)
+        t2 = rng.choice(t2_letters)
+        # insert T1 and T2
         if t1_level == 'global':
-            t1 = t1_global
+            global_letters[t1_pos - 1] = t1
         else:
-            t1 = t1_local
-        t1_correct_resp = [t1.lower(), t1]
-        if t2_lag > 0:
-            t2 = rng.choice(t2_letters)
-            t2_correct_resp = list('yY')
-            if t2_level == 'global':
-                global_letters[t1_pos + t2_lag - 1] = t2
-            else:
-                local_letters[t1_pos + t2_lag - 1] = t2
+            local_letters[t1_pos - 1] = t1
+        if t2_level == 'global':
+            global_letters[t1_pos + t2_lag - 1] = t2
         else:
-            t2 = 'absent'
-            t2_correct_resp = list('nN')
+            local_letters[t1_pos + t2_lag - 1] = t2
+        # set up colors
+        stream_colors = [distractor_color] * n_frames
+        stream_colors[t1_pos - 1] = t1_color
+        stream_colors[t1_pos + t2_lag - 1] = t2_color
+        # set up responses
+        if t1.lower() == t1.upper():
+            t1_correct_resp = t1
+        else:
+            t1_correct_resp = [t1.lower(), t1.upper()]
+        if t2.lower() == t2.upper():
+            t2_correct_resp = t2
+        else:
+            t2_correct_resp = [t2.lower(), t2.upper()]
+
+        # store stimulus information
         trial_handler.addData('global_letters', ''.join(global_letters))
         trial_handler.addData('local_letters', ''.join(local_letters))
         trial_handler.addData('t1_pos', t1_pos)
