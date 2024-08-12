@@ -102,7 +102,7 @@ class RSVP_Stream:
         self.frame_index = 0
 
     def preLoadStream(self, clear=True):
-        # draw all the frames on top off one another to preload them, presumably clearing the 
+        # draw all the frames on top off one another to preload them
         for i in range(self.stream_length):
             self.frames[i].draw()
         if clear:
