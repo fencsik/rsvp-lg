@@ -22,7 +22,9 @@ break_every = 40 # break every X trials
 conditions_file = 'RSVPLGTrials.csv'
 feedback_color_correct = 'green'
 feedback_color_error = 'red'
-foreground_color = 'black'
+foreground_color = [0] * 3
+background_color = [150] * 3
+color_space = 'rgb255'
 cue_color = 'white'
 font = 'Arial'
 font_size = 24
@@ -131,11 +133,11 @@ class Cue:
         thickness = 5
         # global
         self.globalCue = visual.Rect(
-            win, pos=[0, global_size[1]], size=global_size,
+            win, pos=[0, global_size[1]], size=global_size, colorSpace=color_space,
             lineWidth=thickness, lineColor=color, fillColor=None)
         # local
         self.localCue = visual.Rect(
-            win, pos=[0, local_size[1]], size=local_size,
+            win, pos=[0, local_size[1]], size=local_size, colorSpace=color_space,
             lineWidth=thickness, lineColor=color, fillColor=None)
 
     def draw(self, cue):
@@ -156,10 +158,12 @@ class Fixation:
         self.lines = []
         # vertical
         self.lines.append(visual.Line(win, [cx, cy - h], [cx, cy + h],
-                                      lineWidth=thickness, lineColor=color))
+                                      lineWidth=thickness, lineColor=color,
+                                      colorSpace=color_space))
         # horizontal
         self.lines.append(visual.Line(win, [cx - h, cy], [cx + h, cy],
-                                      lineWidth=thickness, lineColor=color))
+                                      lineWidth=thickness, lineColor=color,
+                                      colorSpace=color_space))
 
     def draw(self):
         for line in self.lines:
@@ -173,15 +177,15 @@ class Feedback:
         self.default_color=foreground_color
         spacing = 100
         self.titleBox = visual.TextBox2(
-            win, '', pos=(0, spacing),
+            win, '', colorSpace=color_space, pos=(0, spacing),
             font=font, letterHeight=font_size, color=self.default_color,
             alignment='center', autoDraw=False)
         self.t1Box = visual.TextBox2(
-            win, '', pos=(0, 0),
+            win, '', colorSpace=color_space, pos=(0, 0),
             font=font, letterHeight=font_size, color=self.default_color,
             alignment='center', autoDraw=False)
         self.t2Box = visual.TextBox2(
-            win, '', pos=(0, -spacing),
+            win, '', colorSpace=color_space, pos=(0, -spacing),
             font=font, letterHeight=font_size, color=self.default_color,
             alignment='center', autoDraw=False)
 
@@ -216,7 +220,7 @@ class BreakDialog:
     def __init__(self, win):
         self.default_color=foreground_color
         self.textBox = visual.TextBox2(
-            win, '', pos=(0, 0),
+            win, '', pos=(0, 0), colorSpace=color_space,
             font=font, letterHeight=font_size, color=self.default_color,
             alignment='center', autoDraw=False)
 
@@ -391,7 +395,7 @@ else:
 win = visual.Window(
     size=screen_size, fullscr=True, screen=0, 
     winType='pyglet', allowStencil=False,
-    monitor='Default', color=[0.29411] * 3, colorSpace='rgb',
+    monitor='Default', color=background_color, colorSpace=color_space,
     backgroundImage=None, backgroundFit=None,
     blendMode='avg', useFBO=True,
     units='pix')
@@ -413,17 +417,17 @@ breakDialog = BreakDialog(win)
 t1_response_prompt = visual.TextBox2(
     win, text='1st target: Did you see ' + ' or '.join(t1_letters) + '?',
     font=font, letterHeight=font_size, alignment='center',
-    color=foreground_color)
+    colorSpace=color_space, color=foreground_color)
 t1_response_prompt.setAutoDraw(False)
 t2_response_prompt = visual.TextBox2(
     win, text='2nd target: Did you see ' + ' or '.join(t2_letters) + '?',
     font=font, letterHeight=font_size, alignment='center',
-    color=foreground_color)
+    colorSpace=color_space, color=foreground_color)
 t2_response_prompt.setAutoDraw(False)
 self_paced_prompt = visual.TextBox2(
     win, text='Press any button to begin the next trial',
     font=font, letterHeight=font_size, alignment='center',
-    color=foreground_color)
+    colorSpace=color_space, color=foreground_color)
 self_paced_prompt.setAutoDraw(False)
 
 # set up accuracy tracking
@@ -653,7 +657,7 @@ end_of_block_feedback_text += '\n\nThank you!'
 end_of_block_feedback = visual.TextBox2(
     win, text=end_of_block_feedback_text,
     font=font, letterHeight=font_size, alignment='center',
-    color=foreground_color)
+    colorSpace=color_space, color=foreground_color)
 win.clearBuffer()
 end_of_block_feedback.draw()
 win.flip()
