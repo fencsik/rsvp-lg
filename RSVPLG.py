@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-EXPERIMENT = 'RSVPLG01'
+EXPERIMENT = 'RSVPLG02'
 VERSION = '1.1'
 
 # Basic setup
