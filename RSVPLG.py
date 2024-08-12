@@ -663,5 +663,7 @@ end_of_block_feedback.draw()
 win.flip()
 keyboard.waitKeys()
 
+win.clearBuffer()
+win.flip()
 win.close()
 core.quit()
