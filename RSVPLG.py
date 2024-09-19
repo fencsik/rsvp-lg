@@ -281,7 +281,7 @@ dlg_info = {
     'Participant': '',
     'Experimenter Initials': '',
     'Session': '1',
-    'Block Type': ['Practice T1', 'Practice T2', 'Practice Both', 'Experiment'],
+    'Block Type': ['Practice T1', 'Practice Both', 'Experiment'],
     'Version': VERSION
     }
 dlg = gui.DlgFromDict(
