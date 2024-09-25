@@ -137,7 +137,7 @@ class Cue:
             lineWidth=thickness, lineColor=color, fillColor=None)
         # local
         self.localCue = visual.Rect(
-            win, pos=[0, local_size[1]], size=local_size, colorSpace=color_space,
+            win, pos=[0, 2 * local_size[1]], size=local_size, colorSpace=color_space,
             lineWidth=thickness, lineColor=color, fillColor=None)
 
     def draw(self, cue):
