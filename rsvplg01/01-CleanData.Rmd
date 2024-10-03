@@ -153,11 +153,11 @@ Remove any columns that could be used to identify subjects
 
 ```{r anonymize2}
 rsvpCols2Keep = c("exp", "ver", "sub", "experimenter", "blocktyp", "sess",
-                  "trial", "trial_type", "t1_level", "t2_level", "t2_lag",
-                  "global_letters", "local_letters", "t1_pos", "t1", "t1_corr",
-                  "t1_resp", "t1_acc", "t2", "t2_corr", "t2_resp", "t2_acc",
-                  "t1_rt", "t2_rt")
-survCols2Keep = c("sub", "age", "gender",  "gender_6_text",
+                  "trial", "trial_time", "trial_type", "t1_level", "t2_level",
+                  "t2_lag", "global_letters", "local_letters", "t1_pos", "t1",
+                  "t1_corr", "t1_resp", "t1_acc", "t2", "t2_corr", "t2_resp",
+                  "t2_acc", "t1_rt", "t2_rt")
+survCols2Keep = c("sub", "age", "gender",  "gender_6_text", "startdate", "enddate",
                   "bsam1", "bsam2", "bsam3", "bsam4", "bsam5", "bsam6",
                   "sias6_1", "sias6_2", "sias6_3", "sias6_4", "sias6_5", "sias6_6",
                   "promisd1", "promisd2", "promisd3", "promisd4", "promisd5",
