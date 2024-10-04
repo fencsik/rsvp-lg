@@ -189,23 +189,17 @@ surveyData = surveyData[, survCols2Keep]
 
 Create a data set that aggregates accuracies and survey totals for each combination of subject and IV levels.
 
-```{r, loaddata2}
-# rename data files
-dfRSVP = rsvpData
-dfSurvey = surveyData
-```
-
 ## Aggregate Accuracies
 
 Remove non-experimental trials and weird responses (acc < 0), then extract overall T1 and T2 accuracy, and T2 accuracy conditional on T1, for each cell.
 
 ```{r, rsvp1}
 # filter out non-experimental trials and any with weird responses
-dfRSVP2 = dfRSVP |>
+rsvpData2 = rsvpData |>
   filter(blocktyp == "Experiment" & trial_type == "exp") |>
   filter(t1_acc >= 0 & t2_acc >= 0)
 # get T1 accuracy and overall T2 hit rate
-rsvp1 = dfRSVP2 |>
+rsvpAggregate = rsvpData2 |>
   group_by(sub, t1_level, t2_level, t2_lag, .drop=FALSE) |>
   summarize(t1acc = mean(t1_acc, na.rm=TRUE),
             t2acc=mean(t2_acc, na.rm=TRUE),
@@ -213,7 +207,7 @@ rsvp1 = dfRSVP2 |>
   ungroup()
 
 # get T2 hit rate conditional on correct T1 responses
-rsvpt2t1 = dfRSVP2 |>
+rsvpt2t1 = rsvpData2 |>
   group_by(sub, t1_level, t2_level, t2_lag, .drop=FALSE) |>
   filter(t1_acc == 1, .preserve=FALSE) |>
   summarize(t2t1acc = mean(t2_acc, na.rm=TRUE),
@@ -226,7 +220,7 @@ rsvpt2t1 = dfRSVP2 |>
 Sanity check to make sure the overall and conditional data sets have the same factors and levels.
 
 ```{r, sanitycheck}
-rsvp2 = rsvp1
+rsvp2 = rsvpAggregate
 # check that these columns match
 col2fac = c("sub", "t1_level", "t2_level", "t2_lag")
 # convert those columns to factors
@@ -257,31 +251,32 @@ if (!all(labels1$vars == labels2$vars)) {
 Add the conditional T2 accuracy to the first data set.
 
 ```{r, rsvp2}
-rsvp1$t2t1acc = rsvpt2t1$t2t1acc
+rsvpAggregate$t2t1acc = rsvpt2t1$t2t1acc
 ```
 
 ## Add Survey Data
 
 ```{r, addsurvey}
-rsvp1$age = -1
-rsvp1$gender = ""
-rsvp1$bsam = -1
-rsvp1$sias6 = -1
-rsvp1$promisa = -1
-rsvp1$promisd = -1
-dfSurvey$gender = as.character(dfSurvey$gender)
-for (i in 1:nrow(dfSurvey)) {
-  index = rsvp1$sub == dfSurvey$sub[i]
-  rsvp1$age[index] = dfSurvey$age[i]
-  rsvp1$gender[index] = dfSurvey$gender[i]
-  rsvp1$bsam[index] = dfSurvey$sumbsam[i]
-  rsvp1$sias6[index] = dfSurvey$sumsias6[i]
-  rsvp1$promisa[index] = dfSurvey$sumpromisa[i]
-  rsvp1$promisd[index] = dfSurvey$sumpromisd[i]
+rsvpAggregate$age = -1
+rsvpAggregate$gender = ""
+rsvpAggregate$bsam = -1
+rsvpAggregate$sias6 = -1
+rsvpAggregate$promisa = -1
+rsvpAggregate$promisd = -1
+surveyData2 = surveyData
+surveyData2$gender = as.character(surveyData2$gender)
+for (i in 1:nrow(surveyData)) {
+  index = rsvpAggregate$sub == surveyData2$sub[i]
+  rsvpAggregate$age[index] = surveyData2$age[i]
+  rsvpAggregate$gender[index] = surveyData2$gender[i]
+  rsvpAggregate$bsam[index] = surveyData2$sumbsam[i]
+  rsvpAggregate$sias6[index] = surveyData2$sumsias6[i]
+  rsvpAggregate$promisa[index] = surveyData2$sumpromisa[i]
+  rsvpAggregate$promisd[index] = surveyData2$sumpromisd[i]
 }
-rsvp1$gender = factor(rsvp1$gender)
-summary(rsvp1)
-rsvpAggregate = rsvp1
+rsvpAggregate$gender = factor(rsvpAggregate$gender)
+summary(rsvpAggregate)
+rsvpAggregate = rsvpAggregate
 ```
 
 # Save Data
