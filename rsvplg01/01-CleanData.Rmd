@@ -35,7 +35,7 @@ names(surveyData) = tolower(names(surveyData))
 names(surveyData)[names(surveyData) == "id"] = "sub"
 ```
 
-1. Remove data lines that have NA values from a crash or empty survey responses
+2. Remove data lines that have NA values from a crash or empty survey responses
 
 ```{r cleandata2}
 rsvpData = rsvpData[!is.na(rsvpData$sub), ]
