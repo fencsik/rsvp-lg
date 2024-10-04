@@ -109,7 +109,22 @@ surveyData = surveyData |>
   filter(!(sub == 320 & is.na(age)))
 ```
 
-9. Get a list of subject IDs sorted by start date/time
+9. Recode survey questions where needed, then create sums for each survey.
+
+```{r, modsurveys}
+# reverse code BSAM items (1, 2 and 4), then create sums
+surveyData = surveyData |>
+  rowwise() |>
+  mutate(bsam1 = 5 - bsam1,
+         bsam2 = 5 - bsam2,
+         bsam4 = 5 - bsam4,
+         sumbsam = sum(c_across(starts_with("bsam"))),
+         sumsias6 = sum(c_across(starts_with("sias6"))),
+         sumpromisd = sum(c_across(starts_with("promisd"))),
+         sumpromisa = sum(c_across(starts_with("promisa"))))
+```
+
+10. Get a list of subject IDs sorted by start date/time
 
 ```{r, sortedsubjectids}
 orderedSurvey = surveyData |>
@@ -147,9 +162,9 @@ x |> arrange(min) |> select(sub, min) |> head(20)
 x |> arrange(max) |> select(sub, max) |> tail(20)
 ```
 
-# Anonymize Data
+# Reduce Data
 
-Remove any columns that could be used to identify subjects
+Reduce to a smaller set of columns
 
 ```{r anonymize2}
 rsvpCols2Keep = c("exp", "ver", "sub", "experimenter", "blocktyp", "sess",
@@ -158,12 +173,14 @@ rsvpCols2Keep = c("exp", "ver", "sub", "experimenter", "blocktyp", "sess",
                   "t1_corr", "t1_resp", "t1_acc", "t2", "t2_corr", "t2_resp",
                   "t2_acc", "t1_rt", "t2_rt")
 survCols2Keep = c("sub", "age", "gender",  "gender_6_text", "startdate", "enddate",
-                  "bsam1", "bsam2", "bsam3", "bsam4", "bsam5", "bsam6",
+                  "bsam1", "bsam2", "bsam3", "bsam4", "bsam5", "bsam6", "sumbsam",
                   "sias6_1", "sias6_2", "sias6_3", "sias6_4", "sias6_5", "sias6_6",
+                  "sumsias6",
                   "promisd1", "promisd2", "promisd3", "promisd4", "promisd5",
-                  "promisd6", "promisd7", "promisd8", "promisa1", "promisa2",
-                  "promisa3", "promisa4", "promisa5", "promisa6", "promisa7",
-                  "promisa8", "progress", "finished")
+                  "promisd6", "promisd7", "promisd8", "sumpromisd",
+                  "promisa1", "promisa2", "promisa3", "promisa4", "promisa5",
+                  "promisa6", "promisa7", "promisa8", "sumpromisa",
+                  "progress", "finished")
 rsvpData = rsvpData[, rsvpCols2Keep]
 surveyData = surveyData[, survCols2Keep]
 ```
@@ -176,35 +193,6 @@ Create a data set that aggregates accuracies and survey totals for each combinat
 # rename data files
 dfRSVP = rsvpData
 dfSurvey = surveyData
-```
-
-## Survey Totals
-
-Recode survey questions where needed, then create sums for each survey.
-
-```{r, surveys}
-dfSurvey$gender = factor(dfSurvey$gender)
-
-# reverse code BSAM items (1, 2 and 4)
-dfSurvey$bsam1 = 5 - dfSurvey$bsam1
-dfSurvey$bsam2 = 5 - dfSurvey$bsam2
-dfSurvey$bsam4 = 5 - dfSurvey$bsam4
-
-# create sum of survey's scores'
-# Brief State Anxiety Measure (BSAM)
-dfSurvey = dfSurvey |>
-  rowwise() |> mutate(sumbsam=sum(c_across(starts_with("bsam"))))
-# Social Interaction Anxiety Scale (SIAS)
-dfSurvey = dfSurvey |>
-  rowwise() |> mutate(sumsias6=sum(c_across(starts_with("sias6"))))
-# Patient-Reported Outcomes Measurement Information System - Depression (PROMIS-D)
-dfSurvey = dfSurvey |>
-  rowwise() |> mutate(sumpromisd=sum(c_across(starts_with("promisd"))))
-# Patient-Reported Outcomes Measurement Information System - Anxiety (PROMIS-A)
-dfSurvey = dfSurvey |>
-  rowwise() |> mutate(sumpromisa=sum(c_across(starts_with("promisa"))))
-length(unique(dfSurvey$sub))
-dim(dfSurvey)
 ```
 
 ## Aggregate Accuracies
