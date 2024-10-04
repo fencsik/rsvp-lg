@@ -41,7 +41,7 @@ rsvpAggregate = rsvpAggregate |>
 Number of participants before outlier removal
 
 ```{r, preOutlierRemovalSummary}
-print(length(unique(rsvpDataAnon$sub)))
+print(length(unique(rsvpData$sub)))
 ```
 
 Remove SIAS6 outlier
@@ -52,7 +52,7 @@ if (filterSIAS6) {
   outlierSubs = c(135)
   rsvpAggregate = rsvpAggregate |>
     filter(!(sub %in% outlierSubs))
-  rsvpDataAnon = rsvpDataAnon |>
+  rsvpData = rsvpData |>
     filter(!(sub %in% outlierSubs))
 }
 ```
@@ -65,7 +65,7 @@ if (filterPROMISA) {
   outlierSubs = c(237)
   rsvpAggregate = rsvpAggregate |>
     filter(!(sub %in% outlierSubs))
-  rsvpDataAnon = rsvpDataAnon |>
+  rsvpData = rsvpData |>
     filter(!(sub %in% outlierSubs))
 }
 ```
@@ -78,7 +78,7 @@ if (filterPROMISD) {
   outlierSubs = c(244)
   rsvpAggregate = rsvpAggregate |>
     filter(!(sub %in% outlierSubs))
-  rsvpDataAnon = rsvpDataAnon |>
+  rsvpData = rsvpData |>
     filter(!(sub %in% outlierSubs))
 }
 ```
@@ -93,7 +93,7 @@ if (filtert1acc) {
                   277, 302, 304, 308, 312, 316, 325)
   rsvpAggregate = rsvpAggregate |>
     filter(!(sub %in% outlierSubs))
-  rsvpDataAnon = rsvpDataAnon |>
+  rsvpData = rsvpData |>
     filter(!(sub %in% outlierSubs))
 }
 ```
@@ -110,7 +110,7 @@ if (filtert1accextreme) {
   subToKeep = x$sub[x$t1acc >= t1acc_median]
   rsvpAggregate = rsvpAggregate |>
     filter(sub %in% subToKeep)
-  rsvpDataAnon = rsvpDataAnon |>
+  rsvpData = rsvpData |>
     filter(sub %in% subToKeep)
 }
 ```
@@ -118,7 +118,7 @@ if (filtert1accextreme) {
 Number of participants after outlier removal
 
 ```{r, postOutlierRemovalSummary}
-print(length(unique(rsvpDataAnon$sub)))
+print(length(unique(rsvpData$sub)))
 ```
 
 # Survey Distributions
@@ -172,7 +172,7 @@ x |> arrange(sias6) |> tail(10)
 Number of correct T1 responses in each condition to measure the number of trials going into calculations of T2|T1 accuracy.
 
 ```{r, lowT1acc1}
-x = rsvpDataAnon |>
+x = rsvpData |>
   filter(blocktyp == "Experiment" & trial_type == "exp") |>
   filter(t1_acc >= 0 & t2_acc >= 0) |>
   group_by(sub, t1_level, t2_level, t2_lag) |>
@@ -391,7 +391,7 @@ rsvpAggregate |>
 T1 accuracy as a function of the letter. Letters E and S were much easier to detect locally than globally, and Z and to some Y and L were much easier to detect globally than locally. It looks like E was somewhat more frequently presented as the global letter than the local letter, at least for the first 88 subjects.
 
 ```{r, random1, fig.height=4.5, fig.width=11}
-x = rsvpDataAnon |>
+x = rsvpData |>
   filter(blocktyp == "Experiment" & trial_type == "exp") |>
   filter(t1_acc >= 0 & t2_acc >= 0) |>
   group_by(t1_level, t1) |>
@@ -413,7 +413,7 @@ y |>
   summarize(avg_local_adv = mean(local_adv),
             sum_local_adv = sum(local_adv))
 
-x = rsvpDataAnon |>
+x = rsvpData |>
   filter(blocktyp == "Experiment" & trial_type == "exp") |>
   filter(t1_acc >= 0 & t2_acc >= 0) |>
   group_by(t1_level, t1) |>
@@ -434,7 +434,7 @@ x |>
 Confusion matrix where the rows are the stimulus and the columns show the response
 
 ```{r, random2}
-rsvpDataAnon |>
+rsvpData |>
   filter(blocktyp == "Experiment" & trial_type == "exp") |>
   filter(t1_acc >= 0 & t2_acc >= 0) |>
   mutate(t1_resp = toupper(t1_resp)) |>
@@ -447,7 +447,7 @@ rsvpDataAnon |>
 Compare T1 accuracy as a function of T1 position and T2 lag
 
 ```{r, t1accbyposandlag, fig.height=4.5, fig.width=11}
-rsvpDataAnon |>
+rsvpData |>
   filter(blocktyp == "Experiment" & trial_type == "exp") |>
   filter(t1_acc >= 0 & t2_acc >= 0) |>
   mutate(t1_pos = factor(t1_pos),

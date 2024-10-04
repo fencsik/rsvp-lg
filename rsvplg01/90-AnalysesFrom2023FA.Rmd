@@ -37,8 +37,8 @@ sub20239 = c(101, 103, 104, 105, 107, 108, 110, 111, 112, 113, 114, 115,
              158, 160, 161, 162, 163, 164, 201, 202, 203, 204, 205, 206,
              207, 208, 209, 210, 211, 212, 213, 215, 217, 220, 221, 222)
 
-dfRSVP = rsvpDataAnon[rsvpDataAnon$sub %in% sub20239, ]
-dfSurvey = surveyDataAnon[surveyDataAnon$sub %in% sub20239, ]
+dfRSVP = rsvpData[rsvpData$sub %in% sub20239, ]
+dfSurvey = surveyData[surveyData$sub %in% sub20239, ]
 ```
 
 # Clean data
