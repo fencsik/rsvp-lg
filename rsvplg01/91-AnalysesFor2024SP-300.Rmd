@@ -12,21 +12,12 @@ library(GGally)
 library(viridis)
 library(rstatix)
 this_file = "91-AnalysesFor2024SP-300"
-source_file = "01-CleanData"
-dataFile = sprintf("%s.RData", source_file)
 ```
 
 # Load data files
 
-```{r, loaddata1}
-if(!file.exists(dataFile)) {
-  sprintf("Cannot find file %s", dataFile)
-  knitr::knit_exit()
-}
-```
-
-```{r, loaddata2}
-load(dataFile)
+```{r, loaddata}
+rsvpAggregate = read.csv("rsvpAggregate.csv")
 ```
 
 # Simplify Data

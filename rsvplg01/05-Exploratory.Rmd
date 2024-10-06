@@ -11,21 +11,13 @@ library(tidyverse)
 library(GGally)
 library(viridis)
 this_file = "05-Exploratory"
-source_file = "01-CleanData"
-dataFile = sprintf("%s.RData", source_file)
 ```
 
 # Load data files
 
-```{r, loaddata1}
-if(!file.exists(dataFile)) {
-  sprintf("Cannot find file %s", dataFile)
-  knitr::knit_exit()
-}
-```
-
-```{r, loaddata2}
-load(dataFile)
+```{r, loaddata}
+rsvpData = read.csv("rsvpData.csv")
+rsvpAggregate = read.csv("rsvpAggregate.csv")
 ```
 
 Shorten "global" and "local" to "G" and "L", respectively.

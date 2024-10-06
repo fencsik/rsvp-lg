@@ -282,5 +282,7 @@ rsvpAggregate = rsvpAggregate
 # Save Data
 
 ```{r savedata}
-save(rsvpData, surveyData, rsvpAggregate, file=sprintf("%s.RData", this_file))
+write.csv(rsvpData, "rsvpData.csv", row.names=FALSE)
+write.csv(surveyData, "surveyData.csv", row.names=FALSE)
+write.csv(rsvpAggregate, "rsvpAggregate.csv", row.names=FALSE)
 ```

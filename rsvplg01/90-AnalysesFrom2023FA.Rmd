@@ -8,21 +8,13 @@ output: html_document
 ```{r, setup, include=FALSE}
 knitr::opts_chunk$set(echo=FALSE)
 library(tidyverse)
-source_file = "01-CleanData"
-dataFile = sprintf("%s.RData", source_file)
 ```
 
 # Load data files
 
-```{r, loaddata1}
-if(!file.exists(dataFile)) {
-  sprintf("Cannot find file %s", dataFile)
-  knitr::knit_exit()
-}
-```
-
-```{r, loaddata2}
-load(dataFile)
+```{r, loaddata}
+rsvpData = read.csv("rsvpData.csv")
+surveyData = read.csv("surveyData.csv")
 ```
 
 # Extract Fall 2023 PSYC 491C Dataset

@@ -11,15 +11,12 @@ library(tidyverse)
 library(GGally)
 library(viridis)
 library(rstatix)
-this_file = "93-AnalysesForClasses"
-source_file = "01-CleanData"
-dataFile = sprintf("%s.RData", source_file)
 ```
 
 # Load data files
 
-```{r, loaddata2}
-load(dataFile)
+```{r, loaddata}
+rsvpAggregate = read.csv("rsvpAggregate.csv")
 ```
 
 # Create Wide Data Set
