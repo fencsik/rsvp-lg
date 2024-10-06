@@ -1,4 +1,5 @@
-*.csv
 *.html
 *.RData
 data
+SurveyDataRaw.csv
+RSVPLG01*JASP*.csv
