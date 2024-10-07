@@ -1,0 +1,162 @@
+---
+title: "Gather Data Files"
+author: "David Fencsik"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=TRUE)
+library(tidyverse)
+
+this_file = "00-GatherData"
+testmode = TRUE
+
+# set variables to select from RSVP data file
+variables = c(
+  'exp',
+  'ver',
+  'mod.utc',
+  'sub',
+  'experimenter',
+  'datetime',
+  'blocktyp',
+  'sess',
+  'trial',
+  'trial_type',
+  'trial_time',
+  't1_level',
+  't2_level',
+  't2_lag',
+  'global_letters',
+  'local_letters',
+  't1_pos',
+  't1',
+  't1_corr',
+  't1_resp',
+  't1_acc',
+  't2',
+  't2_corr',
+  't2_resp',
+  't2_acc',
+  't1_rt',
+  't2_rt'
+)
+```
+
+# Purpose
+
+Gather all the individual RSVP data files and the survey data and save them as an R binary
+
+# Load Data Files
+
+## Combine Individual RSVP Data Files
+
+Gather all the files in the data/ directory and all subdirectories together into one data frame, making sure that the headings match.
+
+```{r loadrsvp1}
+if (testmode) {
+  dataDir = "data"
+} else {
+  dataDir = rstudioapi::selectDirectory(caption="Select RSVP Data Files Directory",
+                                        label="Select",
+                                        path=getwd())
+}
+if (is.null(dataDir)) {
+  print("Canceled")
+  knitr::knit_exit()
+} else if (!dir.exists(dataDir)) {
+  print(sprintf("Directory not found: %s", dataDir))
+  knitr::knit_exit()
+}
+```
+
+```{r, gatherdatacode, echo=FALSE}
+GatherData = function(dir=NULL, columns=NULL) {
+
+    if (is.null(dir) || !dir.exists(dir)) return (NULL)
+
+    fileList = list.files(path=dir, pattern="\\.csv$", full.names=TRUE,
+                          recursive=TRUE, ignore.case=TRUE, no..=TRUE)
+    allData = NULL
+    for (fileName in fileList) {
+        df = read.csv(fileName)
+        if (is.null(columns)) {
+            columns = names(df)
+        }
+        if (!all(columns %in% names(df))) {
+            warning("Skipping file due to missing columns: ", fileName)
+            next
+        }
+        if (is.null(allData)) {
+            allData = df[columns]
+        } else {
+            allData = rbind(allData, df[columns])
+        }
+    }
+    return(allData)
+}
+```
+
+```{r loadrsvp2}
+rsvpData = GatherData(dataDir, variables)
+sprintf("Gathered data files in %s together", dataDir)
+sprintf("Data consists of %d rows and %d columns",
+        dim(rsvpData)[1], dim(rsvpData)[2])
+print("Columns:")
+cat(sprintf("\"%s\"", paste(colnames(rsvpData), collapse="\", \"")))
+```
+
+## Load Survey Data
+
+Load the survey CSV file
+
+```{r loadsurvey1}
+if (testmode) {
+  surveyFile = "SurveyDataRaw.csv"
+} else {
+  surveyFile = rstudioapi::selectFile(caption="Select Survey Data File",
+                                      label="Select",
+                                      path=getwd(),
+                                      filter="CSV Files (*.csv)",
+                                      existing=TRUE)
+}
+if(is.null(surveyFile)) {
+  print("Cancelled")
+  knitr::knit_exit()
+} else if (!file.exists(surveyFile)) {
+  print(sprintf("File not found: %s", surveyFile))
+  knitr::knit_exit()
+}
+```
+
+```{r loadsurvey2}
+surveyData = read.csv(surveyFile)
+sprintf("Loaded survey data file %s", surveyFile)
+sprintf("Data consists of %d rows and %d columns",
+        dim(surveyData)[1], dim(surveyData)[2])
+print("Columns:")
+cat(sprintf("\"%s\"", paste(colnames(surveyData), collapse="\", \"")))
+```
+
+# Save Data
+
+## Raw Task Data CSV File
+
+Save the raw task data to a CSV file for sharing
+
+```{r saversvp}
+write.csv(rsvpData, sprintf("RSVPLG01-RawTaskData-%s.csv", Sys.Date()),
+          row.names=FALSE)
+```
+
+## Combined Data R File
+
+Save both the task data and the survey data to an R binary file
+
+```{r savedata}
+save(rsvpData, surveyData, file=sprintf("%s.RData", this_file))
+```

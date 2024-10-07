@@ -1,0 +1,269 @@
+---
+title: "Clean Data"
+author: "David Fencsik"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=TRUE)
+library(tidyverse)
+
+this_file = "01-CleanData"
+source_file = "00-GatherData"
+```
+
+# Purpose
+
+Clean the task and survey data files and the survey data, correct some known problems, do some sanity checking, and then prepare them for later analysis
+
+# Load Data
+
+```{r loaddata}
+load(sprintf("%s.RData", source_file))
+```
+
+# Clean Data
+
+1. Lowercase and rename survey data columns
+
+```{r cleandata1}
+names(surveyData) = tolower(names(surveyData))
+names(surveyData)[names(surveyData) == "id"] = "sub"
+```
+
+2. Remove data lines that have NA values from a crash or empty survey responses
+
+```{r cleandata2}
+rsvpData = rsvpData[!is.na(rsvpData$sub), ]
+surveyData = surveyData[!is.na(surveyData$sub), ]
+```
+
+3. Correct subject ID typos
+
+```{r cleandata4}
+print("No known problems yet")
+```
+
+4. Remove test runs (Subjects w/ IDs >= 900)
+
+```{r cleandata3}
+rsvpData = rsvpData[rsvpData$sub < 900, ]
+surveyData = surveyData[surveyData$sub < 900, ]
+```
+
+5. Remove minors
+
+```{r cleandata5}
+print("We're allowed to use data from minors in this study")
+```
+
+6. Recode gender to labeled factors
+
+```{r, cleandata6}
+# recode gender (0->male, 1->female, 2->transmale, 3->transfemale, 4->nonbinary, 5->agender, 6->other)
+surveyData$gender = factor(surveyData$gender, levels=as.character(0:6),
+                          labels=c("male", "female", "transmale", "transfemale",
+                                   "nonbinary", "agender", "other"))
+```
+
+
+7. Create a common set of subjects across the two data sets.
+
+```{r, cleandata7}
+subRSVP = sort(unique(rsvpData$sub))
+subSurvey = sort(unique(surveyData$sub))
+subCommon = intersect(subRSVP, subSurvey)
+sprintf("Subjects in RSVP data set but not Survey data set: %s",
+        paste(setdiff(subRSVP, subSurvey), collapse=", "))
+sprintf("Subjects in Survey data set but not RSVP data set: %s",
+        paste(setdiff(subSurvey, subRSVP), collapse=", "))
+rsvpData = rsvpData[rsvpData$sub %in% subCommon, ]
+surveyData = surveyData[surveyData$sub %in% subCommon, ]
+```
+
+8. Remove any duplicates
+
+```{r, removedups}
+print("No duplicates yet")
+```
+
+9. Recode survey questions where needed, then create sums for each survey.
+
+```{r, modsurveys}
+# reverse code BSAM items (1, 2 and 4), then create sums
+surveyData = surveyData |>
+  rowwise() |>
+  mutate(bsam1 = 5 - bsam1,
+         bsam2 = 5 - bsam2,
+         bsam4 = 5 - bsam4,
+         sumbsam = sum(c_across(starts_with("bsam"))),
+         sumsias6 = sum(c_across(starts_with("sias6"))),
+         sumpromisd = sum(c_across(starts_with("promisd"))),
+         sumpromisa = sum(c_across(starts_with("promisa"))))
+```
+
+10. Get a list of subject IDs sorted by start date/time
+
+```{r, sortedsubjectids}
+orderedSurvey = surveyData |>
+  mutate(starttime = strptime(startdate, "%m/%d/%y %H:%M")) |>
+  arrange(starttime) |>
+  select(sub)
+orderedSub = orderedSurvey$sub
+print("test for duplicate subject ids")
+if (length(orderedSub) != length(unique(orderedSub))) {
+  print("there are duplicated subjects")
+  print(orderedSub[duplicated(orderedSub)])
+} else {
+  print("no duplicates detected")
+}
+
+```
+
+# Sanity Checks
+
+Check for min and max counts on numbers of trials in each condition. In a previous experiment these numbers varied due to changes in code and an RA's misunderstanding, but everything should be 20 in this experiment so far.
+
+Here are two tables that count the number of trials in each cell, sort by that number, then show the highest and lowest ones.
+
+```{r, trialcount}
+x = rsvpData |>
+  filter(blocktyp == "Experiment" & trial_type == "exp") |>
+  group_by(sub, t1_level, t2_level, t2_lag) |>
+  summarize(n=n()) |>
+  ungroup() |>
+  group_by(sub) |>
+  summarize(max=max(n),
+            min=min(n)) |>
+  ungroup()
+x |> arrange(min) |> select(sub, min) |> head(20)
+x |> arrange(max) |> select(sub, max) |> tail(20)
+```
+
+# Reduce Data
+
+Reduce to a smaller set of columns
+
+```{r anonymize2}
+rsvpCols2Keep = c("exp", "ver", "sub", "experimenter", "blocktyp", "sess",
+                  "trial", "trial_time", "trial_type", "t1_level", "t2_level",
+                  "t2_lag", "global_letters", "local_letters", "t1_pos", "t1",
+                  "t1_corr", "t1_resp", "t1_acc", "t2", "t2_corr", "t2_resp",
+                  "t2_acc", "t1_rt", "t2_rt")
+survCols2Keep = c("sub", "age", "gender",  "gender_6_text", "startdate", "enddate",
+                  "bsam1", "bsam2", "bsam3", "bsam4", "bsam5", "bsam6", "sumbsam",
+                  "sias6_1", "sias6_2", "sias6_3", "sias6_4", "sias6_5", "sias6_6",
+                  "sumsias6",
+                  "promisd1", "promisd2", "promisd3", "promisd4", "promisd5",
+                  "promisd6", "promisd7", "promisd8", "sumpromisd",
+                  "promisa1", "promisa2", "promisa3", "promisa4", "promisa5",
+                  "promisa6", "promisa7", "promisa8", "sumpromisa",
+                  "progress", "finished")
+rsvpData = rsvpData[, rsvpCols2Keep]
+surveyData = surveyData[, survCols2Keep]
+```
+
+# Generate Aggregated Data Set
+
+Create a data set that aggregates accuracies and survey totals for each combination of subject and IV levels.
+
+## Aggregate Accuracies
+
+Remove non-experimental trials and weird responses (acc < 0), then extract overall T1 and T2 accuracy, and T2 accuracy conditional on T1, for each cell.
+
+```{r, rsvp1}
+# filter out non-experimental trials and any with weird responses
+rsvpData2 = rsvpData |>
+  filter(blocktyp == "Experiment" & trial_type == "exp") |>
+  filter(t1_acc >= 0 & t2_acc >= 0)
+# get T1 accuracy and overall T2 hit rate
+rsvpAggregate = rsvpData2 |>
+  group_by(sub, t1_level, t2_level, t2_lag, .drop=FALSE) |>
+  summarize(t1acc = mean(t1_acc, na.rm=TRUE),
+            t2acc=mean(t2_acc, na.rm=TRUE),
+            .groups = "drop_last") |>
+  ungroup()
+
+# get T2 hit rate conditional on correct T1 responses
+rsvpt2t1 = rsvpData2 |>
+  group_by(sub, t1_level, t2_level, t2_lag, .drop=FALSE) |>
+  filter(t1_acc == 1, .preserve=FALSE) |>
+  summarize(t2t1acc = mean(t2_acc, na.rm=TRUE),
+            .groups = "drop_last") |>
+  ungroup()
+```
+
+## Check Factor Levels
+
+Sanity check to make sure the overall and conditional data sets have the same factors and levels.
+
+```{r, sanitycheck}
+rsvp2 = rsvpAggregate
+# check that these columns match
+col2fac = c("sub", "t1_level", "t2_level", "t2_lag")
+# convert those columns to factors
+rsvp2[col2fac] = lapply(rsvp2[col2fac], factor)
+rsvpt2t1[col2fac] = lapply(rsvpt2t1[col2fac], factor)
+summary(rsvp2)
+print(length(levels(rsvp2$sub)))
+summary(rsvpt2t1)
+print(length(levels(rsvpt2t1$sub)))
+# combine the levels in those columns
+labels1 = rsvp2 |>
+  unite("vars", all_of(col2fac), remove=TRUE, sep="-")
+labels2 = rsvpt2t1 |>
+  unite("vars", all_of(col2fac), remove=TRUE, sep="-")
+# make sure the factor combos match in the two datasets
+print(length(labels1$vars))
+print(length(labels2$vars))
+if (!all(labels1$vars == labels2$vars)) {
+  print("mismatch")
+  knitr::knit_exit()
+} else {
+  print("good")
+}
+```
+
+## Add Conditional Accuracy
+
+Add the conditional T2 accuracy to the first data set.
+
+```{r, rsvp2}
+rsvpAggregate$t2t1acc = rsvpt2t1$t2t1acc
+```
+
+## Add Survey Data
+
+```{r, addsurvey}
+rsvpAggregate$age = -1
+rsvpAggregate$gender = ""
+rsvpAggregate$bsam = -1
+rsvpAggregate$sias6 = -1
+rsvpAggregate$promisa = -1
+rsvpAggregate$promisd = -1
+surveyData2 = surveyData
+surveyData2$gender = as.character(surveyData2$gender)
+for (i in 1:nrow(surveyData)) {
+  index = rsvpAggregate$sub == surveyData2$sub[i]
+  rsvpAggregate$age[index] = surveyData2$age[i]
+  rsvpAggregate$gender[index] = surveyData2$gender[i]
+  rsvpAggregate$bsam[index] = surveyData2$sumbsam[i]
+  rsvpAggregate$sias6[index] = surveyData2$sumsias6[i]
+  rsvpAggregate$promisa[index] = surveyData2$sumpromisa[i]
+  rsvpAggregate$promisd[index] = surveyData2$sumpromisd[i]
+}
+rsvpAggregate$gender = factor(rsvpAggregate$gender)
+summary(rsvpAggregate)
+```
+
+# Save Data
+
+```{r savedata}
+write.csv(rsvpData, "rsvpData.csv", row.names=FALSE)
+write.csv(surveyData, "surveyData.csv", row.names=FALSE)
+write.csv(rsvpAggregate, "rsvpAggregate.csv", row.names=FALSE)
+```
