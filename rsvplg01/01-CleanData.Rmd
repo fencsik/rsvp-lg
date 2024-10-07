@@ -276,7 +276,6 @@ for (i in 1:nrow(surveyData)) {
 }
 rsvpAggregate$gender = factor(rsvpAggregate$gender)
 summary(rsvpAggregate)
-rsvpAggregate = rsvpAggregate
 ```
 
 # Save Data
