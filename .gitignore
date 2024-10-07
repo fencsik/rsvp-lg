@@ -1,3 +1,5 @@
 # R save files
 .RData
 .Rhistory
+data/
+stim/
