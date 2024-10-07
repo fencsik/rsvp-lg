@@ -1,0 +1,422 @@
+---
+title: "Exploratory Data Analysis"
+author: "David Fencsik"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(GGally)
+library(viridis)
+this_file = "05-Exploratory"
+```
+
+# Load data files
+
+```{r, loaddata}
+rsvpData = read.csv("rsvpData.csv")
+rsvpAggregate = read.csv("rsvpAggregate.csv")
+```
+
+Shorten "global" and "local" to "G" and "L", respectively.
+
+```{r, shortenlabels}
+rsvpAggregate = rsvpAggregate |>
+  mutate(t1_level = toupper(substr(t1_level, 1, 1)),
+         t2_level = toupper(substr(t2_level, 1, 1)))
+```
+
+# Optional Outlier Removal
+
+Number of participants before outlier removal
+
+```{r, preOutlierRemovalSummary}
+print(length(unique(rsvpData$sub)))
+```
+
+No outliers detected yet, but here is sample code to remove outliers with low T1 accuracy (fewer than 5 correct T1 responses in any cell) from RSVPLG01
+
+```{r, outliert1accbasic}
+filtert1acc = FALSE
+if (filtert1acc) {
+  outlierSubs = c(109, 127, 132, 149, 162, 167, 180, 184, 187, 189,
+                  194, 212, 217, 245, 248, 251, 255, 260, 261, 269,
+                  277, 302, 304, 308, 312, 316, 325)
+  rsvpAggregate = rsvpAggregate |>
+    filter(!(sub %in% outlierSubs))
+  rsvpData = rsvpData |>
+    filter(!(sub %in% outlierSubs))
+}
+```
+
+And another example filter to remove subjects below the median T1 accuracy
+
+```{r outliert1accextreme}
+filtert1accextreme = FALSE
+if (filtert1accextreme) {
+  x = rsvpAggregate |>
+    group_by(sub) |>
+    summarize(t1acc = mean(t1acc), .groups="drop")
+  t1acc_median = median(x$t1acc)
+  subToKeep = x$sub[x$t1acc >= t1acc_median]
+  rsvpAggregate = rsvpAggregate |>
+    filter(sub %in% subToKeep)
+  rsvpData = rsvpData |>
+    filter(sub %in% subToKeep)
+}
+```
+
+Number of participants after outlier removal
+
+```{r, postOutlierRemovalSummary}
+print(length(unique(rsvpData$sub)))
+```
+
+# Survey Distributions
+
+Violin plots of the summed survey scores with quantile lines and the black X marking the mean, and individual subject scores marked by points and jittered.
+
+```{r, surveydistr}
+rsvpAggregate |>
+  pivot_longer(bsam:promisd, names_to = "survey", values_to = "x") |>
+  group_by(sub, survey) |>
+  summarize(sum=max(x), .groups="drop") |>
+  drop_na(sum) |> 
+  ggplot(aes(factor(survey), sum, color=survey)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_jitter(width=.15, height=.15) +
+  theme(legend.position = "none") +
+  stat_summary(fun=mean, geom="point", color="black", shape="cross", size=5) +
+  #scale_color_viridis(discrete=TRUE) +
+  labs(x="Survey", y="Sum of responses")
+```
+
+# Survey Correlations
+
+Check for correlations among the four surveys.
+
+```{r, surveycorrelations1}
+columns = c("bsam", "promisa", "promisd", "sias6")
+rsvpAggregate |>
+  select(all_of(columns)) |>
+  drop_na(everything()) |>
+  ggpairs()
+```
+
+Check for outliers in each survey...
+
+```{r, surveyoutliers}
+x = rsvpAggregate |>
+  group_by(sub) |>
+  summarize(bsam=mean(bsam),
+            promisa=mean(promisa),
+            promisd=mean(promisd),
+            sias6=mean(sias6))
+x |> arrange(bsam) |> tail(10)
+x |> arrange(promisa) |> tail(10)
+x |> arrange(promisd) |> tail(10)
+x |> arrange(sias6) |> tail(10)
+```
+
+# Summaries of Accuracy
+
+Number of correct T1 responses in each condition to measure the number of trials going into calculations of T2|T1 accuracy.
+
+```{r, lowT1acc1}
+x = rsvpData |>
+  filter(blocktyp == "Experiment" & trial_type == "exp") |>
+  filter(t1_acc >= 0 & t2_acc >= 0) |>
+  group_by(sub, t1_level, t2_level, t2_lag) |>
+  summarize(numcor = sum(t1_acc), .groups="drop") |>
+  ungroup()
+
+x |>
+  arrange(numcor) |>
+  head(15)
+
+# Count cells with fewer than this many correct T1 responses
+cutoff = 5
+
+x |>
+  group_by(sub) |>
+  summarize(nlowacc = sum(numcor < cutoff), .groups="drop") |>
+  select(sub, nlowacc) |>
+  arrange(nlowacc) |>
+  tail(10)
+```
+
+Subjects with fewer than *cutoff* correct T1 responses in any of the conditions
+
+```{r, lowT1acc2}
+subsWithLowT1Acc = x |>
+  filter(numcor < cutoff) |>
+  select(sub) |>
+  distinct()
+
+subsWithLowT1Acc$sub
+```
+
+T1 Accuracy across the 12 cells
+
+```{r, accuracysummaries1, fig.height=4.5, fig.width=11}
+rsvpAggregate |>
+  unite("cell", t1_level, t2_level, t2_lag) |>
+  ggplot(aes(factor(cell), t1acc)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  theme(legend.position = "none") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5)
+```
+
+Overall T2 accuracy across the 8 cells (not including T2 absent)
+
+```{r, accuracysummaries2, fig.height=4.5, fig.width=11}
+rsvpAggregate |>
+  filter(t2_lag > 0) |>
+  unite("cell", t2_lag, t1_level, t2_level) |>
+  ggplot(aes(factor(cell), t2acc)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  theme(legend.position = "none") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5)
+```
+
+T2|T1 accuracy across the 8 cells (not including T2 absent)
+
+```{r, accuracysummaries3, fig.height=4.5, fig.width=11}
+rsvpAggregate |>
+  filter(t2_lag > 0) |>
+  drop_na(t2t1acc) |>
+  unite("cell", t2_lag, t1_level, t2_level) |>
+  ggplot(aes(factor(cell), t2t1acc)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  theme(legend.position = "none") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5)
+```
+
+# RSVP Analyses
+
+Generate standard RSVP plots looking at T1 and T2|T1 accuracy as a function of lag
+
+**START WORKING HERE** 
+
+# Effects of Anxiety on Attention Measures
+
+## BSAM
+
+Plot of various accuracies as a function of BSAM.
+
+```{r, attentionbybsam, fig.height=4.5, fig.width=11}
+rsvpAggregate |>
+  drop_na(t2t1acc) |>
+  filter(t2_lag > 0) |>
+  unite("cell", t1_level, t2_level) |>
+  ggplot(aes(x=bsam, y=t2t1acc, color=cell)) +
+  geom_point() +
+  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+  coord_cartesian(ylim = c(0.0, 1.0)) +
+  facet_wrap(~t2_lag)
+
+doModel = function(dat) lm(t2t1acc ~ bsam, dat)
+getSlope = function(mod) coef(mod)[2]
+getSig = function(mod) summary(mod)$coef[2, 4]
+getRsq = function(mod) summary(mod)$r.squared
+
+rsvpAggregate |>
+  group_by(t2_lag, t1_level, t2_level) |>
+  nest() |>
+  mutate(model = map(data, doModel)) |>
+  mutate(beta = map(model, getSlope),
+         sig = map(model, getSig),
+         r2 = map(model, getRsq)) |>
+  select(!model) |>
+  unnest(col=everything()) |>
+  summarize(slope=mean(beta),
+            p = mean(sig),
+            rsq = mean(r2),
+            .groups = "drop")
+```
+
+## PROMIS-A
+
+Plot of various accuracies as a function of PROMIS-A.
+
+```{r, attentionbyanxiety, fig.height=4.5, fig.width=11}
+rsvpAggregate |>
+  drop_na(t2t1acc) |>
+  filter(t2_lag > 0) |>
+  unite("cell", t1_level, t2_level) |>
+  ggplot(aes(x=promisa, y=t2t1acc, color=cell)) +
+  geom_point() +
+  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+  coord_cartesian(ylim = c(0.0, 1.0)) +
+  facet_wrap(~t2_lag)
+
+doModel = function(dat) lm(t2t1acc ~ promisa, dat)
+getSlope = function(mod) coef(mod)[2]
+getSig = function(mod) summary(mod)$coef[2, 4]
+getRsq = function(mod) summary(mod)$r.squared
+
+rsvpAggregate |>
+  group_by(t2_lag, t1_level, t2_level) |>
+  nest() |>
+  mutate(model = map(data, doModel)) |>
+  mutate(beta = map(model, getSlope),
+         sig = map(model, getSig),
+         r2 = map(model, getRsq)) |>
+  select(!model) |>
+  unnest(col=everything()) |>
+  summarize(slope=mean(beta),
+            p = mean(sig),
+            rsq = mean(r2),
+            .groups = "drop")
+```
+
+## SIAS-6
+
+Plot of various accuracies as a function of SIAS-6.
+
+```{r, attentionbysias6, fig.height=4.5, fig.width=11}
+rsvpAggregate |>
+  drop_na(t2t1acc) |>
+  filter(t2_lag > 0) |>
+  unite("cell", t1_level, t2_level) |>
+  ggplot(aes(x=sias6, y=t2t1acc, color=cell)) +
+  geom_point() +
+  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+  coord_cartesian(ylim = c(0.0, 1.0)) +
+  facet_wrap(~t2_lag)
+
+doModel = function(dat) lm(t2t1acc ~ sias6, dat)
+getSlope = function(mod) coef(mod)[2]
+getSig = function(mod) summary(mod)$coef[2, 4]
+getRsq = function(mod) summary(mod)$r.squared
+
+rsvpAggregate |>
+  group_by(t2_lag, t1_level, t2_level) |>
+  nest() |>
+  mutate(model = map(data, doModel)) |>
+  mutate(beta = map(model, getSlope),
+         sig = map(model, getSig),
+         r2 = map(model, getRsq)) |>
+  select(!model) |>
+  unnest(col=everything()) |>
+  summarize(slope=mean(beta),
+            p = mean(sig),
+            rsq = mean(r2),
+            .groups = "drop")
+```
+
+## PROMIS-D
+
+Plot of various accuracies as a function of PROMIS-D.
+
+```{r, attentionbypromisd, fig.height=4.5, fig.width=11}
+rsvpAggregate |>
+  drop_na(t2t1acc) |>
+  filter(t2_lag > 0) |>
+  unite("cell", t1_level, t2_level) |>
+  ggplot(aes(x=promisd, y=t2t1acc, color=cell)) +
+  geom_point() +
+  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+  coord_cartesian(ylim = c(0.0, 1.0)) +
+  facet_wrap(~t2_lag)
+
+doModel = function(dat) lm(t2t1acc ~ promisd, dat)
+getSlope = function(mod) coef(mod)[2]
+getSig = function(mod) summary(mod)$coef[2, 4]
+getRsq = function(mod) summary(mod)$r.squared
+
+rsvpAggregate |>
+  group_by(t2_lag, t1_level, t2_level) |>
+  nest() |>
+  mutate(model = map(data, doModel)) |>
+  mutate(beta = map(model, getSlope),
+         sig = map(model, getSig),
+         r2 = map(model, getRsq)) |>
+  select(!model) |>
+  unnest(col=everything()) |>
+  summarize(slope=mean(beta),
+            p = mean(sig),
+            rsq = mean(r2),
+            .groups = "drop")
+```
+
+# Random Analyses
+
+T1 accuracy as a function of the letter. Letters E and S were much easier to detect locally than globally, and Z and to some Y and L were much easier to detect globally than locally. It looks like E was somewhat more frequently presented as the global letter than the local letter, at least for the first 88 subjects.
+
+```{r, random1, fig.height=4.5, fig.width=11}
+x = rsvpData |>
+  filter(blocktyp == "Experiment" & trial_type == "exp") |>
+  filter(t1_acc >= 0 & t2_acc >= 0) |>
+  group_by(t1_level, t1) |>
+  summarize(t1acc = mean(t1_acc), .groups="drop") |>
+  ungroup()
+
+x |>
+  ggplot(mapping=aes(t1, t1acc, group=t1_level, fill=t1_level)) +
+  coord_cartesian(ylim = c(0.5, 1.0)) +
+  geom_col(position = "dodge")
+
+y = x |>
+  pivot_wider(names_from = t1_level, values_from = t1acc) |>
+  mutate(local_adv = local - global)
+
+y
+
+y |>
+  summarize(avg_local_adv = mean(local_adv),
+            sum_local_adv = sum(local_adv))
+
+x = rsvpData |>
+  filter(blocktyp == "Experiment" & trial_type == "exp") |>
+  filter(t1_acc >= 0 & t2_acc >= 0) |>
+  group_by(t1_level, t1) |>
+  summarize(freq = n(), .groups="drop") |>
+  ungroup() |>
+  pivot_wider(names_from = t1_level, values_from = freq) |>
+  mutate(local_adv = local - global)
+
+x
+
+x |>
+  summarize(gmean = mean(global),
+            gsd = sqrt(var(global)),
+            lmean = mean(local),
+            lsd = sqrt(var(global)))
+```
+
+Confusion matrix where the rows are the stimulus and the columns show the response
+
+```{r, random2}
+rsvpData |>
+  filter(blocktyp == "Experiment" & trial_type == "exp") |>
+  filter(t1_acc >= 0 & t2_acc >= 0) |>
+  mutate(t1_resp = toupper(t1_resp)) |>
+  group_by(t1_level, t1, t1_resp) |>
+  summarize(n = n(), .groups="drop") |>
+  ungroup() |>
+  pivot_wider(names_from = t1_resp, values_from = n)
+```
+
+Compare T1 accuracy as a function of T1 position and T2 lag
+
+```{r, t1accbyposandlag, fig.height=4.5, fig.width=11}
+rsvpData |>
+  filter(blocktyp == "Experiment" & trial_type == "exp") |>
+  filter(t1_acc >= 0 & t2_acc >= 0) |>
+  mutate(t1_pos = factor(t1_pos),
+         t2_lag = factor(t2_lag),
+         t1_level = factor(t1_level)) |>
+  group_by(t1_level, t1_pos, t2_lag) |>
+  summarize(t1acc = mean(t1_acc), .groups="keep") |>
+  ggplot(mapping = aes(x=t1_pos, y=t1acc, color=t2_lag)) +
+  geom_line(mapping=aes(group=t2_lag)) +
+  geom_point() +
+  facet_wrap(~ t1_level) +
+  coord_cartesian(ylim = c(0.5, 1.0))
+```
