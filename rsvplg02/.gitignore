@@ -1,0 +1,6 @@
+*.html
+*.RData
+data
+SurveyDataRaw.csv
+RSVPLG*JASP*.csv
+RSVPLG*Data*.csv
