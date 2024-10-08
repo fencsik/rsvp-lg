@@ -1,0 +1,105 @@
+---
+title: "Accuracy Analyses"
+author: "David Fencsik"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(GGally)
+library(viridis)
+this_file = "06-Accuracy"
+```
+
+# Load data files
+
+```{r, loaddata}
+rsvpData = read.csv("rsvpData.csv")
+rsvpAggregate = read.csv("rsvpAggregate.csv")
+rsvpAggregate1 = read.csv("../rsvplg01/rsvpAggregate.csv")
+```
+
+# Combine Data Sets
+
+```{r, combinedata}
+if (all(names(rsvpAggregate) == names(rsvpAggregate1))) {
+  rsvpAggregate$experiment = "RSVPLG02"
+  rsvpAggregate1$experiment = "RSVPLG01"
+  combined = rbind(rsvpAggregate1,rsvpAggregate)
+} else {
+  combined = NA
+}
+```
+
+# RSVP Analyses
+
+Generate standard RSVP plots looking at T1 and T2|T1 accuracy as a function of lag
+
+## T1 and T2|T1 accuracy as a function of lag, collapsing across local/global
+
+```{r, rsvpplots1, fig.height=4, fig.width=6}
+combined |>
+  drop_na(t2t1acc) |>
+  filter(t2_lag > 0) |>
+  group_by(experiment, sub, t2_lag) |>
+  summarize(t1acc = mean(t1acc),
+            t2acc = mean(t2t1acc),
+            .groups="drop") |>
+  group_by(experiment, t2_lag) |>
+  summarize(t1acc = mean(t1acc),
+            t2acc = mean(t2acc),
+            .groups="drop") |>
+  pivot_longer(cols = ends_with("acc"),
+               names_to = "target",
+               values_to = "acc") |>
+  mutate(target = factor(sub("acc", "", target)),
+         experiment = factor(experiment, levels=c("RSVPLG02", "RSVPLG01")),
+         t2_lag = factor(t2_lag)) |>
+  ggplot(aes(x=t2_lag, y=acc, color=target, linetype=experiment,
+             group=interaction(target, experiment))) +
+  geom_line(linewidth=1.25) +
+  geom_point(size=3) +
+  scale_color_manual(values=c("black","red")) +
+  theme_classic() +
+  theme(legend.position="right",
+        legend.title=element_blank()) +
+  coord_cartesian(ylim=c(0.5, 1.0))
+#  facet_wrap(~t2_lag)
+```
+
+## Individual accuracy
+
+Violin plot of overall accuracy with each target
+
+```{r, indaccplot, fig.height=4, fig.width=4}
+x = rsvpAggregate |>
+  drop_na(t2t1acc) |>
+  group_by(sub) |>
+  summarize(t1acc = mean(t1acc),
+            t2acc = mean(t2t1acc),
+            .groups="drop")
+x |>
+  pivot_longer(cols = ends_with("acc"),
+               names_to = "target",
+               values_to = "acc") |>
+  mutate(target = factor(sub("acc", "", target))) |>
+  ggplot(aes(target, acc)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  theme_classic() +
+  theme(legend.position="none") +
+  scale_x_discrete("Target",
+    labels = c("t1"="T1", "t2"="T2|T1")) +
+  coord_cartesian(ylim=c(0.5, 1.0))
+```
+
+Participants with the lowest T1 accuracy
+
+```{r, indacclist}
+x |>
+  arrange(t1acc) |>
+  head(10)
+```
