@@ -197,12 +197,6 @@ rsvpAggregate |>
   stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5)
 ```
 
-# RSVP Analyses
-
-Generate standard RSVP plots looking at T1 and T2|T1 accuracy as a function of lag
-
-**START WORKING HERE** 
-
 # Effects of Anxiety on Attention Measures
 
 ## BSAM
