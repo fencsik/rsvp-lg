@@ -1,0 +1,117 @@
+---
+title: "Filter Data"
+author: "David Fencsik"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+this_file = "02-FilterData"
+```
+
+# Optionally Remove Participants
+
+## Load data files
+
+```{r, loaddata}
+rsvpData = read.csv("rsvpData.csv")
+surveyData = read.csv("surveyData.csv")
+rsvpAggregate = read.csv("rsvpAggregate.csv")
+```
+
+## Number of Particants Before Filtering
+
+```{r, preOutlierRemovalSummary}
+print(length(unique(surveyData$sub)))
+print(length(unique(rsvpAggregate$sub)))
+```
+
+## Outlier Removal
+
+Remove SIAS6 outlier
+
+```{r, outlierSIAS6}
+filterSIAS6 = FALSE
+if (filterSIAS6) {
+  outlierSubs = c(135)
+  rsvpAggregate = rsvpAggregate |>
+    filter(!(sub %in% outlierSubs))
+  rsvpData = rsvpData |>
+    filter(!(sub %in% outlierSubs))
+}
+```
+
+Remove PROMIS-A outlier(s)
+
+```{r, outlierPROMISA}
+filterPROMISA = FALSE
+if (filterPROMISA) {
+  outlierSubs = c(237)
+  rsvpAggregate = rsvpAggregate |>
+    filter(!(sub %in% outlierSubs))
+  rsvpData = rsvpData |>
+    filter(!(sub %in% outlierSubs))
+}
+```
+
+Remove PROMIS-D outlier(s)
+
+```{r, outlierPROMISD}
+filterPROMISD = FALSE
+if (filterPROMISD) {
+  outlierSubs = c(244)
+  rsvpAggregate = rsvpAggregate |>
+    filter(!(sub %in% outlierSubs))
+  rsvpData = rsvpData |>
+    filter(!(sub %in% outlierSubs))
+}
+```
+
+Remove subjects w/ fewer than 5 correct T1 responses in any cell
+
+```{r, outliert1accbasic}
+filtert1acc = FALSE
+if (filtert1acc) {
+  outlierSubs = c(109, 127, 132, 149, 162, 167, 180, 184, 187, 189,
+                  194, 212, 217, 245, 248, 251, 255, 260, 261, 269,
+                  277, 302, 304, 308, 312, 316, 325)
+  rsvpAggregate = rsvpAggregate |>
+    filter(!(sub %in% outlierSubs))
+  rsvpData = rsvpData |>
+    filter(!(sub %in% outlierSubs))
+}
+```
+
+Remove subjects below the median T1 accuracy
+
+```{r outliert1accextreme}
+filtert1accextreme = FALSE
+if (filtert1accextreme) {
+  x = rsvpAggregate |>
+    group_by(sub) |>
+    summarize(t1acc = mean(t1acc), .groups="drop")
+  t1acc_median = median(x$t1acc)
+  subToKeep = x$sub[x$t1acc >= t1acc_median]
+  rsvpAggregate = rsvpAggregate |>
+    filter(sub %in% subToKeep)
+  rsvpData = rsvpData |>
+    filter(sub %in% subToKeep)
+  surveyData = surveyData |>
+    filter(sub %in% subToKeep)
+}
+```
+
+## Number of Particants After Filtering
+
+```{r, postOutlierRemovalSummary}
+print(length(unique(surveyData$sub)))
+print(length(unique(rsvpAggregate$sub)))
+```
+
+## Save data
+
+```{r, savedata}
+save(rsvpData, surveyData, rsvpAggregate, file=sprintf("%s.RData", this_file))
+```

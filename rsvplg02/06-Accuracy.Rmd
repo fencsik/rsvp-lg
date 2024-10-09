@@ -11,13 +11,21 @@ library(tidyverse)
 library(GGally)
 library(viridis)
 this_file = "06-Accuracy"
+source_file = "02-FilterData"
+dataFile = sprintf("%s.RData", source_file)
 ```
 
 # Load data files
 
-```{r, loaddata}
-rsvpData = read.csv("rsvpData.csv")
-rsvpAggregate = read.csv("rsvpAggregate.csv")
+```{r, loaddata1}
+if(!file.exists(dataFile)) {
+  sprintf("Cannot find file %s", dataFile)
+  knitr::knit_exit()
+}
+```
+
+```{r, loaddata2}
+load(dataFile)
 rsvpAggregate1 = read.csv("../rsvplg01/rsvpAggregate.csv")
 ```
 

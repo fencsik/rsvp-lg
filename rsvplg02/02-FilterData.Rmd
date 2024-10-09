@@ -1,0 +1,59 @@
+---
+title: "Filter Data"
+author: "David Fencsik"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+this_file = "02-FilterData"
+```
+
+# Optionally Remove Participants
+
+## Load data files
+
+```{r, loaddata}
+rsvpData = read.csv("rsvpData.csv")
+surveyData = read.csv("surveyData.csv")
+rsvpAggregate = read.csv("rsvpAggregate.csv")
+```
+
+## Number of Particants Before Filtering
+
+```{r, preOutlierRemovalSummary}
+print(length(unique(surveyData$sub)))
+print(length(unique(rsvpAggregate$sub)))
+```
+
+## Remove participants with low accuracy
+
+Participant 424 is barely above chance (< 60% for both targets)
+
+```{r, lowaccuracy}
+runFilter = TRUE
+if (runFilter) {
+  subToRemove = c(424)
+  rsvpData = rsvpData |>
+    filter(!(sub %in% subToRemove))
+  surveyData = surveyData |>
+    filter(!(sub %in% subToRemove))
+  rsvpAggregate = rsvpAggregate |>
+    filter(!(sub %in% subToRemove))
+}
+```
+
+## Number of Particants After Filtering
+
+```{r, postOutlierRemovalSummary}
+print(length(unique(surveyData$sub)))
+print(length(unique(rsvpAggregate$sub)))
+```
+
+## Save data
+
+```{r, savedata}
+save(rsvpData, surveyData, rsvpAggregate, file=sprintf("%s.RData", this_file))
+```

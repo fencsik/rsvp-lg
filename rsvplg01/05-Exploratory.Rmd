@@ -11,13 +11,21 @@ library(tidyverse)
 library(GGally)
 library(viridis)
 this_file = "05-Exploratory"
+source_file = "02-FilterData"
+dataFile = sprintf("%s.RData", source_file)
 ```
 
 # Load data files
 
-```{r, loaddata}
-rsvpData = read.csv("rsvpData.csv")
-rsvpAggregate = read.csv("rsvpAggregate.csv")
+```{r, loaddata1}
+if(!file.exists(dataFile)) {
+  sprintf("Cannot find file %s", dataFile)
+  knitr::knit_exit()
+}
+```
+
+```{r, loaddata2}
+load(dataFile)
 ```
 
 Shorten "global" and "local" to "G" and "L", respectively.
@@ -26,91 +34,6 @@ Shorten "global" and "local" to "G" and "L", respectively.
 rsvpAggregate = rsvpAggregate |>
   mutate(t1_level = toupper(substr(t1_level, 1, 1)),
          t2_level = toupper(substr(t2_level, 1, 1)))
-```
-
-# Optional Outlier Removal
-
-Number of participants before outlier removal
-
-```{r, preOutlierRemovalSummary}
-print(length(unique(rsvpData$sub)))
-```
-
-Remove SIAS6 outlier
-
-```{r, outlierSIAS6}
-filterSIAS6 = FALSE
-if (filterSIAS6) {
-  outlierSubs = c(135)
-  rsvpAggregate = rsvpAggregate |>
-    filter(!(sub %in% outlierSubs))
-  rsvpData = rsvpData |>
-    filter(!(sub %in% outlierSubs))
-}
-```
-
-Remove PROMIS-A outlier(s)
-
-```{r, outlierPROMISA}
-filterPROMISA = FALSE
-if (filterPROMISA) {
-  outlierSubs = c(237)
-  rsvpAggregate = rsvpAggregate |>
-    filter(!(sub %in% outlierSubs))
-  rsvpData = rsvpData |>
-    filter(!(sub %in% outlierSubs))
-}
-```
-
-Remove PROMIS-D outlier(s)
-
-```{r, outlierPROMISD}
-filterPROMISD = FALSE
-if (filterPROMISD) {
-  outlierSubs = c(244)
-  rsvpAggregate = rsvpAggregate |>
-    filter(!(sub %in% outlierSubs))
-  rsvpData = rsvpData |>
-    filter(!(sub %in% outlierSubs))
-}
-```
-
-Remove subjects w/ fewer than 5 correct T1 responses in any cell
-
-```{r, outliert1accbasic}
-filtert1acc = FALSE
-if (filtert1acc) {
-  outlierSubs = c(109, 127, 132, 149, 162, 167, 180, 184, 187, 189,
-                  194, 212, 217, 245, 248, 251, 255, 260, 261, 269,
-                  277, 302, 304, 308, 312, 316, 325)
-  rsvpAggregate = rsvpAggregate |>
-    filter(!(sub %in% outlierSubs))
-  rsvpData = rsvpData |>
-    filter(!(sub %in% outlierSubs))
-}
-```
-
-Remove subjects below the median T1 accuracy
-
-```{r outliert1accextreme}
-filtert1accextreme = FALSE
-if (filtert1accextreme) {
-  x = rsvpAggregate |>
-    group_by(sub) |>
-    summarize(t1acc = mean(t1acc), .groups="drop")
-  t1acc_median = median(x$t1acc)
-  subToKeep = x$sub[x$t1acc >= t1acc_median]
-  rsvpAggregate = rsvpAggregate |>
-    filter(sub %in% subToKeep)
-  rsvpData = rsvpData |>
-    filter(sub %in% subToKeep)
-}
-```
-
-Number of participants after outlier removal
-
-```{r, postOutlierRemovalSummary}
-print(length(unique(rsvpData$sub)))
 ```
 
 # Survey Distributions
