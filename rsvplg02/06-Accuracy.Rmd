@@ -35,7 +35,7 @@ rsvpAggregate1 = read.csv("../rsvplg01/rsvpAggregate.csv")
 if (all(names(rsvpAggregate) == names(rsvpAggregate1))) {
   rsvpAggregate$experiment = "RSVPLG02"
   rsvpAggregate1$experiment = "RSVPLG01"
-  combined = rbind(rsvpAggregate1,rsvpAggregate)
+  combined = bind_rows(rsvpAggregate1,rsvpAggregate)
 } else {
   combined = NA
 }
@@ -46,16 +46,15 @@ if (all(names(rsvpAggregate) == names(rsvpAggregate1))) {
 Generate standard RSVP plots looking at T1 and T2|T1 accuracy as a function of lag
 
 ## T1 and T2|T1 accuracy as a function of lag, collapsing across local/global
-
 ```{r, rsvpplots1, fig.height=4, fig.width=6}
 combined |>
   drop_na(t2t1acc) |>
-  filter(t2_lag > 0) |>
-  group_by(experiment, sub, t2_lag) |>
+  filter(lag > 0) |>
+  group_by(experiment, sub, lag) |>
   summarize(t1acc = mean(t1acc),
             t2acc = mean(t2t1acc),
             .groups="drop") |>
-  group_by(experiment, t2_lag) |>
+  group_by(experiment, lag) |>
   summarize(t1acc = mean(t1acc),
             t2acc = mean(t2acc),
             .groups="drop") |>
@@ -64,8 +63,8 @@ combined |>
                values_to = "acc") |>
   mutate(target = factor(sub("acc", "", target)),
          experiment = factor(experiment, levels=c("RSVPLG02", "RSVPLG01")),
-         t2_lag = factor(t2_lag)) |>
-  ggplot(aes(x=t2_lag, y=acc, color=target, linetype=experiment,
+         lag = factor(lag)) |>
+  ggplot(aes(x=lag, y=acc, color=target, linetype=experiment,
              group=interaction(target, experiment))) +
   geom_line(linewidth=1.25) +
   geom_point(size=3) +
@@ -74,7 +73,7 @@ combined |>
   theme(legend.position="right",
         legend.title=element_blank()) +
   coord_cartesian(ylim=c(0.5, 1.0))
-#  facet_wrap(~t2_lag)
+#  facet_wrap(~lag)
 ```
 
 ## Individual accuracy

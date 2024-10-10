@@ -90,7 +90,7 @@ Number of correct T1 responses in each condition to measure the number of trials
 x = rsvpData |>
   filter(blocktyp == "Experiment" & trial_type == "exp") |>
   filter(t1_acc >= 0 & t2_acc >= 0) |>
-  group_by(sub, t1_level, t2_level, t2_lag) |>
+  group_by(sub, t1_level, t2_level, lag) |>
   summarize(numcor = sum(t1_acc), .groups="drop") |>
   ungroup()
 
@@ -124,7 +124,7 @@ T1 Accuracy across the 12 cells
 
 ```{r, accuracysummaries1, fig.height=4.5, fig.width=11}
 rsvpAggregate |>
-  unite("cell", t1_level, t2_level, t2_lag) |>
+  unite("cell", t1_level, t2_level, lag) |>
   ggplot(aes(factor(cell), t1acc)) +
   geom_violin(draw_quantiles=c(.25, .5, .75)) +
   geom_jitter(width=.15, height=0, color="black", shape="circle open") +
@@ -136,8 +136,8 @@ Overall T2 accuracy across the 8 cells (not including T2 absent)
 
 ```{r, accuracysummaries2, fig.height=4.5, fig.width=11}
 rsvpAggregate |>
-  filter(t2_lag > 0) |>
-  unite("cell", t2_lag, t1_level, t2_level) |>
+  filter(lag > 0) |>
+  unite("cell", lag, t1_level, t2_level) |>
   ggplot(aes(factor(cell), t2acc)) +
   geom_violin(draw_quantiles=c(.25, .5, .75)) +
   geom_jitter(width=.15, height=0, color="black", shape="circle open") +
@@ -149,9 +149,9 @@ T2|T1 accuracy across the 8 cells (not including T2 absent)
 
 ```{r, accuracysummaries3, fig.height=4.5, fig.width=11}
 rsvpAggregate |>
-  filter(t2_lag > 0) |>
+  filter(lag > 0) |>
   drop_na(t2t1acc) |>
-  unite("cell", t2_lag, t1_level, t2_level) |>
+  unite("cell", lag, t1_level, t2_level) |>
   ggplot(aes(factor(cell), t2t1acc)) +
   geom_violin(draw_quantiles=c(.25, .5, .75)) +
   geom_jitter(width=.15, height=0, color="black", shape="circle open") +
@@ -168,13 +168,13 @@ Plot of various accuracies as a function of BSAM.
 ```{r, attentionbybsam, fig.height=4.5, fig.width=11}
 rsvpAggregate |>
   drop_na(t2t1acc) |>
-  filter(t2_lag > 0) |>
+  filter(lag > 0) |>
   unite("cell", t1_level, t2_level) |>
   ggplot(aes(x=bsam, y=t2t1acc, color=cell)) +
   geom_point() +
   geom_smooth(method="lm", formula=y~x, se=FALSE) +
   coord_cartesian(ylim = c(0.0, 1.0)) +
-  facet_wrap(~t2_lag)
+  facet_wrap(~lag)
 
 doModel = function(dat) lm(t2t1acc ~ bsam, dat)
 getSlope = function(mod) coef(mod)[2]
@@ -182,7 +182,7 @@ getSig = function(mod) summary(mod)$coef[2, 4]
 getRsq = function(mod) summary(mod)$r.squared
 
 rsvpAggregate |>
-  group_by(t2_lag, t1_level, t2_level) |>
+  group_by(lag, t1_level, t2_level) |>
   nest() |>
   mutate(model = map(data, doModel)) |>
   mutate(beta = map(model, getSlope),
@@ -203,13 +203,13 @@ Plot of various accuracies as a function of PROMIS-A.
 ```{r, attentionbyanxiety, fig.height=4.5, fig.width=11}
 rsvpAggregate |>
   drop_na(t2t1acc) |>
-  filter(t2_lag > 0) |>
+  filter(lag > 0) |>
   unite("cell", t1_level, t2_level) |>
   ggplot(aes(x=promisa, y=t2t1acc, color=cell)) +
   geom_point() +
   geom_smooth(method="lm", formula=y~x, se=FALSE) +
   coord_cartesian(ylim = c(0.0, 1.0)) +
-  facet_wrap(~t2_lag)
+  facet_wrap(~lag)
 
 doModel = function(dat) lm(t2t1acc ~ promisa, dat)
 getSlope = function(mod) coef(mod)[2]
@@ -217,7 +217,7 @@ getSig = function(mod) summary(mod)$coef[2, 4]
 getRsq = function(mod) summary(mod)$r.squared
 
 rsvpAggregate |>
-  group_by(t2_lag, t1_level, t2_level) |>
+  group_by(lag, t1_level, t2_level) |>
   nest() |>
   mutate(model = map(data, doModel)) |>
   mutate(beta = map(model, getSlope),
@@ -238,13 +238,13 @@ Plot of various accuracies as a function of SIAS-6.
 ```{r, attentionbysias6, fig.height=4.5, fig.width=11}
 rsvpAggregate |>
   drop_na(t2t1acc) |>
-  filter(t2_lag > 0) |>
+  filter(lag > 0) |>
   unite("cell", t1_level, t2_level) |>
   ggplot(aes(x=sias6, y=t2t1acc, color=cell)) +
   geom_point() +
   geom_smooth(method="lm", formula=y~x, se=FALSE) +
   coord_cartesian(ylim = c(0.0, 1.0)) +
-  facet_wrap(~t2_lag)
+  facet_wrap(~lag)
 
 doModel = function(dat) lm(t2t1acc ~ sias6, dat)
 getSlope = function(mod) coef(mod)[2]
@@ -252,7 +252,7 @@ getSig = function(mod) summary(mod)$coef[2, 4]
 getRsq = function(mod) summary(mod)$r.squared
 
 rsvpAggregate |>
-  group_by(t2_lag, t1_level, t2_level) |>
+  group_by(lag, t1_level, t2_level) |>
   nest() |>
   mutate(model = map(data, doModel)) |>
   mutate(beta = map(model, getSlope),
@@ -273,13 +273,13 @@ Plot of various accuracies as a function of PROMIS-D.
 ```{r, attentionbypromisd, fig.height=4.5, fig.width=11}
 rsvpAggregate |>
   drop_na(t2t1acc) |>
-  filter(t2_lag > 0) |>
+  filter(lag > 0) |>
   unite("cell", t1_level, t2_level) |>
   ggplot(aes(x=promisd, y=t2t1acc, color=cell)) +
   geom_point() +
   geom_smooth(method="lm", formula=y~x, se=FALSE) +
   coord_cartesian(ylim = c(0.0, 1.0)) +
-  facet_wrap(~t2_lag)
+  facet_wrap(~lag)
 
 doModel = function(dat) lm(t2t1acc ~ promisd, dat)
 getSlope = function(mod) coef(mod)[2]
@@ -287,7 +287,7 @@ getSig = function(mod) summary(mod)$coef[2, 4]
 getRsq = function(mod) summary(mod)$r.squared
 
 rsvpAggregate |>
-  group_by(t2_lag, t1_level, t2_level) |>
+  group_by(lag, t1_level, t2_level) |>
   nest() |>
   mutate(model = map(data, doModel)) |>
   mutate(beta = map(model, getSlope),
@@ -366,12 +366,12 @@ rsvpData |>
   filter(blocktyp == "Experiment" & trial_type == "exp") |>
   filter(t1_acc >= 0 & t2_acc >= 0) |>
   mutate(t1_pos = factor(t1_pos),
-         t2_lag = factor(t2_lag),
+         lag = factor(lag),
          t1_level = factor(t1_level)) |>
-  group_by(t1_level, t1_pos, t2_lag) |>
+  group_by(t1_level, t1_pos, lag) |>
   summarize(t1acc = mean(t1_acc), .groups="keep") |>
-  ggplot(mapping = aes(x=t1_pos, y=t1acc, color=t2_lag)) +
-  geom_line(mapping=aes(group=t2_lag)) +
+  ggplot(mapping = aes(x=t1_pos, y=t1acc, color=lag)) +
+  geom_line(mapping=aes(group=lag)) +
   geom_point() +
   facet_wrap(~ t1_level) +
   coord_cartesian(ylim = c(0.5, 1.0))

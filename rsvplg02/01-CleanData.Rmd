@@ -70,7 +70,6 @@ surveyData$gender = factor(surveyData$gender, levels=as.character(0:6),
                                    "nonbinary", "agender", "other"))
 ```
 
-
 7. Create a common set of subjects across the two data sets.
 
 ```{r, cleandata7}
@@ -106,7 +105,14 @@ surveyData = surveyData |>
          sumpromisa = sum(c_across(starts_with("promisa"))))
 ```
 
-10. Get a list of subject IDs sorted by start date/time
+10. Add a variable that has lag in milliseconds instead of frames
+
+```{r, convertlag}
+rsvpData = rsvpData |>
+  mutate(lag = t2_lag * 150)
+```
+
+11. Get a list of subject IDs sorted by start date/time
 
 ```{r, sortedsubjectids}
 orderedSurvey = surveyData |>
@@ -151,7 +157,7 @@ Reduce to a smaller set of columns
 ```{r anonymize2}
 rsvpCols2Keep = c("exp", "ver", "sub", "experimenter", "blocktyp", "sess",
                   "trial", "trial_time", "trial_type", "t1_level", "t2_level",
-                  "t2_lag", "global_letters", "local_letters", "t1_pos", "t1",
+                  "lag", "t2_lag", "global_letters", "local_letters", "t1_pos", "t1",
                   "t1_corr", "t1_resp", "t1_acc", "t2", "t2_corr", "t2_resp",
                   "t2_acc", "t1_rt", "t2_rt")
 survCols2Keep = c("sub", "age", "gender",  "gender_6_text", "startdate", "enddate",
@@ -182,7 +188,7 @@ rsvpData2 = rsvpData |>
   filter(t1_acc >= 0 & t2_acc >= 0)
 # get T1 accuracy and overall T2 hit rate
 rsvpAggregate = rsvpData2 |>
-  group_by(sub, t1_level, t2_level, t2_lag, .drop=FALSE) |>
+  group_by(sub, t1_level, t2_level, lag, .drop=FALSE) |>
   summarize(t1acc = mean(t1_acc, na.rm=TRUE),
             t2acc=mean(t2_acc, na.rm=TRUE),
             .groups = "drop_last") |>
@@ -190,7 +196,7 @@ rsvpAggregate = rsvpData2 |>
 
 # get T2 hit rate conditional on correct T1 responses
 rsvpt2t1 = rsvpData2 |>
-  group_by(sub, t1_level, t2_level, t2_lag, .drop=FALSE) |>
+  group_by(sub, t1_level, t2_level, lag, .drop=FALSE) |>
   filter(t1_acc == 1, .preserve=FALSE) |>
   summarize(t2t1acc = mean(t2_acc, na.rm=TRUE),
             .groups = "drop_last") |>
@@ -204,7 +210,7 @@ Sanity check to make sure the overall and conditional data sets have the same fa
 ```{r, sanitycheck}
 rsvp2 = rsvpAggregate
 # check that these columns match
-col2fac = c("sub", "t1_level", "t2_level", "t2_lag")
+col2fac = c("sub", "t1_level", "t2_level", "lag")
 # convert those columns to factors
 rsvp2[col2fac] = lapply(rsvp2[col2fac], factor)
 rsvpt2t1[col2fac] = lapply(rsvpt2t1[col2fac], factor)
