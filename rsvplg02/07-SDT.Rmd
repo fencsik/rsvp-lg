@@ -1,0 +1,101 @@
+---
+title: "RSVPLG02: Signal Detection Theory Analyses"
+author: "David Fencsik"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(GGally)
+this_file = "06-Accuracy"
+source_file = "02-FilterData"
+dataFile = sprintf("%s.RData", source_file)
+```
+
+Analyze data based on signal detection theory, calculating d' and criterion
+
+# Load data files
+
+```{r, loaddata1}
+if(!file.exists(dataFile)) {
+  sprintf("Cannot find file %s", dataFile)
+  knitr::knit_exit()
+}
+```
+
+```{r, loaddata2}
+load(dataFile)
+```
+
+# Calculate d' and criterion
+
+```{r, computestats}
+x = rsvpData |>
+  filter(trial_type == "exp") |>
+  mutate(sub = factor(sub),
+         blocktyp = factor(blocktyp),
+         trial_type = factor(trial_type),
+         t1_level = factor(t1_level),
+         t2_level = factor(t2_level),
+         t1 = factor(t1),
+         t2 = factor(t2))
+
+t1 = x |>
+  group_by(sub, t1_level, t2_level, lag, t1) |>
+  summarize(acc = mean(t1_acc),
+            count=n(),
+            .groups="drop") |>
+  pivot_wider(names_from=t1,
+              values_from=c(acc, count)) |>
+  rename(hr = acc_H,
+         cr = acc_S) |>
+  rowwise() |>
+  mutate(count = sum(c_across(starts_with("count")))) |>
+  ungroup() |>
+  select(!starts_with("count_")) |>
+  mutate(hr = if_else(hr == 0, 1 / (2 * count), hr),
+         hr = if_else(hr == 1, 1 - 1 / (2 * count), hr),
+         cr = if_else(cr == 0, 1 / (2 * count), cr),
+         cr = if_else(cr == 1, 1 - 1 / (2*count), cr),
+         t1_dprime = qnorm(hr) + qnorm(cr),
+         t1_crit = -0.5 * (qnorm(hr) + qnorm(1-cr)))
+
+t2 = x |>
+  filter(t1_acc == 1) |>
+  group_by(sub, lag, t2) |>
+  summarize(ncor = sum(t2_acc),
+            count=n(),
+            acc=ncor / count,
+            acc = mean(t2_acc),
+            .groups="drop") |>
+  #select(!c(ncor)) |>
+  pivot_wider(names_from=t2,
+              values_from=c(acc, count, ncor)) |>
+  rename(hr = acc_H,
+         cr = acc_S) |>
+  rowwise() |>
+  mutate(count = sum(c_across(starts_with("count")))) |>
+  ungroup() |>
+  #select(!starts_with("count_")) |>
+  mutate(hr = if_else(hr == 0, 1 / (2 * count), hr),
+         hr = if_else(hr == 1, 1 - 1 / (2 * count), hr),
+         cr = if_else(cr == 0, 1 / (2 * count), cr),
+         cr = if_else(cr == 1, 1 - 1 / (2*count), cr),
+         t2_dprime = qnorm(hr) + qnorm(cr),
+         t2_crit = -0.5 * (qnorm(hr) + qnorm(1-cr)))
+
+
+# rsvpAggregate |>
+# #  filter(trial_type == "exp") |>
+#   mutate(sub = factor(sub),
+#          t1_level = factor(t1_level),
+#          t2_level = factor(t2_level)) |>
+#   summary()
+summary(t1)
+summary(t2)
+t2 |>
+  arrange(t2_dprime) |>
+  head(20)
+```
