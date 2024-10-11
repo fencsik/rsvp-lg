@@ -105,8 +105,16 @@ x |>
 
 Participants with the lowest T1 accuracy
 
-```{r, indacclist}
+```{r, indacclist1}
 x |>
   arrange(t1acc) |>
+  head(10)
+```
+
+Participants with the lowest T2 accuracy
+
+```{r, indacclist2}
+x |>
+  arrange(t2acc) |>
   head(10)
 ```
