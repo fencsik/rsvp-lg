@@ -42,15 +42,18 @@ rsvpData = rsvpData[!is.na(rsvpData$sub), ]
 surveyData = surveyData[!is.na(surveyData$sub), ]
 ```
 
-3. Correct subject ID typos
+3. Correct subject ID typos. Subject 440 was mislabeled as 340 consistently throughout the run.
 
-```{r cleandata4}
-print("No known problems yet")
+```{r cleandata3}
+surveyData = surveyData |>
+  mutate(sub = ifelse(sub == 340, 440, sub))
+rsvpData = rsvpData |>
+  mutate(sub = ifelse(sub == 340, 440, sub))
 ```
 
 4. Remove test runs (Subjects w/ IDs >= 900)
 
-```{r cleandata3}
+```{r cleandata4}
 rsvpData = rsvpData[rsvpData$sub < 900, ]
 surveyData = surveyData[surveyData$sub < 900, ]
 ```
