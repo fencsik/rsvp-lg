@@ -24,6 +24,7 @@ rsvpAggregate = read.csv("rsvpAggregate.csv")
 ## Number of Particants Before Filtering
 
 ```{r, preOutlierRemovalSummary}
+print(length(unique(rsvpData$sub)))
 print(length(unique(surveyData$sub)))
 print(length(unique(rsvpAggregate$sub)))
 ```
@@ -106,6 +107,7 @@ if (filtert1accextreme) {
 ## Number of Particants After Filtering
 
 ```{r, postOutlierRemovalSummary}
+print(length(unique(rsvpData$sub)))
 print(length(unique(surveyData$sub)))
 print(length(unique(rsvpAggregate$sub)))
 ```
