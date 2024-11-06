@@ -1,0 +1,203 @@
+---
+title: "RSVPLG01: Signal Detection Theory Analyses"
+author: "David Fencsik"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ez)
+this_file = "07-SDT"
+data_file = "02-FilterData.RData"
+```
+
+Analyze data based on signal detection theory, calculating d' and criterion
+
+# Load data files
+
+```{r, loaddata1}
+if(!file.exists(data_file)) {
+  sprintf("Cannot find file %s", data_file)
+  knitr::knit_exit()
+}
+```
+
+```{r, loaddata2}
+load(data_file)
+```
+
+# Define function to calculate d'
+
+```{r, dprimefunction}
+ComputeDprime <- function (nhits, nfa, npos, nneg, correction=0.5) {
+    ## correct HR for {0,1}
+    adjHR <- nhits
+    index <- adjHR == 0
+    if (any(index)) adjHR[index] <- 0.5
+    index <- adjHR == npos
+    if (any(index)) adjHR[index] <- npos[index] - 0.5
+    adjHR <- adjHR / npos
+
+    ## correct FA for {0,1}
+    adjFA <- nfa
+    index <- adjFA == 0
+    if (any(index)) adjFA[index] <- 0.5
+    index <- adjFA == nneg
+    if (any(index)) adjFA[index] <- nneg[index] - 0.5
+    adjFA <- adjFA / nneg
+
+    ## compute d' and criterion
+    dprime <- qnorm(adjHR) - qnorm(adjFA)
+    crit <- -0.5 * (qnorm(adjHR) + qnorm(adjFA))
+
+    ## compute CI around d'
+    phiFA <- 1 / sqrt(2 * pi) * exp(-0.5 * qnorm(adjFA))
+    phiHR <- 1 / sqrt(2 * pi) * exp(-0.5 * qnorm(adjHR))
+    ci <- 1.96 * sqrt(adjHR * (1 - adjHR) / npos / (phiHR^2) +
+                      adjFA * (1 - adjFA) / nneg / (phiFA^2))
+
+    return(data.frame(dprime=dprime, criterion=crit, ci=ci))
+}
+```
+
+# Setup Data
+
+## Compute counts
+
+```{r, computecounts}
+dt = rsvpData |>
+  filter(trial_type == "exp",
+         t1_acc == 1,
+         t2_acc >= 0) |>
+  mutate(t2 = if_else(t2 == "X", "present", "absent")) |>
+  group_by(sub, lag, t1_level, t2_level, t2) |>
+  summarize(ncor = sum(t2_acc),
+            count = n(),
+            .groups = "drop")
+```
+
+## Separate Data
+
+Separate present and absent trials, then duplicate the absent trials so there's a set for both 300 and 750 ms lags.
+
+```{r, separatetypes}
+dt_present = dt |>
+  filter(t2 == "present")
+
+dt_absent_300 = dt |>
+  filter(t2 == "absent") |>
+  mutate(lag = 300)
+
+dt_absent_750 = dt_absent_300 |>
+  mutate(lag = 750)
+```
+
+## Recombine Data
+
+```{r, combinedata}
+# combined data
+dt = bind_rows(dt_present, dt_absent_300, dt_absent_750)
+```
+
+## Compute D'
+
+```{r, computedprime}
+dt = dt |>
+  pivot_wider(names_from=t2,
+              values_from=c(ncor, count)) |>
+  drop_na(ends_with(c("absent", "present"))) |>
+  mutate(nerr_absent = count_absent - ncor_absent) |>
+  select(sub, t1_level, t2_level, lag,
+         n_hits=ncor_present, n_present=count_present,
+         n_fa=nerr_absent, n_absent=count_absent) |>
+  nest(data = c(n_hits, n_present, n_fa, n_absent)) |>
+  mutate(out = map(data, ~ComputeDprime(.$n_hits, .$n_fa, .$n_present, .$n_absent))) |>
+  unnest(cols=c(data, out)) |>
+  select(!(c(n_hits, n_present, n_fa, n_absent)))
+```
+
+## Add in Demographics and Surveys
+
+```{r, addothervars}
+dt = rsvpAggregate |>
+  filter(lag > 0) |>
+  select(sub, t1_level, t2_level, lag,
+         age, gender,
+         bsam, sias6, promisa, promisd) |>
+  full_join(dt) |>
+  drop_na(bsam:ci)
+```
+
+## Filter
+
+Remove participants who are missing a d' in any condition
+
+```{r, filterlowdprime}
+sub_to_keep = dt |>
+  mutate(t1l=substr(t1_level, 1, 1),
+         t2l=substr(t2_level, 1, 1),
+         var=paste0(t1l, t2l, lag)) |>
+  pivot_wider(names_from=var,
+              values_from=dprime,
+              id_cols=sub) |>
+  drop_na() |>
+  select(sub)
+
+sub_to_keep = sub_to_keep$sub
+
+dt = dt |>
+  filter(sub %in% sub_to_keep)
+```
+
+# Median split on Promis-A
+
+```{r, mediansplit}
+x = dt |>
+  distinct(sub, promisa)
+
+dt = dt |>
+  mutate(anxiety = factor(ifelse(promisa > median(x$promisa), "high", "low")))
+```
+
+# Plots
+
+```{r, plotdprime}
+dt |>
+  mutate(scope=factor(paste(t1_level, t2_level, sep="-"))) |>
+  group_by(scope, lag, anxiety) |>
+  summarize(dprime=mean(dprime),
+            .groups="drop") |>  
+  ggplot(aes(x=lag, y=dprime, color=anxiety)) +
+  geom_line(linewidth=1.25) +
+  facet_wrap(~scope) +
+  theme_classic()
+```
+
+# ANOVAs
+
+```{r, anovas}
+# get the 4 combos of scope
+dt = dt |>
+  mutate(scope=paste(t1_level, t2_level, sep="-"),
+         sub=factor(sub),
+         lag=factor(lag),
+         anxiety=factor(anxiety))
+
+scope = sort(unique(dt$scope))
+
+for (s in scope) {
+  cat("ANOVA on scope", s, "\n")
+  # print(summary(dt[dt$scope == s, ]))
+  dt |>
+    filter(scope == s) |>
+    ezANOVA(dv=dprime,
+                wid=sub,
+                within=lag,
+                between=anxiety,
+                type=3,
+                detailed=FALSE) |>
+    print()
+}
+```
