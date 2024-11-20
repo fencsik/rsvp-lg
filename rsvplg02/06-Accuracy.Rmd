@@ -8,8 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
-library(GGally)
-library(viridis)
+library(ez)
 this_file = "06-Accuracy"
 source_file = "02-FilterData"
 dataFile = sprintf("%s.RData", source_file)
@@ -119,4 +118,68 @@ Participants with the lowest T2 accuracy
 x |>
   arrange(t2acc) |>
   head(10)
+```
+
+# Effects of anxiety on AB and local/global processing
+
+Create groups
+
+```{r creategroups}
+nGroups = 2
+dt = rsvpAggregate2 |>
+  mutate(anx = promisa) |>
+  drop_na(anx) |>
+  mutate(anxgrp = cut(anx, nGroups, labels=as.character(1:nGroups)))
+```
+
+Test grouping function
+
+```{r testgroups}
+dt |>
+  ggplot(aes(anxgrp, anx)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  theme(legend.position="none") +
+  theme_classic()
+```
+
+Plot by groups
+
+```{r plotgroupsandscope}
+dt = dt |>
+  filter(anxgrp == "1" | anxgrp == as.character(nGroups)) |>
+  mutate(anxgrp = factor(anxgrp),
+         scope = paste(t1_level, t2_level, sep="-"))
+
+dt |>
+  group_by(scope, lag, anxgrp) |>
+  summarize(t2acc = mean(t2t1acc), .groups="drop") |>
+  ggplot(aes(lag, t2acc, color=anxgrp)) +
+  geom_line(linewidth=1.25) +
+  facet_wrap(~scope) +
+  theme_classic()
+```
+
+```{r anovagroupsandscope}
+# get the 4 combos of scope
+dt = dt |>
+  mutate(sub=factor(sub),
+         lag=factor(lag))
+
+scope = sort(unique(dt$scope))
+
+for (s in scope) {
+  cat("ANOVA on scope", s, "\n")
+  # print(summary(dt[dt$scope == s, ]))
+  dt |>
+    filter(scope == s) |>
+    ezANOVA(dv=t2t1acc,
+                wid=sub,
+                within=lag,
+                between=anxgrp,
+                type=3,
+                detailed=FALSE) |>
+    print()
+}
 ```
