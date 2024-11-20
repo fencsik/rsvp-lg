@@ -26,16 +26,18 @@ if(!file.exists(dataFile)) {
 
 ```{r, loaddata2}
 load(dataFile)
-rsvpAggregate1 = read.csv("../rsvplg01/rsvpAggregate.csv")
+rsvpAggregate2 = rsvpAggregate
+load("../rsvplg01/02-FilterData.RData")
+rsvpAggregate1 = rsvpAggregate
 ```
 
 # Combine Data Sets
 
 ```{r, combinedata}
-if (all(names(rsvpAggregate) == names(rsvpAggregate1))) {
-  rsvpAggregate$experiment = "RSVPLG02"
+if (all(names(rsvpAggregate2) == names(rsvpAggregate1))) {
+  rsvpAggregate2$experiment = "RSVPLG02"
   rsvpAggregate1$experiment = "RSVPLG01"
-  combined = bind_rows(rsvpAggregate1,rsvpAggregate)
+  combined = bind_rows(rsvpAggregate1,rsvpAggregate2)
 } else {
   combined = NA
 }
@@ -81,7 +83,7 @@ combined |>
 Violin plot of overall accuracy with each target
 
 ```{r, indaccplot, fig.height=4, fig.width=4}
-x = rsvpAggregate |>
+x = rsvpAggregate2 |>
   drop_na(t2t1acc) |>
   group_by(sub) |>
   summarize(t1acc = mean(t1acc),
