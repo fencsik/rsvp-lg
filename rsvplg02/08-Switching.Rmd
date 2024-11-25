@@ -1,0 +1,54 @@
+---
+title: "RSVPLG02: Switch-Cost Analyses"
+author: "David Fencsik"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ez)
+this_file = "08-Switching"
+source_file = "02-FilterData"
+dataFile = sprintf("%s.RData", source_file)
+```
+
+# Summary
+
+The purpose of this analysis is to look at switch costs, starting with whether there is any evidence of switching between scopes.
+
+# Load data files
+
+```{r, loaddata1, include=FALSE}
+if(!file.exists(dataFile)) {
+  sprintf("Cannot find file %s", dataFile)
+  knitr::knit_exit()
+}
+```
+
+```{r, loaddata2}
+load(dataFile)
+```
+
+# Overall Switching Effects
+
+Violin plot of T2|T1 accuracy on switch and no switch trials
+
+```{r switchplot, fig.height=4, fig.width=4}
+x = rsvpAggregate |>
+  mutate(switch = ifelse(t1_level == t2_level, "noswitch", "switch")) |>
+  group_by(sub, switch) |>
+  summarize(acc = mean(t2t1acc), .groups="drop")
+
+x |>
+  ggplot(aes(switch, acc)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  theme_classic()
+
+# x |>
+#   pivot_wider(names_from=switch,
+#               values_from=acc)
+```
