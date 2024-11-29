@@ -8,7 +8,8 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
-library(ez)
+library(ggpubr)
+library(rstatix)
 this_file = "08-Switching"
 source_file = "02-FilterData"
 dataFile = sprintf("%s.RData", source_file)
@@ -33,13 +34,18 @@ load(dataFile)
 
 # Overall Switching Effects
 
-Violin plot of T2|T1 accuracy on switch and no switch trials
+Plots and t-test of T2|T1 accuracy on switch and no switch trials
 
 ```{r switchplot, fig.height=4, fig.width=4}
 x = rsvpAggregate |>
   mutate(switch = ifelse(t1_level == t2_level, "noswitch", "switch")) |>
   group_by(sub, switch) |>
   summarize(acc = mean(t2t1acc), .groups="drop")
+
+diff = x |>
+  pivot_wider(names_from=switch,
+              values_from=acc) |>
+  mutate(d = noswitch - switch)
 
 x |>
   ggplot(aes(switch, acc)) +
@@ -48,7 +54,23 @@ x |>
   stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
   theme_classic()
 
-# x |>
-#   pivot_wider(names_from=switch,
-#               values_from=acc)
+diff |>
+  ggplot(aes(x="", y=d)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_hline(yintercept=0, linetype=2, color="gray") +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  theme_classic()
+
+x |>
+  group_by(switch) |>
+  get_summary_stats(acc, type = "mean_sd")
+
+diff |>
+  shapiro_test(d)
+
+ggqqplot(diff, "d")
+
+x |>
+  t_test(acc ~ switch, paired=TRUE)
 ```
