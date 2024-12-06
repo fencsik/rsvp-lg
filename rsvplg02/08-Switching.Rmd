@@ -74,3 +74,55 @@ ggqqplot(diff, "d")
 x |>
   t_test(acc ~ switch, paired=TRUE)
 ```
+
+```{r switchplotbylevel1, fig.height=4, fig.width=8}
+x = rsvpAggregate |>
+  mutate(switch = ifelse(t1_level == t2_level, "noswitch", "switch")) |>
+  group_by(sub, switch, t2_level) |>
+  summarize(acc = mean(t2t1acc), .groups="drop")
+
+diff = x |>
+  pivot_wider(names_from=switch,
+              values_from=acc) |>
+  mutate(d = noswitch - switch)
+
+x |>
+  ggplot(aes(switch, acc)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  facet_wrap(~t2_level) +
+  theme_classic()
+```
+
+```{r switchplotbylevel2, fig.height=4, fig.width=4}
+diff |>
+  ggplot(aes(x=t2_level, y=d)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_hline(yintercept=0, linetype=2, color="gray") +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  theme_classic()
+
+x |>
+  group_by(t2_level, switch) |>
+  get_summary_stats(acc, type = "mean_sd")
+
+diff |>
+  group_by(t2_level) |>
+  shapiro_test(d)
+```
+
+```{r switchplotbylevel3, fig.height=4, fig.width=8}
+diff |>
+  ggqqplot("d", facet.by="t2_level")
+
+x |>
+  anova_test(dv=acc,
+             wid=sub,
+             within=c(t2_level, switch))
+
+x |>
+  group_by(t2_level) |>
+  t_test(acc ~ switch, paired=TRUE)
+```
