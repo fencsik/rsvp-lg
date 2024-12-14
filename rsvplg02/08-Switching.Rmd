@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 library(tidyverse)
 library(ggpubr)
 library(rstatix)
@@ -34,9 +34,7 @@ load(dataFile)
 
 # Overall Switching Effects
 
-Plots and t-test of T2|T1 accuracy on switch and no switch trials
-
-```{r switchplot, fig.height=4, fig.width=4}
+```{r overallswitch1}
 x = rsvpAggregate |>
   mutate(switch = ifelse(t1_level == t2_level, "noswitch", "switch")) |>
   group_by(sub, switch) |>
@@ -46,14 +44,22 @@ diff = x |>
   pivot_wider(names_from=switch,
               values_from=acc) |>
   mutate(d = noswitch - switch)
+```
 
+Plot of T2|T1 accuracy on switch and no switch trials
+
+```{r overallswitch2, fig.height=4, fig.width=4}
 x |>
   ggplot(aes(switch, acc)) +
   geom_violin(draw_quantiles=c(.25, .5, .75)) +
   geom_jitter(width=.15, height=0, color="black", shape="circle open") +
   stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
   theme_classic()
+```
 
+Plot of difference score: T2|T1 accuracy, no-switch minus switch
+
+```{r overallswitch3, fig.height=4, fig.width=4}
 diff |>
   ggplot(aes(x="", y=d)) +
   geom_violin(draw_quantiles=c(.25, .5, .75)) +
@@ -61,21 +67,39 @@ diff |>
   geom_jitter(width=.15, height=0, color="black", shape="circle open") +
   stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
   theme_classic()
+```
 
+Summary statistics for T2|T1 accuracy on no-switch and switch trials
+
+```{r overallswitch4}
 x |>
   group_by(switch) |>
   get_summary_stats(acc, type = "mean_sd")
+```
 
+Shapiro-Wilk test of normality for the difference score. A significant outcome indicates non-normality
+
+```{r overallswitch5}
 diff |>
   shapiro_test(d)
+```
 
+QQ plot of the difference score to test for non-normality
+
+```{r overallswitch6, fig.height=4, fig.width=4}
 ggqqplot(diff, "d")
+```
 
+Paired *t*-test comparing T2|T1 accuracy on no-switch and switch trials
+
+```{r overallswitch7}
 x |>
   t_test(acc ~ switch, paired=TRUE)
 ```
 
-```{r switchplotbylevel1, fig.height=4, fig.width=8}
+# Switch Costs by Level
+
+```{r switchbylevel1}
 x = rsvpAggregate |>
   mutate(switch = ifelse(t1_level == t2_level, "noswitch", "switch")) |>
   group_by(sub, switch, t2_level) |>
@@ -85,7 +109,11 @@ diff = x |>
   pivot_wider(names_from=switch,
               values_from=acc) |>
   mutate(d = noswitch - switch)
+```
 
+Violin plot of T2|T1 accuracy separately for each combination of T2 level and switch condition
+
+```{r switchbylevel2, fig.height=4, fig.width=8}
 x |>
   ggplot(aes(switch, acc)) +
   geom_violin(draw_quantiles=c(.25, .5, .75)) +
@@ -95,7 +123,9 @@ x |>
   theme_classic()
 ```
 
-```{r switchplotbylevel2, fig.height=4, fig.width=4}
+Violin plot of the difference score for T2 local or global. The difference score is accuracy on no-switch trials minus accuracy on switch trials
+
+```{r switchbylevel3, fig.height=4, fig.width=4}
 diff |>
   ggplot(aes(x=t2_level, y=d)) +
   geom_violin(draw_quantiles=c(.25, .5, .75)) +
@@ -103,26 +133,69 @@ diff |>
   geom_jitter(width=.15, height=0, color="black", shape="circle open") +
   stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
   theme_classic()
+```
 
+Summary statistics for T2|T1 accuracy for each of the 4 combinations of switch-type and T2 level
+
+```{r switchbylevel4}
 x |>
   group_by(t2_level, switch) |>
   get_summary_stats(acc, type = "mean_sd")
+```
 
+Summary statistics for the difference score for each T2 level
+
+```{r switchbylevel4a}
+diff |>
+  group_by(t2_level) |>
+  get_summary_stats(d, type = "mean_sd")
+```
+
+Shapiro-Wilk test of normality for accuracy. A significant outcome supports non-normality
+
+```{r switchbylevel5a}
+x |>
+  group_by(t2_level, switch) |>
+  shapiro_test(acc)
+```
+
+Shapiro-Wilk test of normality for the difference score. A significant outcome supports non-normality
+
+```{r switchbylevel5b}
 diff |>
   group_by(t2_level) |>
   shapiro_test(d)
 ```
 
-```{r switchplotbylevel3, fig.height=4, fig.width=8}
+QQ plot of the difference scores at each T2 level
+
+```{r switchbylevel6, fig.height=4, fig.width=8}
 diff |>
   ggqqplot("d", facet.by="t2_level")
+```
 
+Overall repeated-measures ANOVA looking at the effects of T2 level (global, local) and switch condition (no-switch, switch) on T2|T1 accuracy
+
+```{r switchbylevel7}
 x |>
   anova_test(dv=acc,
              wid=sub,
              within=c(t2_level, switch))
+```
 
+Planned comparisons for the above ANOVA: paired *t*-tests looking at the switch cost for each T2 level
+
+```{r switchbylevel8}
 x |>
   group_by(t2_level) |>
   t_test(acc ~ switch, paired=TRUE)
+```
+
+Now run a *t*-tests on the difference scores for each T2 level. These are more appropriate because the difference scores are normally distributed, whereas some of the accuracies don't seem to be.
+
+Run at *t*-test comparing the difference scores at each level. That is, compare the switch cost at T2 global to the switch cost at T2 local
+
+```{r switchbylevel9}
+diff |>
+  t_test(d ~ t2_level, paired=TRUE)
 ```
