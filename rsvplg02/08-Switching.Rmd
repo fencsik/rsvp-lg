@@ -199,3 +199,14 @@ Run at *t*-test comparing the difference scores at each level. That is, compare 
 diff |>
   t_test(d ~ t2_level, paired=TRUE)
 ```
+
+Now try a difference of a difference score
+
+```{r switchbylevel10}
+diff |>
+  pivot_wider(names_from=t2_level,
+              values_from=d,
+              id_cols=sub) |>
+  mutate(dd = local - global) |>
+  head(10)
+```
