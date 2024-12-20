@@ -73,7 +73,7 @@ surveyData$gender = factor(surveyData$gender, levels=as.character(0:6),
                                    "nonbinary", "agender", "other"))
 ```
 
-7. Create a common set of subjects across the two data sets.
+7. Create a common set of subjects across the two data sets. Subject 508 struggled with the task, left early, and didn't complete the survey, so they'll be dropped here.
 
 ```{r, cleandata7}
 subRSVP = sort(unique(rsvpData$sub))
