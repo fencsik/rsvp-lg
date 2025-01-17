@@ -104,6 +104,34 @@ if (filtert1accextreme) {
 }
 ```
 
+Include just the participants run by Amanda's RAs in 2023--24. These are participants numbered in the 200s; David's students ran participants numbered in the 100s or 300s.
+
+```{r justamanda}
+filterjustamanda = FALSE
+if (filterjustamanda) {
+  rsvpAggregate = rsvpAggregate |>
+    filter(sub >= 200 & sub <= 299)
+  rsvpData = rsvpData |>
+    filter(sub >= 200 & sub <= 299)
+  surveyData = surveyData |>
+    filter(sub >= 200 & sub <= 299)
+}
+```
+
+Include just the participants run by David's 491C students in 2023--24 (see above). Note that only one of these two should be TRUE, otherwise we'll remove everyone.
+
+```{r justdavid}
+filterjustdavid = FALSE
+if (filterjustdavid) {
+  rsvpAggregate = rsvpAggregate |>
+    filter(sub < 200 | sub > 299)
+  rsvpData = rsvpData |>
+    filter(sub < 200 | sub > 299)
+  surveyData = surveyData |>
+    filter(sub < 200 | sub > 299)
+}
+```
+
 ## Number of Particants After Filtering
 
 ```{r, postOutlierRemovalSummary}
