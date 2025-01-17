@@ -97,6 +97,24 @@ x |>
   t_test(acc ~ switch, paired=TRUE)
 ```
 
+## Effect of Surveys
+
+Plot the difference score as a function of PROMIS-A
+
+```{r overallswitchbypromisa1, fig.height=4, fig.width=4}
+diff |>
+  ggplot(aes(x=promisa, y=d)) +
+  geom_point(size=1) +
+#  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+  theme(legend.position="right",
+        legend.title=element_blank()) +
+  theme_classic()
+
+m = lm(d ~ promisa, data=diff)
+summary(m)
+```
+
+
 # Switch Costs by Level
 
 ```{r switchbylevel1}
@@ -199,6 +217,48 @@ Run at *t*-test comparing the difference scores at each level. That is, compare 
 diff |>
   t_test(d ~ t2_level, paired=TRUE)
 ```
+
+# Difference Scores by Level and by Surveys
+
+Plot local and global difference scores by PROMIS-A
+
+```{r diffbypromisa1}
+# rsvpAggregate |>
+#   mutate(switch = ifelse(t1_level == t2_level, "noswitch", "switch")) |>
+#   group_by(sub, switch, t2_level, bsam, sias6, promisa, promisd) |>
+#   summarize(acc = mean(t2t1acc), .groups="drop") |>
+#   pivot_wider(names_from=switch,
+#               values_from=acc) |>
+#   mutate(d = noswitch - switch) -> x
+
+diff |>
+  ggplot(aes(x=promisa, y=d, color=t2_level)) +
+  geom_point(size=1) +
+#  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+  scale_color_manual(values=c("black","red")) +
+  theme(legend.position="right",
+        legend.title=element_blank()) +
+  theme_classic()
+#  facet_wrap(~lag)
+```
+
+Separate plots for global and local, but otherwise same as above
+
+```{r diffbypromisa2, fig.height=4, fig.width=8}
+diff |>
+  ggplot(aes(x=promisa, y=d)) +
+  geom_point(size=1) +
+#  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+  facet_wrap(~t2_level) +
+  theme(legend.position="right",
+        legend.title=element_blank()) +
+  theme_classic()
+
+summary(lm(d ~ promisa, data=diff, subset=(t2_level == "local")))
+```
+
+
+# Exploring Difference-of-Differences
 
 Now try a difference of a difference score
 
