@@ -54,6 +54,8 @@ x |>
   geom_violin(draw_quantiles=c(.25, .5, .75)) +
   geom_jitter(width=.15, height=0, color="black", shape="circle open") +
   stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  labs(x="Switch Condition", y="T2|T1 Accuracy") +
+  scale_x_discrete(labels=c("No Switch", "Switch")) +
   theme_classic()
 ```
 
@@ -66,6 +68,7 @@ diff |>
   geom_hline(yintercept=0, linetype=2, color="gray") +
   geom_jitter(width=.15, height=0, color="black", shape="circle open") +
   stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  labs(x=NULL, y="No-Switch - Switch") +
   theme_classic()
 ```
 
@@ -108,6 +111,7 @@ diff |>
   geom_smooth(method="lm", formula=y~x, se=FALSE) +
   theme(legend.position="right",
         legend.title=element_blank()) +
+  labs(x="Sum of PROMIS-A", y="No-Switch - Switch") +
   theme_classic()
 
 m = lm(d ~ promisa, data=diff)
@@ -137,7 +141,9 @@ x |>
   geom_violin(draw_quantiles=c(.25, .5, .75)) +
   geom_jitter(width=.15, height=0, color="black", shape="circle open") +
   stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
-  facet_wrap(~t2_level) +
+  labs(x="Switch Condition", y="T2|T1 Accuracy") +
+  scale_x_discrete(labels=c("No Switch", "Switch")) +
+  facet_wrap(~t2_level, labeller=as_labeller(c(local="T2 Local", global="T2 Global"))) +
   theme_classic()
 ```
 
@@ -150,6 +156,8 @@ diff |>
   geom_hline(yintercept=0, linetype=2, color="gray") +
   geom_jitter(width=.15, height=0, color="black", shape="circle open") +
   stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  labs(x="T2 Level", y="No-Switch - Switch") +
+  scale_x_discrete(labels=c("Global", "Local")) +
   theme_classic()
 ```
 
@@ -230,6 +238,7 @@ diff |>
   scale_color_manual(values=c("black","red")) +
   theme(legend.position="right",
         legend.title=element_blank()) +
+  labs(x="Sum of PROMIS-A", y="No-Switch - Switch") +
   theme_classic()
 ```
 
@@ -240,9 +249,10 @@ diff |>
   ggplot(aes(x=promisa, y=d)) +
   geom_point(size=1) +
   geom_smooth(method="lm", formula=y~x, se=FALSE) +
-  facet_wrap(~t2_level) +
+  facet_wrap(~t2_level, labeller=as_labeller(c(local="T2 Local", global="T2 Global"))) +
   theme(legend.position="right",
         legend.title=element_blank()) +
+  labs(x="Sum of PROMIS-A", y="No-Switch - Switch") +
   theme_classic()
 ```
 
