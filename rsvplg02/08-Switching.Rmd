@@ -257,17 +257,3 @@ Same as above but for T2 local.
 ```{r diffbypromisalm2}
 summary(lm(d ~ promisa, data=diff, subset=(t2_level == "local")))
 ```
-
-
-# Exploring Difference-of-Differences
-
-Now try a difference of a difference score
-
-```{r switchbylevel10}
-diff |>
-  pivot_wider(names_from=t2_level,
-              values_from=d,
-              id_cols=sub) |>
-  mutate(dd = local - global) |>
-  head(10)
-```
