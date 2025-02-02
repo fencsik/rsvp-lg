@@ -105,7 +105,7 @@ Plot the difference score as a function of PROMIS-A
 diff |>
   ggplot(aes(x=promisa, y=d)) +
   geom_point(size=1) +
-#  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+  geom_smooth(method="lm", formula=y~x, se=FALSE) +
   theme(legend.position="right",
         legend.title=element_blank()) +
   theme_classic()
@@ -234,7 +234,7 @@ Plot local and global difference scores by PROMIS-A
 diff |>
   ggplot(aes(x=promisa, y=d, color=t2_level)) +
   geom_point(size=1) +
-#  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+  geom_smooth(method="lm", formula=y~x, se=FALSE) +
   scale_color_manual(values=c("black","red")) +
   theme(legend.position="right",
         legend.title=element_blank()) +
@@ -248,7 +248,7 @@ Separate plots for global and local, but otherwise same as above
 diff |>
   ggplot(aes(x=promisa, y=d)) +
   geom_point(size=1) +
-#  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+  geom_smooth(method="lm", formula=y~x, se=FALSE) +
   facet_wrap(~t2_level) +
   theme(legend.position="right",
         legend.title=element_blank()) +
