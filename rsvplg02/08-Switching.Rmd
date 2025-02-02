@@ -244,7 +244,17 @@ diff |>
   theme(legend.position="right",
         legend.title=element_blank()) +
   theme_classic()
+```
 
+Linear fit of global data above. Runs a regression of the effect of PROMIS-A on the difference score for just T2 global.
+
+```{r diffbypromisalm1}
+summary(lm(d ~ promisa, data=diff, subset=(t2_level == "global")))
+```
+
+Same as above but for T2 local.
+
+```{r diffbypromisalm2}
 summary(lm(d ~ promisa, data=diff, subset=(t2_level == "local")))
 ```
 
