@@ -223,14 +223,6 @@ diff |>
 Plot local and global difference scores by PROMIS-A
 
 ```{r diffbypromisa1}
-# rsvpAggregate |>
-#   mutate(switch = ifelse(t1_level == t2_level, "noswitch", "switch")) |>
-#   group_by(sub, switch, t2_level, bsam, sias6, promisa, promisd) |>
-#   summarize(acc = mean(t2t1acc), .groups="drop") |>
-#   pivot_wider(names_from=switch,
-#               values_from=acc) |>
-#   mutate(d = noswitch - switch) -> x
-
 diff |>
   ggplot(aes(x=promisa, y=d, color=t2_level)) +
   geom_point(size=1) +
@@ -239,7 +231,6 @@ diff |>
   theme(legend.position="right",
         legend.title=element_blank()) +
   theme_classic()
-#  facet_wrap(~lag)
 ```
 
 Separate plots for global and local, but otherwise same as above
