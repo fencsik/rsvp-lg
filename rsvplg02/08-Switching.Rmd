@@ -267,3 +267,114 @@ Same as above but for T2 local.
 ```{r diffbypromisalm2}
 summary(lm(d ~ promisa, data=diff, subset=(t2_level == "local")))
 ```
+
+
+# Overall Switch Costs by Lag
+
+```{r switchbylag1}
+x = rsvpAggregate |>
+  mutate(switch = ifelse(t1_level == t2_level, "noswitch", "switch"),
+         lag = factor(lag)) |>
+  group_by(sub, switch, lag, bsam, sias6, promisa, promisd) |>
+  summarize(acc = mean(t2t1acc), .groups="drop")
+
+diff = x |>
+  pivot_wider(names_from=switch,
+              values_from=acc) |>
+  mutate(d = noswitch - switch)
+```
+
+Violin plot of T2|T1 accuracy separately for each combination of T2 lag and switch condition
+
+```{r switchbylag2, fig.height=4, fig.width=8}
+x |>
+  ggplot(aes(switch, acc)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  labs(x="Switch Condition", y="T2|T1 Accuracy") +
+  scale_x_discrete(labels=c("No Switch", "Switch")) +
+  facet_wrap(~lag) +
+  theme_classic()
+```
+
+Violin plot of the difference score for each level of T2 lag. The difference score is still accuracy on no-switch trials minus accuracy on switch trials
+
+```{r switchbylag3, fig.height=4, fig.width=4}
+diff |>
+  ggplot(aes(x=lag, y=d)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_hline(yintercept=0, linetype=2, color="gray") +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  labs(x="T2 Lag (ms)", y="No-Switch - Switch") +
+  theme_classic()
+```
+
+Overall repeated-measures ANOVA looking at the effects of T2 lag (300 vs. 750 ms) and switch condition (no-switch, switch) on T2|T1 accuracy. Any effect of T2 lag would be the attentional blink.
+
+```{r switchbylag4}
+x |>
+  anova_test(dv=acc,
+             wid=sub,
+             within=c(lag, switch))
+```
+
+Planned comparisons for the above ANOVA: paired *t*-tests looking at the switch cost for each level of T2 lag
+
+```{r switchbylag5}
+x |>
+  group_by(lag) |>
+  t_test(acc ~ switch, paired=TRUE)
+```
+
+Now run a *t*-tests on the difference scores for each level of T2 lag. These are more appropriate because the difference scores are normally distributed, whereas some of the accuracies don't seem to be.
+
+Run at *t*-test comparing the difference scores at each level. That is, compare the switch cost at 300 ms lags to 750 ms lags
+
+```{r switchbylag6}
+diff |>
+  t_test(d ~ lag, paired=TRUE)
+```
+
+# Effects of Surveys by Lag
+
+Plot difference scores by PROMIS-A separately for each lag
+
+```{r diffbylagbypromisa1}
+diff |>
+  ggplot(aes(x=promisa, y=d, color=lag)) +
+  geom_point(size=1) +
+  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+  scale_color_manual(values=c("black","red")) +
+  theme(legend.position="right",
+        legend.title=element_blank()) +
+  labs(x="Sum of PROMIS-A", y="No-Switch - Switch") +
+  theme_classic()
+```
+
+Separate plots for global and local, but otherwise same as above
+
+```{r diffbylagbypromisa2, fig.height=4, fig.width=8}
+diff |>
+  ggplot(aes(x=promisa, y=d)) +
+  geom_point(size=1) +
+  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+  facet_wrap(~lag) +
+  theme(legend.position="right",
+        legend.title=element_blank()) +
+  labs(x="Sum of PROMIS-A", y="No-Switch - Switch") +
+  theme_classic()
+```
+
+Linear fit of global data above. Runs a regression of the effect of PROMIS-A on the difference score for just T2 global.
+
+```{r diffbylagbypromisalm1}
+summary(lm(d ~ promisa, data=diff, subset=(lag == "300")))
+```
+
+Same as above but for T2 local.
+
+```{r diffbylagbypromisalm2}
+summary(lm(d ~ promisa, data=diff, subset=(lag == "750")))
+```
