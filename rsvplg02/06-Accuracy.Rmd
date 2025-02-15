@@ -29,6 +29,7 @@ load(dataFile)
 rsvpAggregate2 = rsvpAggregate
 load("../rsvplg01/02-FilterData.RData")
 rsvpAggregate1 = rsvpAggregate
+rsvpAggregate = rsvpAggregate2
 ```
 
 # Combine Data Sets
