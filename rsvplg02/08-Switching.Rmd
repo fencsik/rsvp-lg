@@ -114,8 +114,9 @@ diff |>
   labs(x="Sum of PROMIS-A", y="No-Switch - Switch") +
   theme_classic()
 
-m = lm(d ~ promisa, data=diff)
-summary(m)
+fit = lm(d ~ promisa, data=diff)
+summary(fit)
+confint(fit, 'promisa', level=0.95)
 ```
 
 
@@ -259,13 +260,17 @@ diff |>
 Linear fit of global data above. Runs a regression of the effect of PROMIS-A on the difference score for just T2 global.
 
 ```{r diffbypromisalm1}
-summary(lm(d ~ promisa, data=diff, subset=(t2_level == "global")))
+fit = lm(d ~ promisa, data=diff, subset=(t2_level == "global"))
+summary(fit)
+confint(fit, 'promisa', level=0.95)
 ```
 
 Same as above but for T2 local.
 
 ```{r diffbypromisalm2}
-summary(lm(d ~ promisa, data=diff, subset=(t2_level == "local")))
+fit = lm(d ~ promisa, data=diff, subset=(t2_level == "local"))
+summary(fit)
+confint(fit, 'promisa', level=0.95)
 ```
 
 
@@ -370,11 +375,15 @@ diff |>
 Linear fit of global data above. Runs a regression of the effect of PROMIS-A on the difference score for just T2 global.
 
 ```{r diffbylagbypromisalm1}
-summary(lm(d ~ promisa, data=diff, subset=(lag == "300")))
+fit = lm(d ~ promisa, data=diff, subset=(lag == "300"))
+summary(fit)
+confint(fit, 'promisa', level=0.95)
 ```
 
 Same as above but for T2 local.
 
 ```{r diffbylagbypromisalm2}
-summary(lm(d ~ promisa, data=diff, subset=(lag == "750")))
+fit = lm(d ~ promisa, data=diff, subset=(lag == "750"))
+summary(fit)
+confint(fit, 'promisa', level=0.95)
 ```
