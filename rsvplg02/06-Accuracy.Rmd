@@ -8,6 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 library(tidyverse)
+library(rstatix)
 library(ez)
 this_file = "06-Accuracy"
 source_file = "02-FilterData"
