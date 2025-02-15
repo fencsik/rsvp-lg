@@ -124,7 +124,7 @@ T1 Accuracy across the 12 cells
 
 ```{r, accuracysummaries1, fig.height=4.5, fig.width=11}
 rsvpAggregate |>
-  unite("cell", t1_level, t2_level, lag) |>
+  unite("cell", lag, t1_level, t2_level) |>
   ggplot(aes(factor(cell), t1acc)) +
   geom_violin(draw_quantiles=c(.25, .5, .75)) +
   geom_jitter(width=.15, height=0, color="black", shape="circle open") +
