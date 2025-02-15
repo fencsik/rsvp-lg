@@ -79,6 +79,152 @@ combined |>
 #  facet_wrap(~lag)
 ```
 
+Here is a basic plot of the AB just for this experiment
+
+```{r abplot1}
+x = rsvpAggregate |>
+  group_by(sub, lag, bsam, sias6, promisa, promisd) |>
+  summarize(t1acc = mean(t1acc),
+            t2acc = mean(t2t1acc),
+            .groups="drop")
+
+x |>
+  group_by(lag) |>
+  summarize(t1acc = mean(t1acc),
+            t2acc = mean(t2acc),
+            .groups="drop") |>
+  pivot_longer(cols = ends_with("acc"),
+               names_to = "target",
+               values_to = "acc") |>
+  mutate(target = factor(sub("acc", "", target),
+                         levels=c("t1", "t2"),
+                         labels=c("T1", "T2|T1")),
+         lag = factor(lag)) |>
+  ggplot(aes(x=lag, y=acc, group=target, color=target)) +
+  geom_line(linewidth=1.25) +
+  geom_point(size=3) +
+  scale_color_manual(values=c("black","red")) +
+  coord_cartesian(ylim=c(0.5, 1.0)) +
+  labs(x="T2 Lag (ms)", y="Accuracy") +
+  theme(legend.position="right",
+        legend.title=element_blank()) +
+  theme_classic()
+```
+
+Plot T2|T1 accuracy as a function of lag, separating by each of the T1 and T2 levels
+
+```{r abplotbylevels}
+rsvpAggregate |>
+  mutate(levels = sprintf("%s-%s", t1_level, t2_level)) |>
+  group_by(sub, lag, levels) |>
+  summarize(t2acc = mean(t2t1acc), .groups="drop") |>
+  group_by(lag, levels) |>
+  summarize(t2acc = mean(t2acc), .groups="drop") |>
+  ggplot(aes(x=lag, y=t2acc, group=levels, color=levels)) +
+  geom_line(linewidth=1.25) +
+  geom_point(size=3) +
+#  scale_color_manual(values=c("black","red")) +
+  coord_cartesian(ylim=c(0.5, 1.0)) +
+  labs(x="T2 Lag (ms)", y="T2|T1 Accuracy") +
+  theme(legend.position="right",
+        legend.title=element_blank()) +
+  theme_classic()
+```
+
+ANOVA testing the effects of lag and combined levels on T2|T1 accuracy
+
+```{r}
+rsvpAggregate |>
+  mutate(levels = sprintf("%s-%s", t1_level, t2_level)) |>
+  group_by(sub, lag, levels) |>
+  summarize(t2acc = mean(t2t1acc), .groups="drop") |>
+  anova_test(dv=t2acc,
+             wid=sub,
+             within=c(lag, levels))
+```
+
+
+Violin plots of T1 accuracy separated by lag
+
+```{r abplott1}
+x |>
+  mutate(lag = factor(lag)) |>
+  ggplot(aes(lag, t1acc)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  labs(x="Lag", y="T1 Accuracy") +
+  theme_classic()
+```
+
+Paired t-test comparing T1 accuracy across the two lags, just for kicks. If it's significant, presumably that's just because we have so many participants?
+
+```{r abtest1}
+x |>
+  t_test(t1acc ~ lag, paired=TRUE)
+```
+
+Violin plots of T2|T1 accuracy separated by lag
+
+```{r abplot2}
+x |>
+  mutate(lag = factor(lag)) |>
+  ggplot(aes(lag, t2acc)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  labs(x="Lag", y="T2|T1 Accuracy") +
+  theme_classic()
+```
+
+Paired t-test comparing T2|T1 accuracy across the two lags
+
+```{r abtest2}
+x |>
+  t_test(t2acc ~ lag, paired=TRUE)
+```
+
+Plots of difference scores based on T2|T1 accuracy lag 750 - lag 300
+
+```{r abplot3}
+diff = x |>
+  select(!t1acc) |>
+  mutate(lag = sprintf("l%d", lag)) |>
+  pivot_wider(names_from=lag,
+              values_from=t2acc) |>
+  mutate(d = l750 - l300)
+
+diff |>
+  ggplot(aes("", d)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  geom_hline(yintercept=0, linetype=2, color="gray") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  labs(x=NULL, y="Lag 750 - Lag 300") +
+  theme_classic()
+```
+
+Plot the difference score as a function of PROMIS-A
+
+```{r abplot4}
+diff |>
+  ggplot(aes(x=promisa, y=d)) +
+  geom_point(size=1) +
+  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+#  scale_color_manual(values=c("black","red")) +
+  theme(legend.position="right",
+        legend.title=element_blank()) +
+  labs(x="Sum of PROMIS-A", y="Lag 750 - Lag 300") +
+  theme_classic()
+```
+
+Run a linear model on the above function
+
+```{r abplot4lm}
+summary(lm(d ~ promisa, data=diff))
+```
+
+
 ## Individual accuracy
 
 Violin plot of overall accuracy with each target
