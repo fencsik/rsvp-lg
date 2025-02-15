@@ -132,7 +132,7 @@ rsvpAggregate |>
   stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5)
 ```
 
-Overall T2 accuracy across the 8 cells (not including T2 absent)
+Overall T2 accuracy across the 8 cells
 
 ```{r, accuracysummaries2, fig.height=4.5, fig.width=11}
 rsvpAggregate |>
@@ -145,7 +145,7 @@ rsvpAggregate |>
   stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5)
 ```
 
-T2|T1 accuracy across the 8 cells (not including T2 absent)
+T2|T1 accuracy across the 8 cells
 
 ```{r, accuracysummaries3, fig.height=4.5, fig.width=11}
 rsvpAggregate |>
