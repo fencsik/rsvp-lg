@@ -32,7 +32,66 @@ rsvpAggregate1 = rsvpAggregate
 rsvpAggregate = rsvpAggregate2
 ```
 
-# Combine Data Sets
+# Basic Accuracy Analyses
+
+```{r basics1, fig.height=4, fig.width=4}
+rsvpAggregate |>
+  group_by(sub, bsam, sias6, promisa, promisd) |>
+  summarize(t1acc = mean(t1acc),
+            t2acc = mean(t2t1acc),
+            .groups="drop") |>
+  pivot_longer(cols = ends_with("acc"),
+               names_to = "target",
+               values_to = "acc") |>
+  mutate(target = factor(target,
+                         levels=c("t1acc", "t2acc"),
+                         labels=c("T1", "T2"))) -> x
+```
+
+Violin plots of overall T1 and T2|T1 accuracy
+
+```{r basics2, fig.height=4, fig.width=4}
+x |>
+  ggplot(aes(target, acc)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  labs(x="Target", y="Accuracy") +
+  theme_classic()
+```
+
+Plot accuracy in each task as a function of PROMIS-A
+
+```{r basics3, fig.height=4, fig.width=6}
+x |>
+  ggplot(aes(x=promisa, y=acc, color=target)) +
+  geom_point(size=1) +
+  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+  scale_color_manual(values=c("black","red")) +
+  theme(legend.position="right",
+        legend.title=element_blank()) +
+  labs(x="Sum of PROMIS-A", y="Accuracy") +
+  theme_classic()
+```
+
+Linear model of the effect of PROMIS-A on T1 accuracy
+
+```{r basics4}
+fit = lm(acc ~ promisa, data=x, subset=(target == "T1"))
+summary(fit)
+confint(fit, 'promisa', level=0.95)
+```
+
+Same but for T2 accuracy
+
+```{r basics5}
+fit = lm(acc ~ promisa, data=x, subset=(target == "T2"))
+summary(fit)
+confint(fit, 'promisa', level=0.95)
+```
+
+
+# Combine Data Sets w/ RSVPLG01
 
 ```{r, combinedata}
 if (all(names(rsvpAggregate2) == names(rsvpAggregate1))) {
