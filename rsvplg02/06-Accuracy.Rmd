@@ -140,7 +140,7 @@ combined |>
 
 Here is a basic plot of the AB just for this experiment
 
-```{r abplot1}
+```{r abplot1, fig.height=4, fig.width=6}
 x = rsvpAggregate |>
   group_by(sub, lag, bsam, sias6, promisa, promisd) |>
   summarize(t1acc = mean(t1acc),
@@ -205,7 +205,7 @@ rsvpAggregate |>
 
 Violin plots of T1 accuracy separated by lag
 
-```{r abplott1}
+```{r abplott1, fig.height=4, fig.width=4}
 x |>
   mutate(lag = factor(lag)) |>
   ggplot(aes(lag, t1acc)) +
@@ -225,7 +225,7 @@ x |>
 
 Violin plots of T2|T1 accuracy separated by lag
 
-```{r abplot2}
+```{r abplot2, fig.height=4, fig.width=4}
 x |>
   mutate(lag = factor(lag)) |>
   ggplot(aes(lag, t2acc)) +
@@ -245,7 +245,7 @@ x |>
 
 Plots of difference scores based on T2|T1 accuracy lag 750 - lag 300
 
-```{r abplot3}
+```{r abplot3, fig.height=4, fig.width=3}
 diff = x |>
   select(!t1acc) |>
   mutate(lag = sprintf("l%d", lag)) |>
@@ -265,7 +265,7 @@ diff |>
 
 Plot the difference score as a function of PROMIS-A
 
-```{r abplot4}
+```{r abplot4, fig.height=4, fig.width=6}
 diff |>
   ggplot(aes(x=promisa, y=d)) +
   geom_point(size=1) +
