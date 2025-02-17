@@ -358,7 +358,7 @@ diff |>
   theme_classic()
 ```
 
-Separate plots for global and local, but otherwise same as above
+Separate plots for each lag, but otherwise same as above
 
 ```{r diffbylagbypromisa2, fig.height=4, fig.width=8}
 diff |>
@@ -372,7 +372,7 @@ diff |>
   theme_classic()
 ```
 
-Linear fit of global data above. Runs a regression of the effect of PROMIS-A on the difference score for just T2 global.
+Linear fit of data above. Runs a regression of the effect of PROMIS-A on the difference score for lag 300.
 
 ```{r diffbylagbypromisalm1}
 fit = lm(d ~ promisa, data=diff, subset=(lag == "300"))
@@ -380,7 +380,7 @@ summary(fit)
 confint(fit, 'promisa', level=0.95)
 ```
 
-Same as above but for T2 local.
+Same as above but for lag 750.
 
 ```{r diffbylagbypromisalm2}
 fit = lm(d ~ promisa, data=diff, subset=(lag == "750"))
