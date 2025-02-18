@@ -280,7 +280,9 @@ diff |>
 Run a linear model on the above function
 
 ```{r abplot4lm}
-summary(lm(d ~ promisa, data=diff))
+fit = lm(d ~ promisa, data=diff)
+summary(fit)
+confint(fit, 'promisa', level=0.95)
 ```
 
 
