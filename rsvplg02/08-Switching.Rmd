@@ -32,6 +32,113 @@ if(!file.exists(dataFile)) {
 load(dataFile)
 ```
 
+# Global/Local Differences
+
+## T1
+
+```{r globallocal1}
+rsvpAggregate |>
+  group_by(sub, t1_level, bsam, sias6, promisa, promisd) |>
+  summarize(acc = mean(t1acc), .groups="drop") |>
+  rename(level = t1_level) -> x
+```
+
+T1 accuracy as a function of T1 level
+
+```{r globallocal2, fig.height=4, fig.width=4}
+x |>
+  ggplot(aes(level, acc)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  labs(x="T1 Level", y="T1 Accuracy") +
+  theme_classic()
+```
+
+T1 accuracy as a function of T1 level and PROMIS-A score
+
+```{r globallocal3, fig.height=4, fig.width=6}
+x |>
+  ggplot(aes(x=promisa, y=acc, color=level)) +
+  geom_point(size=1) +
+  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+  scale_color_manual(values=c("black","red")) +
+  theme(legend.position="right",
+        legend.title=element_blank()) +
+  labs(x="Sum of PROMIS-A", y="T1 Accuracy") +
+  theme_classic()
+```
+
+Linear fit for T1 global level
+
+```{r globallocal3lm1}
+fit = lm(acc ~ promisa, data=x, subset=(level == "global"))
+summary(fit)
+confint(fit, 'promisa', level=0.95)
+```
+
+Linear fit for T1 local level
+
+```{r globallocal3lm2}
+fit = lm(acc ~ promisa, data=x, subset=(level == "local"))
+summary(fit)
+confint(fit, 'promisa', level=0.95)
+```
+
+
+## T2
+
+```{r globallocal4}
+rsvpAggregate |>
+  group_by(sub, t2_level, bsam, sias6, promisa, promisd) |>
+  summarize(acc = mean(t2acc), .groups="drop") |>
+  rename(level = t2_level) -> x
+```
+
+T2 accuracy as a function of T2 level
+
+```{r globallocal5, fig.height=4, fig.width=4}
+x |>
+  ggplot(aes(level, acc)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  labs(x="T2 Level", y="T2 Accuracy") +
+  theme_classic()
+```
+
+T1 accuracy as a function of T1 level and PROMIS-A score
+
+```{r globallocal6, fig.height=4, fig.width=6}
+x |>
+  ggplot(aes(x=promisa, y=acc, color=level)) +
+  geom_point(size=1) +
+  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+  scale_color_manual(values=c("black","red")) +
+  theme(legend.position="right",
+        legend.title=element_blank()) +
+  labs(x="Sum of PROMIS-A", y="T2 Accuracy") +
+  theme_classic()
+```
+
+Linear fit for T2 global level
+
+```{r globallocal6lm1}
+fit = lm(acc ~ promisa, data=x, subset=(level == "global"))
+summary(fit)
+confint(fit, 'promisa', level=0.95)
+```
+
+Linear fit for T2 local level
+
+```{r globallocal6lm2}
+fit = lm(acc ~ promisa, data=x, subset=(level == "local"))
+summary(fit)
+confint(fit, 'promisa', level=0.95)
+```
+
+
+
 # Overall Switching Effects
 
 ```{r overallswitch1}
