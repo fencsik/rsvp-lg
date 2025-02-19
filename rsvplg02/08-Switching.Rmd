@@ -103,11 +103,11 @@ x |>
   geom_violin(draw_quantiles=c(.25, .5, .75)) +
   geom_jitter(width=.15, height=0, color="black", shape="circle open") +
   stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
-  labs(x="T2 Level", y="T2 Accuracy") +
+  labs(x="T2 Level", y="T2|T1 Accuracy") +
   theme_classic()
 ```
 
-T1 accuracy as a function of T1 level and PROMIS-A score
+T2 accuracy as a function of T2 level and PROMIS-A score
 
 ```{r globallocal6, fig.height=4, fig.width=6}
 x |>
@@ -117,7 +117,7 @@ x |>
   scale_color_manual(values=c("black","red")) +
   theme(legend.position="right",
         legend.title=element_blank()) +
-  labs(x="Sum of PROMIS-A", y="T2 Accuracy") +
+  labs(x="Sum of PROMIS-A", y="T2|T1 Accuracy") +
   theme_classic()
 ```
 
