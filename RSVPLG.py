@@ -653,6 +653,7 @@ if test_t1:
 if test_t2:
     end_of_block_feedback_text += '\n\nTarget 2 Accuracy = {}%'.format(
         np.round(1000.0 * t2_correct_count / trial) / 10.0)
+print(end_of_block_feedback_text)
 end_of_block_feedback_text += '\n\nThank you!'
 end_of_block_feedback = visual.TextBox2(
     win, text=end_of_block_feedback_text,
