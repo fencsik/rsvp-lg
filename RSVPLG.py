@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 EXPERIMENT = 'RSVPLG02'
-VERSION = '2.2'
+VERSION = '2.3'
 
 # Basic setup
 rsvp_stream_frames = 12
