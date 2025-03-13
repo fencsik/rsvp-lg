@@ -30,12 +30,12 @@ print(length(unique(rsvpAggregate$sub)))
 
 ## Remove participants with low accuracy
 
-Participant 424 is barely above chance (< 60% for both targets)
+Participants 424 and 524 are barely above chance on T1 (T1 < 60%)
 
 ```{r, lowaccuracy}
 runFilter = TRUE
 if (runFilter) {
-  subToRemove = c(424)
+  subToRemove = c(424, 524)
   rsvpData = rsvpData |>
     filter(!(sub %in% subToRemove))
   surveyData = surveyData |>
