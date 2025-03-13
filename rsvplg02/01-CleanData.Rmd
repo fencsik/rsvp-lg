@@ -42,13 +42,21 @@ rsvpData = rsvpData[!is.na(rsvpData$sub), ]
 surveyData = surveyData[!is.na(surveyData$sub), ]
 ```
 
-3. Correct subject ID typos. Subject 440 was mislabeled as 340 consistently throughout the run.
+3. Correct subject ID typos. Subject 440 was mislabeled as 340 consistently throughout the run. An RA misunderstood instructions and mislabeled two participants, so renumber 971&rarr;613 and 2222&rarr;620
 
 ```{r cleandata3}
-surveyData = surveyData |>
-  mutate(sub = ifelse(sub == 340, 440, sub))
-rsvpData = rsvpData |>
-  mutate(sub = ifelse(sub == 340, 440, sub))
+surveyData |>
+  mutate(sub = case_when(
+    sub == 340 ~ 440,
+    sub == 971 ~ 613,
+    sub == 2222 ~ 620,
+    .default = sub)) -> surveyData
+rsvpData |>
+  mutate(sub = case_when(
+    sub == 340 ~ 440,
+    sub == 971 ~ 613,
+    sub == 2222 ~ 620,
+    .default = sub)) -> rsvpData
 ```
 
 4. Remove test runs (Subjects w/ IDs >= 900)
