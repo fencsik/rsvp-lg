@@ -95,10 +95,11 @@ rsvpData = rsvpData[rsvpData$sub %in% subCommon, ]
 surveyData = surveyData[surveyData$sub %in% subCommon, ]
 ```
 
-8. Remove any duplicates
+8. Remove any duplicates: 2 surveys labeled 423
 
 ```{r, removedups}
-print("No duplicates yet")
+surveyData |>
+  filter(!(sub == 423 & startdate == "2/28/25 21:13")) -> surveyData
 ```
 
 9. Recode survey questions where needed, then create sums for each survey.
