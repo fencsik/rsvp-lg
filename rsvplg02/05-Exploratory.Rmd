@@ -84,6 +84,52 @@ x |> arrange(sias6) |> tail(10)
 
 # Summaries of Accuracy
 
+Plot distributions of overall T1, T2, and T2|T1 accuracy
+
+```{r accuracysummary1}
+rsvpData |>
+  filter(blocktyp == "Experiment", trial_type == "exp",
+         t1_acc >= 0, t2_acc >= 0) -> x
+x |>
+  group_by(sub) |>
+  summarize(t1 = mean(t1_acc),
+            t2 = mean(t2_acc)) -> dt
+x |>
+  filter(t1_acc == 1) |>
+  group_by(sub) |>
+  summarize(t2t1 = mean(t2_acc)) |>
+  right_join(dt,
+             by=join_by(sub),
+             unmatched="error",
+             relationship="one-to-one") |>
+  relocate(sub, t1, t2, t2t1) -> dt
+
+dt |>
+  pivot_longer(!sub, names_to="Category", values_to="Accuracy") |>
+  ggplot(aes(x = Category, y = Accuracy)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  labs(x="", y="Accuracy") +
+  theme_classic()
+```
+
+Table with the 10 participants with the lowest T1 accuracy
+
+```{r accuracysummary2}
+dt |>
+  arrange(t1) |>
+  head(10)
+```
+
+Table with the 10 participants with the lowest T2 accuracy
+
+```{r accuracysummary3}
+dt |>
+  arrange(t2) |>
+  head(10)
+```
+
 Number of correct T1 responses in each condition to measure the number of trials going into calculations of T2|T1 accuracy.
 
 ```{r, lowT1acc1}
