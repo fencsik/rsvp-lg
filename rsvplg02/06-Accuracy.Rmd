@@ -243,6 +243,38 @@ x |>
   t_test(t2acc ~ lag, paired=TRUE)
 ```
 
+Plot T2|T1 accuracy separated by lag as a function of PROMIS-A
+
+```{r abplot1a, fig.height=4, fig.width=6}
+x |>
+  mutate(lag = factor(lag)) |>
+  ggplot(aes(x=promisa, y=t2acc, color=lag)) +
+  geom_point(size=1) +
+  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+  scale_color_manual(values=c("black","red")) +
+  theme(legend.position="right",
+        legend.title=element_blank()) +
+  labs(x="Sum of PROMIS-A", y="T2|T1 accuracy") +
+  theme_classic()
+```
+
+Linear fit of lag 300 data above. Runs a regression of the effect of PROMIS-A on the T2|T1 accuracy for lag 300 only.
+
+```{r diffbypromisalm1}
+fit = lm(t2acc ~ promisa, data=x, subset=(lag == "300"))
+summary(fit)
+confint(fit, 'promisa', level=0.95)
+```
+
+Same as above but for lag 750
+
+```{r diffbypromisalm2}
+fit = lm(t2acc ~ promisa, data=x, subset=(lag == "750"))
+summary(fit)
+confint(fit, 'promisa', level=0.95)
+```
+
+
 Plots of difference scores based on T2|T1 accuracy lag 750 - lag 300
 
 ```{r abplot3, fig.height=4, fig.width=3}
