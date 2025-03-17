@@ -30,18 +30,26 @@ print(length(unique(rsvpAggregate$sub)))
 
 ## Remove participants with low accuracy
 
-Participants 424 and 524 are barely above chance on T1 (T1 < 60%)
+Remove participants with accuracy belowe 60% on either T1 or T2
 
 ```{r, lowaccuracy}
 runFilter = TRUE
 if (runFilter) {
-  subToRemove = c(424, 524)
+  rsvpData |>
+    filter(blocktyp == "Experiment", trial_type == "exp",
+           t1_acc >= 0, t2_acc >= 0) |>
+    group_by(sub) |>
+    summarize(t1 = mean(t1_acc),
+              t2 = mean(t2_acc)) |>
+    filter(t1 > .6 & t2 > .6) |>
+    pull(sub) -> sub.to.keep
+
   rsvpData = rsvpData |>
-    filter(!(sub %in% subToRemove))
+    filter(sub %in% sub.to.keep)
   surveyData = surveyData |>
-    filter(!(sub %in% subToRemove))
+    filter(sub %in% sub.to.keep)
   rsvpAggregate = rsvpAggregate |>
-    filter(!(sub %in% subToRemove))
+    filter(sub %in% sub.to.keep)
 }
 ```
 
