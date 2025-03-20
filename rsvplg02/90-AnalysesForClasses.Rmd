@@ -1,0 +1,167 @@
+---
+title: "RSVPLG02: Prepare Data for Classes"
+author: "David Fencsik"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(rstatix)
+```
+
+# Load data files
+
+```{r, loaddata}
+rsvpData = read.csv("rsvpData.csv")
+surveyData = read.csv("surveyData.csv")
+```
+
+# Filter participants w/ low accuracy
+
+```{r filterdata}
+rsvpData |>
+  filter(trial_type == "exp",
+         t1_acc >= 0, t2_acc >= 0) |>
+  group_by(sub) |>
+  summarize(t1 = mean(t1_acc),
+            t2 = mean(t2_acc)) |>
+  filter(t1 > .6 & t2 > .6) |>
+  pull(sub) -> sub.to.keep
+
+rsvpData |> filter(sub %in% sub.to.keep) -> rsvpData
+surveyData |> filter(sub %in% sub.to.keep) -> surveyData
+```
+
+# Modify variables
+
+```{r modifyvars}
+rsvpData |>
+  filter(trial_type == "exp",
+         t1_acc >= 0,
+         t2_acc >= 0) |>
+  mutate(blocktyp = factor(blocktyp),
+         trial_type = factor(trial_type),
+         t1_level = factor(substr(t1_level, 1, 1)),
+         t2_level = factor(substr(t2_level, 1, 1)),
+         switch_type = factor(
+           if_else(t1_level == t2_level, "repeat", "switch"))) -> rsvpData
+```
+
+# Create wide data set
+
+Generate a wide data set for import into JASP that has columns for T2|T1 accuracy for each of the 8 cells in the factorial table of T1 level (local, global), T2 level (local, global), and T2 lag (300, 750)
+
+```{r generateT2}
+rsvpData |>
+  filter(t1_acc == 1) |>
+  group_by(sub, t1_level, t2_level, lag) |>
+  summarize(t2acc = mean(t2_acc),
+            .groups = "drop") |>
+  pivot_wider(names_from = c(t1_level, t2_level, lag),
+              values_from = t2acc,
+              names_prefix = "t2acc_") -> jasp_export
+```
+
+Add columns that separate T2|T1 accuracy by switch type
+
+```{r separateswitch}
+rsvpData |>
+  filter(t1_acc == 1) |>
+  group_by(sub, switch_type) |>
+  summarize(t2acc = mean(t2_acc), .groups="drop") |>
+  pivot_wider(names_from = switch_type,
+              values_from = t2acc,
+              names_prefix = "t2acc_") |>
+  right_join(jasp_export,
+             by=join_by(sub),
+             unmatched="error",
+             relationship="one-to-one") -> jasp_export
+```
+
+Add columns that separate T2|T1 accuracy by lag without scope
+
+```{r separatelag}
+rsvpData |>
+  filter(t1_acc == 1) |>
+  group_by(sub, lag) |>
+  summarize(t2acc = mean(t2_acc), .groups="drop") |>
+  pivot_wider(names_from = lag,
+              values_from = t2acc,
+              names_prefix = "t2acc_") |>
+  right_join(jasp_export,
+             by=join_by(sub),
+             unmatched="error",
+             relationship="one-to-one") -> jasp_export
+```
+
+Add columns that separate T2|T1 accuracy by T2 level
+
+```{r separatet2level}
+rsvpData |>
+  filter(t1_acc == 1) |>
+  group_by(sub, t2_level) |>
+  summarize(t2acc = mean(t2_acc), .groups="drop") |>
+  pivot_wider(names_from = c(t2_level),
+              values_from = t2acc,
+              names_prefix = "t2acc_t2lvl_") |>
+  right_join(jasp_export,
+             by=join_by(sub),
+             unmatched="error",
+             relationship="one-to-one") -> jasp_export
+```
+
+Add columns that separate T2|T1 accuracy by scope global/local without lag
+
+```{r separatelevels}
+rsvpData |>
+  filter(t1_acc == 1) |>
+  group_by(sub, t1_level, t2_level) |>
+  summarize(t2acc = mean(t2_acc), .groups="drop") |>
+  pivot_wider(names_from = c(t1_level, t2_level),
+              values_from = t2acc,
+              names_prefix = "t2acc_") |>
+  right_join(jasp_export,
+             by=join_by(sub),
+             unmatched="error",
+             relationship="one-to-one") -> jasp_export
+```
+
+Add columns for demographics and the four survey sums
+
+```{r addsurveysums}
+surveyData |>
+  select(sub, age, gender, ethnicity, highed,
+         bsam=sumbsam, sias6=sumsias6,
+         promisd=sumpromisd, promisa=sumpromisa) |>
+  right_join(jasp_export,
+             by=join_by(sub),
+             unmatched="error",
+             relationship="one-to-one") -> jasp_export
+```
+
+Create median splits for all columns
+
+```{r mediansplits}
+medians = jasp_export |>
+  summarize(across(c(bsam, promisa, promisd, sias6),
+                   ~median(.x, na.rm=TRUE)))
+jasp_export |>
+  mutate(anxiety_bsam = factor(ifelse(bsam > medians$bsam, "high", "low")),
+         anxiety_pa = factor(ifelse(promisa > medians$promisa, "high", "low")),
+         depression = factor(ifelse(promisd > medians$promisd, "high", "low")),
+         anxiety_sias6 = factor(ifelse(sias6 > medians$sias6, "high", "low"))) |>
+  relocate(sub, age, gender, ethnicity, highed,
+           bsam, promisa, promisd, sias6,
+           anxiety_bsam, anxiety_pa, anxiety_sias6, depression) -> jasp_export
+
+jasp_export |> summary()
+```
+
+# Export Data
+
+```{r, savefile}
+write.csv(jasp_export, sprintf("RSVPLG02-JASP-%s.csv", Sys.Date()),
+          row.names=FALSE)
+```
