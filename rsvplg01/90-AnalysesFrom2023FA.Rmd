@@ -1,5 +1,5 @@
 ---
-title: "Analyze Data from Fall 2023 PSYC 491C"
+title: "RSVPLG01: Analyze Data from Fall 2023 PSYC 491C"
 author: "David Fencsik"
 date: "`r Sys.Date()`"
 output: html_document
