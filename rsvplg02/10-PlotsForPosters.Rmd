@@ -1,0 +1,55 @@
+---
+title: 'RSVPLG02: Generate Plots for Posters'
+author: "David E. Fencsik"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      dev = "pdf",
+                      dpi = 72)
+library(tidyverse)
+this_file = "10-PlotsForPosters"
+source_file = "02-FilterData"
+dataFile = sprintf("%s.RData", source_file)
+load(dataFile)
+#on.exit(graphics.off())
+```
+
+# Switch vs. Repeat Trials
+
+Prepare data
+
+```{r filterdata}
+rsvpData |>
+  filter(trial_type == "exp",
+         t1_acc >= 0,
+         t2_acc >= 0) |>
+  mutate(switch_type=case_when(
+           t1_level == t2_level ~ "repeat",
+           t1_level != t2_level ~ "switch",
+           .default = NA)) -> rsvpData
+
+rsvpData |>
+  filter(t1_acc == 1) |>
+  group_by(sub, t2_level, switch_type) |>
+  summarize(t2t1acc = mean(t2_acc),
+            .groups="drop") -> x
+```
+
+Generate violin plots of overall repeating and switching
+
+```{r ViolinPlotsByLevelAndSwitch, fig.height=4, fig.width=8}
+x |>
+  ggplot(aes(x=switch_type, y=t2t1acc)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  labs(x="Switch Condition", y="T2|T1 Accuracy") +
+  scale_x_discrete(labels=c("repeat"="No Switch", "switch"="Switch")) +
+  facet_wrap(~t2_level, labeller=as_labeller(c(global="T2 Global", local="T2 Local"))) +
+  theme_classic()
+```
