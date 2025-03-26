@@ -53,3 +53,22 @@ x |>
   facet_wrap(~t2_level, labeller=as_labeller(c(global="T2 Global", local="T2 Local"))) +
   theme_classic()
 ```
+
+Generate violin plots of overall repeating and switching
+
+```{r ViolinPlotsSwitchCostByLevel, fig.height=4, fig.width=4}
+x |>
+  pivot_wider(names_from=switch_type,
+              values_from=t2t1acc) |>
+  mutate(cost = noswitch - switch) -> switch.cost
+
+switch.cost |>
+  ggplot(aes(x=t2_level, y=cost)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  geom_hline(yintercept=0, linetype=2, color="gray") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  labs(x="T2 Level", y="No Switch - Switch (T2|T1 Accuracy)") +
+  scale_x_discrete(labels=c("global"="Global", "local"="Local")) +
+  theme_classic()
+```
