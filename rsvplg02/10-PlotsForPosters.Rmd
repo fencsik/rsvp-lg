@@ -19,6 +19,24 @@ dataFile = sprintf("%s.RData", source_file)
 load(dataFile)
 ```
 
+# Subject Demographics
+
+```{r demographics}
+surveyData |>
+  select(age, gender, ethnicity, highed) |>
+  mutate(gender=factor(gender),
+         ethnicity=factor(ethnicity),
+         highed=factor(highed)) -> demographics
+
+demographics |> select(age) |> summary()
+
+demographics |> select(gender) |> table() |> prop.table()
+
+demographics |> select(ethnicity) |> table() |> prop.table()
+
+demographics |> select(highed) |> table() |> prop.table()
+```
+
 # Switch vs. Repeat Trials
 
 Prepare data
