@@ -89,14 +89,18 @@ Plot local and global switch cost as a function of PROMIS-A total
 
 ```{r ScatterplotSwitchCostByLevelAndPROMISA}
 switch.cost |>
+  mutate(t2_level = factor(t2_level, levels=c("global", "local"),
+                           labels=c("Global", "Local"))) |>
   ggplot(aes(x=promisa, y=cost, color=t2_level)) +
   geom_point(size=1) +
   geom_smooth(method="lm", formula=y~x, se=FALSE) +
   scale_color_manual(values=c("black","red")) +
-  theme(legend.position="right",
-        legend.title=element_blank()) +
   labs(x="Sum of PROMIS-A", y="No Switch - Switch (T2|T1 Accuracy)") +
-  theme_classic()
+  theme_classic() +
+  guides(color=guide_legend(title="T2 Level")) +
+  theme(legend.position="inside",
+        legend.position.inside=c(0.9, 0.9))
+
 ```
 
 Linear fit of global data above. Runs a regression of the effect of PROMIS-A on the difference score for just T2 global.
