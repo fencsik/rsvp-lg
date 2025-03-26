@@ -46,6 +46,7 @@ x |>
   ggplot(aes(x=switch_type, y=t2t1acc)) +
   geom_violin(draw_quantiles=c(.25, .5, .75)) +
   geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  geom_hline(yintercept=0.5, linetype=2, color="gray") +
   stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
   labs(x="Switch Condition", y="T2|T1 Accuracy") +
   scale_x_discrete(labels=c("noswitch"="No Switch", "switch"="Switch")) +
