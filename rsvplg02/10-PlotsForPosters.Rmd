@@ -16,7 +16,6 @@ this_file = "10-PlotsForPosters"
 source_file = "02-FilterData"
 dataFile = sprintf("%s.RData", source_file)
 load(dataFile)
-#on.exit(graphics.off())
 ```
 
 # Switch vs. Repeat Trials
