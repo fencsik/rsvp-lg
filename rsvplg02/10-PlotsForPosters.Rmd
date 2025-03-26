@@ -28,7 +28,7 @@ rsvpData |>
          t1_acc >= 0,
          t2_acc >= 0) |>
   mutate(switch_type=case_when(
-           t1_level == t2_level ~ "repeat",
+           t1_level == t2_level ~ "noswitch",
            t1_level != t2_level ~ "switch",
            .default = NA)) -> rsvpData
 
@@ -48,7 +48,7 @@ x |>
   geom_jitter(width=.15, height=0, color="black", shape="circle open") +
   stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
   labs(x="Switch Condition", y="T2|T1 Accuracy") +
-  scale_x_discrete(labels=c("repeat"="No Switch", "switch"="Switch")) +
+  scale_x_discrete(labels=c("noswitch"="No Switch", "switch"="Switch")) +
   facet_wrap(~t2_level, labeller=as_labeller(c(global="T2 Global", local="T2 Local"))) +
   theme_classic()
 ```
