@@ -194,3 +194,21 @@ ab.data |>
         legend.position.inside=c(0.8, 0.2),
         legend.title=element_blank())
 ```
+
+Generate violin plot of accuracy separately for each lag and target
+
+```{r ViolinPlotsByTargetAndLag, fig.height=4, fig.width=8}
+ab.data |>
+  pivot_longer(cols = ends_with("acc"),
+               names_to = "target",
+               values_to = "acc") |>
+  mutate(lag = factor(lag)) |>
+  ggplot(aes(x=lag, y=acc)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  geom_hline(yintercept=0.5, linetype=2, color="gray") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  labs(x="Lag (ms)", y="Accuracy") +
+  facet_wrap(~target, labeller=as_labeller(c(t1acc="T1", t2t1acc="T2|T1"))) +
+  theme_classic()
+```
