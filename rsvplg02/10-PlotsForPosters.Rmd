@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE,
                       dev = "pdf",
                       dpi = 72)
 library(tidyverse)
+library(rstatix)
 this_file = "10-PlotsForPosters"
 source_file = "02-FilterData"
 dataFile = sprintf("%s.RData", source_file)
@@ -140,11 +141,25 @@ rsvpData |>
              by=join_by(sub, lag),
              unmatched="error",
              relationship="one-to-one") -> ab.data
+
 ```
 
 Generate the basic AB plot
 
 ```{r BasicABPlot, fig.height=4, fig.width=4}
+# extract 95% CI ranges for error bars
+ab.data |>
+  t_test(t1acc ~ lag, paired=TRUE, detailed=TRUE) |>
+  select(conf.low, conf.high) |>
+  mutate(ci.range = abs(conf.low - conf.high)) |>
+  pull(ci.range) -> ci.t1
+
+ab.data |>
+  t_test(t2t1acc ~ lag, paired=TRUE, detailed=TRUE) |>
+  select(conf.low, conf.high) |>
+  mutate(ci.range = abs(conf.low - conf.high)) |>
+  pull(ci.range) -> ci.t2
+
 ab.data |>
   group_by(lag) |>
   summarize(t1acc = mean(t1acc),
@@ -154,10 +169,22 @@ ab.data |>
                names_to = "target",
                values_to = "acc") |>
   mutate(lag = factor(lag),
+         lower=case_when(
+           target == "t1acc" ~ acc - ci.t1,
+           target == "t2t1acc" ~ acc - ci.t2,
+           .default = 0
+         ),
+         upper=case_when(
+           target == "t1acc" ~ acc + ci.t1,
+           target == "t2t1acc" ~ acc + ci.t2,
+           .default = 0
+         ),
          target = factor(target, levels=c("t1acc", "t2t1acc"),
                          labels = c("T1", "T2|T1"))) |>
-  ggplot(aes(x=lag, y=acc, group=target, color=target)) +
+  ggplot(aes(x=lag, y=acc, group=target, color=target,
+             ymin=lower, ymax=upper)) +
   geom_line(linewidth=1.25) +
+  geom_errorbar(width = 0.1) +
   geom_point(size=3, shape=21, fill="white", stroke=2) +
   scale_color_manual(values=c("black","red")) +
   coord_cartesian(ylim=c(0.5, 1.0)) +
