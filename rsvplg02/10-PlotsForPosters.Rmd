@@ -72,3 +72,46 @@ switch.cost |>
   scale_x_discrete(labels=c("global"="Global", "local"="Local")) +
   theme_classic()
 ```
+
+Add survey totals to switch.cost data
+
+```{r AddSurveysToSwitchCost}
+surveyData |>
+  select(sub,
+         bsam=sumbsam, sias6=sumsias6,
+         promisd=sumpromisd, promisa=sumpromisa) |>
+  right_join(switch.cost,
+             by=join_by(sub),
+             unmatched="error",
+             relationship="one-to-many") -> switch.cost
+```
+
+Plot local and global switch cost as a function of PROMIS-A total
+
+```{r ScatterplotSwitchCostByLevelAndPROMISA}
+switch.cost |>
+  ggplot(aes(x=promisa, y=cost, color=t2_level)) +
+  geom_point(size=1) +
+  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+  scale_color_manual(values=c("black","red")) +
+  theme(legend.position="right",
+        legend.title=element_blank()) +
+  labs(x="Sum of PROMIS-A", y="No Switch - Switch (T2|T1 Accuracy)") +
+  theme_classic()
+```
+
+Linear fit of global data above. Runs a regression of the effect of PROMIS-A on the difference score for just T2 global.
+
+```{r RegressionSwitchCostByPROMISAforGlobal}
+fit = lm(cost ~ promisa, data=switch.cost, subset=(t2_level == "global"))
+summary(fit)
+confint(fit, 'promisa', level=0.95)
+```
+
+Same as above but for T2 local.
+
+```{r diffbypromisalm2}
+fit = lm(cost ~ promisa, data=switch.cost, subset=(t2_level == "local"))
+summary(fit)
+confint(fit, 'promisa', level=0.95)
+```
