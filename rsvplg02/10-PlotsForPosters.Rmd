@@ -30,9 +30,7 @@ rsvpData |>
   mutate(switch_type=case_when(
            t1_level == t2_level ~ "noswitch",
            t1_level != t2_level ~ "switch",
-           .default = NA)) -> rsvpData
-
-rsvpData |>
+           .default = NA)) |>
   filter(t1_acc == 1) |>
   group_by(sub, t2_level, switch_type) |>
   summarize(t2t1acc = mean(t2_acc),
