@@ -275,3 +275,45 @@ fit = lm(t2t1acc ~ promisa, data=ab.data, subset=(lag == "750"))
 summary(fit)
 confint(fit, 'promisa', level=0.95)
 ```
+
+Compute a difference score on T2|T1 accuracy between lags 750 and 300, measuring depth of AB
+
+```{r ComputeABDiffScore}
+ab.data |>
+  pivot_wider(names_from=lag,
+              values_from=t2t1acc,
+              names_prefix="lag",
+              id_cols=!t1acc) |>
+  mutate(diff = lag750 - lag300) -> ab.diff
+```
+
+Violin plot of AB cost
+
+```{r ViolinPlotsABCost, fig.height=4, fig.width=4}
+ab.diff |>
+  ggplot(aes(x="", y=diff)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  geom_hline(yintercept=0, linetype=2, color="gray") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  labs(x="", y="Lag 750 - Lag 300")
+```
+
+Plot AB diff score by PROMIS-A total
+
+```{r ScatterplotABDiffByPROMISA}
+ab.diff |>
+  ggplot(aes(x=promisa, y=diff)) +
+  geom_point(size=1) +
+  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+  geom_hline(yintercept=0, linetype=2, color="gray") +
+  labs(x="Sum of PROMIS-A", y="Lag 750 - Lag 300")
+```
+
+Linear fit of lag 300 data above. Runs a regression of the effect of PROMIS-A on the difference score for 300-ms lags.
+
+```{r RegressionABDiffByPROMISA}
+fit = lm(diff ~ promisa, data=ab.diff)
+summary(fit)
+confint(fit, 'promisa', level=0.95)
+```
