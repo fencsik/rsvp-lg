@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = TRUE,
                       dpi = 72)
 library(tidyverse)
 library(rstatix)
+theme_set(theme_classic(base_size = 18))
 this_file = "10-PlotsForPosters"
 source_file = "02-FilterData"
 dataFile = sprintf("%s.RData", source_file)
@@ -67,8 +68,7 @@ x |>
   stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
   labs(x="Switch Condition", y="T2|T1 Accuracy") +
   scale_x_discrete(labels=c("noswitch"="No Switch", "switch"="Switch")) +
-  facet_wrap(~t2_level, labeller=as_labeller(c(global="T2 Global", local="T2 Local"))) +
-  theme_classic()
+  facet_wrap(~t2_level, labeller=as_labeller(c(global="T2 Global", local="T2 Local")))
 ```
 
 Generate violin plots of overall repeating and switching
@@ -85,9 +85,8 @@ switch.cost |>
   geom_jitter(width=.15, height=0, color="black", shape="circle open") +
   geom_hline(yintercept=0, linetype=2, color="gray") +
   stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
-  labs(x="T2 Level", y="No Switch - Switch (T2|T1 Accuracy)") +
-  scale_x_discrete(labels=c("global"="Global", "local"="Local")) +
-  theme_classic()
+  labs(x="T2 Level", y="No Switch - Switch") +
+  scale_x_discrete(labels=c("global"="Global", "local"="Local"))
 ```
 
 Add survey totals to switch.cost data
@@ -114,7 +113,6 @@ switch.cost |>
   geom_smooth(method="lm", formula=y~x, se=FALSE) +
   scale_color_manual(values=c("black","red")) +
   labs(x="Sum of PROMIS-A", y="No Switch - Switch (T2|T1 Accuracy)") +
-  theme_classic() +
   guides(color=guide_legend(title="T2 Level")) +
   theme(legend.position="inside",
         legend.position.inside=c(0.9, 0.9))
@@ -211,7 +209,6 @@ ab.data |>
   scale_color_manual(values=c("black","red")) +
   coord_cartesian(ylim=c(0.5, 1.0)) +
   labs(x="T2 Lag (ms)", y="Accuracy") +
-  theme_classic() +
   theme(legend.position="inside",
         legend.position.inside=c(0.8, 0.2),
         legend.title=element_blank())
@@ -231,8 +228,7 @@ ab.data |>
   geom_hline(yintercept=0.5, linetype=2, color="gray") +
   stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
   labs(x="Lag (ms)", y="Accuracy") +
-  facet_wrap(~target, labeller=as_labeller(c(t1acc="T1", t2t1acc="T2|T1"))) +
-  theme_classic()
+  facet_wrap(~target, labeller=as_labeller(c(t1acc="T1", t2t1acc="T2|T1")))
 ```
 
 Add survey data to AB data
@@ -258,7 +254,6 @@ ab.data |>
   geom_smooth(method="lm", formula=y~x, se=FALSE) +
   scale_color_manual(values=c("black","red")) +
   labs(x="Sum of PROMIS-A", y="T2|T1 Accuracy") +
-  theme_classic() +
   guides(color=guide_legend(title="T2 Lag (ms)")) +
   theme(legend.position="inside",
         legend.position.inside=c(0.9, 0.9))
