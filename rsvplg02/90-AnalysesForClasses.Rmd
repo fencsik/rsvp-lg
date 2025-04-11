@@ -165,3 +165,14 @@ jasp_export |> summary()
 write.csv(jasp_export, sprintf("RSVPLG02-JASP-%s.csv", Sys.Date()),
           row.names=FALSE)
 ```
+
+# Export a Subset
+
+Export just the first 100 participants to create a demo dataset
+
+```{r savesubset}
+jasp_export |>
+  arrange(sub) |>
+  slice_head(n=100) |>
+  write.csv(file="RSVPLG02-JASP-Subset.csv", row.names=FALSE)
+```
