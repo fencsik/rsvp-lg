@@ -31,10 +31,13 @@ surveyData |>
 
 demographics |> select(age) |> summary()
 
+demographics |> select(gender) |> table()
 demographics |> select(gender) |> table() |> prop.table()
 
+demographics |> select(ethnicity) |> table()
 demographics |> select(ethnicity) |> table() |> prop.table()
 
+demographics |> select(highed) |> table()
 demographics |> select(highed) |> table() |> prop.table()
 ```
 
