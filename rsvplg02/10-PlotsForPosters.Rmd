@@ -115,7 +115,7 @@ switch.cost |>
   geom_point(size=1) +
   geom_smooth(method="lm", formula=y~x, se=FALSE) +
   scale_color_manual(values=c("black","red")) +
-  labs(x="Sum of PROMIS-A", y="No Switch - Switch (T2|T1 Accuracy)") +
+  labs(x="Anxiety", y="No Switch - Switch (T2|T1 Accuracy)") +
   guides(color=guide_legend(title="T2 Level")) +
   theme(legend.position="inside",
         legend.position.inside=c(0.9, 0.9))
@@ -256,7 +256,7 @@ ab.data |>
   geom_point(size=1) +
   geom_smooth(method="lm", formula=y~x, se=FALSE) +
   scale_color_manual(values=c("black","red")) +
-  labs(x="Sum of PROMIS-A", y="T2|T1 Accuracy") +
+  labs(x="Anxiety", y="T2|T1 Accuracy") +
   guides(color=guide_legend(title="T2 Lag (ms)")) +
   theme(legend.position="inside",
         legend.position.inside=c(0.9, 0.9))
@@ -310,7 +310,7 @@ ab.diff |>
   geom_point(size=1) +
   geom_smooth(method="lm", formula=y~x, se=FALSE) +
   geom_hline(yintercept=0, linetype=2, color="gray") +
-  labs(x="Sum of PROMIS-A", y="Lag 750 - Lag 300")
+  labs(x="Anxiety", y="Lag 750 - Lag 300")
 ```
 
 Linear fit of lag 300 data above. Runs a regression of the effect of PROMIS-A on the difference score for 300-ms lags.
