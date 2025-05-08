@@ -35,16 +35,16 @@ names(surveyData) = tolower(names(surveyData))
 names(surveyData)[names(surveyData) == "id"] = "sub"
 ```
 
-2. Remove data lines that have NA values from a crash or empty survey responses, and participants with incomplete experimental data (561)
+2. Remove data lines that have NA values from a crash or empty survey responses, and participants with incomplete experimental data (555, 561)
 
 ```{r cleandata2}
 rsvpData = rsvpData[!is.na(rsvpData$sub), ]
 surveyData = surveyData[!is.na(surveyData$sub), ]
 
 rsvpData |>
-  filter(sub != 561) -> rsvpData
+  filter(sub != 555, sub != 561) -> rsvpData
 surveyData |>
-  filter(sub != 561) -> surveyData
+  filter(sub != 555, sub != 561) -> surveyData
 ```
 
 3. Correct subject ID typos. Subject 440 was mislabeled as 340 consistently throughout the run. An RA misunderstood instructions and mislabeled two participants, so renumber 971&rarr;613 and 2222&rarr;620
