@@ -26,6 +26,14 @@ rsvpAggregate = read.csv("rsvpAggregate.csv")
 ```{r, preOutlierRemovalSummary}
 print(length(unique(surveyData$sub)))
 print(length(unique(rsvpAggregate$sub)))
+
+subRSVP = sort(unique(rsvpAggregate$sub))
+subSurvey = sort(unique(surveyData$sub))
+subCommon = intersect(subRSVP, subSurvey)
+sprintf("Subjects in RSVP data set but not Survey data set: %s",
+        paste(setdiff(subRSVP, subSurvey), collapse=", "))
+sprintf("Subjects in Survey data set but not RSVP data set: %s",
+        paste(setdiff(subSurvey, subRSVP), collapse=", "))
 ```
 
 ## Remove participants with low accuracy
