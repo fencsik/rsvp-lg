@@ -314,6 +314,7 @@ Overall repeated-measures ANOVA looking at the effects of T2 level (global, loca
 x |>
   anova_test(dv=acc,
              wid=sub,
+             effect.size="pes",
              within=c(t2_level, switch))
 ```
 
