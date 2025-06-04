@@ -1,7 +1,7 @@
 ---
 title: 'RSVPLG02: Attentional Blink'
-author: "David E. Fencsik"
-date: "`r Sys.Date()`"
+author: "David Fencsik, Amanda Morrison"
+date: "`r format(Sys.Date(), '%B %e, %Y')`"
 output: html_document
 ---
 
@@ -19,7 +19,7 @@ load(dataFile)
 
 # Background on Attentional Blink
 
-One thing we're looking at is the effect of anxiety on a phenomenon called the *attentional blink* (AB). In short, if someone has to detect two targets in a row, they will have a difficult time detecting the 2nd target if it occurs within roughly 500 milliseconds of the 1st target. The evidence suggests that our attention pauses after processing a target in a way that's analogous to what happens during a physical eyeblink, even though the AB happens independent of an eyeblink.
+One thing we're looking at is the effect of anxiety on a phenomenon called the *attentional blink* (AB). In short, if someone has to detect two targets in a row, they will have difficulty detecting the 2nd target if it occurs within roughly 500 milliseconds of the 1st target. The evidence suggests that our attention pauses after processing a target in a way that's analogous to what happens during a physical eyeblink, even though the AB happens independent of an eyeblink.
 
 # Setup Data
 
@@ -61,7 +61,7 @@ surveyData |>
 
 # Attentional Blink Measurement
 
-We can measure the AB by presenting two targets, called "T1" and "T2", separated by a variable interval or *lag*. In our experiment, the two targets were separated by lags of either 300 or 750 ms. We would expect to observe lower average accuracy on T2 at lags of 300 ms, because that's during the AB, relative to lags of 750 ms (after the AB). We would also expect no effect of lag on T1 accuracy because the AB would follow it.
+We can measure the AB by presenting two targets called "T1" and "T2" separated by a variable interval or *lag*. In our experiment, the two targets were separated by lags of either 300 or 750 ms. We would expect to observe lower average accuracy on T2 at lags of 300 ms relative to lags of 750 ms because the AB is still happening 300 ms after T1 but has ended by 750 ms. We also expect no effect of lag on T1 accuracy because the AB would follow it.
 
 Note that in AB research it is typical to report T2 accuracy conditional on T1---that is, T2 accuracy based solely on trials when the participant responded correctly to T1. The goal is to focus on trials when they paid attention to T1, otherwise there's nothing to cause the AB. This conditional accuracy is usually labelled "T2|T1".
 
@@ -150,7 +150,7 @@ ab.data |>
 
 Here's the same data but with the two lags on the same graph.
 
-```{r ScatterplotT2AccByLagAndPROMISA, fig.height=4, fig.width=8}
+```{r ScatterplotT2AccByLagAndPROMISA, fig.height=4, fig.width=6}
 ab.data |>
   mutate(lag = factor(lag)) |>
   ggplot(aes(x=promisa, y=t2t1acc, color=lag)) +
@@ -166,7 +166,7 @@ ab.data |>
 
 These lines seem to be diverging, which is intriguing!
 
-A linear model on the 300-ms line shows no reliable slope at 300 ms ($p = .22$), but on 750 ms it shows a reliably positive slope; $b = 0.0016, t(193) = 2.06, p = .041, R^2 = .021$. This suggests that anxiety doesn't affect performance during the blink, but does predict better performance after it.
+A linear model on the 300-ms line shows no reliable slope ($p = .22$), but on 750 ms it shows a reliably positive slope; $b = 0.0016, t(193) = 2.06, p = .041, R^2 = .021$. This suggests that anxiety doesn't affect performance during the blink, but does predict better performance after it.
 
 # Summary of Data
 
@@ -191,9 +191,7 @@ Hopefully the other columns are self explanatory.
 
 # Your Mission...
 
-...should you choose to accept it...
-
-We'd like to analyze the interaction between anxiety and lag, with lag treated as a within-subjects categorical variable and anxiety as a between-subjects continuous variable. I'm pretty sure this isn't doable with `lm`, and I couldn't figure out a way with `glm`. Can you figure it out?
+...should you choose to accept it, is to figure out how to analyze the interaction between anxiety and lag. We've run linear models on each line separately and on the individual subject difference scores between them, and run ANOVAs using a median split to group anxiety. We'd like to try an analysis that treats lag as a within-subjects categorical variable and anxiety as a between-subjects continuous variable.
 
 We also have two other experimental variables that we want to analyze separately from lag, but maybe this is a good place to start?
 
