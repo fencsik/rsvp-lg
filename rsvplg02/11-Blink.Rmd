@@ -1,0 +1,202 @@
+---
+title: 'RSVPLG02: Attentional Blink'
+author: "David E. Fencsik"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(rstatix)
+library(knitr)
+theme_set(theme_classic())
+this_file = "11-Blink"
+source_file = "02-FilterData"
+dataFile = sprintf("%s.RData", source_file)
+load(dataFile)
+```
+
+# Background on Attentional Blink
+
+One thing we're looking at is the effect of anxiety on a phenomenon called the *attentional blink* (AB). In short, if someone has to detect two targets in a row, they will have a difficult time detecting the 2nd target if it occurs within roughly 500 milliseconds of the 1st target. The evidence suggests that our attention pauses after processing a target in a way that's analogous to what happens during a physical eyeblink, even though the AB happens independent of an eyeblink.
+
+# Setup Data
+
+Data setup code left here for reference:
+
+```{r ExtractABData, echo=TRUE}
+# extract T1 accuracy
+rsvpData |>
+  filter(trial_type == "exp",
+         t1_acc >= 0,
+         t2_acc >= 0) |>
+  group_by(sub, lag) |>
+  summarize(t1acc = mean(t1_acc),
+            .groups = "drop") -> ab.data
+
+# extract T2|T1 accuracy and add to data
+rsvpData |>
+  filter(trial_type == "exp",
+         t1_acc == 1,
+         t2_acc >= 0) |>
+  group_by(sub, lag) |>
+  summarize(t2t1acc = mean(t2_acc),
+            .groups = "drop") |>
+  right_join(ab.data,
+             by=join_by(sub, lag),
+             unmatched="error",
+             relationship="one-to-one") -> ab.data
+
+# add survey data
+surveyData |>
+  select(sub,
+         promisa=sumpromisa, bsam=sumbsam,
+         sias6=sumsias6, promisd=sumpromisd) |>
+  right_join(ab.data,
+             by=join_by(sub),
+             unmatched="error",
+             relationship="one-to-many") -> ab.data
+```
+
+# Attentional Blink Measurement
+
+We can measure the AB by presenting two targets, called "T1" and "T2", separated by a variable interval or *lag*. In our experiment, the two targets were separated by lags of either 300 or 750 ms. We would expect to observe lower average accuracy on T2 at lags of 300 ms, because that's during the AB, relative to lags of 750 ms (after the AB). We would also expect no effect of lag on T1 accuracy because the AB would follow it.
+
+Note that in AB research it is typical to report T2 accuracy conditional on T1---that is, T2 accuracy based solely on trials when the participant responded correctly to T1. The goal is to focus on trials when they paid attention to T1, otherwise there's nothing to cause the AB. This conditional accuracy is usually labelled "T2|T1".
+
+Here's a plot based on our data showing T1 and T2|T1 accuracy as a function of lag. As expected, T1 accuracy doesn't change much with lag while T2|T1 accuracy is lower at lags of 300 ms compared to lags of 750 ms. Error bars are 95% confidence intervals based on the difference in each line.
+
+```{r BasicABPlot, fig.height=4, fig.width=4}
+# extract 95% CI ranges for error bars
+ab.data |>
+  t_test(t1acc ~ lag, paired=TRUE, detailed=TRUE) |>
+  select(conf.low, conf.high) |>
+  mutate(ci.range = abs(conf.low - conf.high)) |>
+  pull(ci.range) -> ci.t1
+
+ab.data |>
+  t_test(t2t1acc ~ lag, paired=TRUE, detailed=TRUE) |>
+  select(conf.low, conf.high) |>
+  mutate(ci.range = abs(conf.low - conf.high)) |>
+  pull(ci.range) -> ci.t2
+
+ab.data |>
+  group_by(lag) |>
+  summarize(t1acc = mean(t1acc),
+            t2t1acc = mean(t2t1acc),
+            .groups="drop") |>
+  pivot_longer(cols = ends_with("acc"),
+               names_to = "target",
+               values_to = "acc") |>
+  mutate(lag = factor(lag),
+         lower=case_when(
+           target == "t1acc" ~ acc - ci.t1,
+           target == "t2t1acc" ~ acc - ci.t2,
+           .default = 0
+         ),
+         upper=case_when(
+           target == "t1acc" ~ acc + ci.t1,
+           target == "t2t1acc" ~ acc + ci.t2,
+           .default = 0
+         ),
+         target = factor(target, levels=c("t1acc", "t2t1acc"),
+                         labels = c("T1", "T2|T1"))) |>
+  ggplot(aes(x=lag, y=acc, group=target, color=target,
+             ymin=lower, ymax=upper)) +
+  geom_line(linewidth=1.25) +
+  geom_errorbar(width = 0.1) +
+  geom_point(size=3, shape=21, fill="white", stroke=2) +
+  scale_color_manual(values=c("black","red")) +
+  coord_cartesian(ylim=c(0.5, 1.0)) +
+  labs(x="Lag (ms)", y="Proportion correct") +
+  theme(legend.position="inside",
+        legend.position.inside=c(0.8, 0.2),
+        legend.title=element_blank())
+```
+
+Here's a violin plot showing the distributions for each of the points that went into the above line graph:
+
+```{r ViolinPlotsByTargetAndLag, fig.height=4, fig.width=8}
+ab.data |>
+  pivot_longer(cols = ends_with("acc"),
+               names_to = "target",
+               values_to = "acc") |>
+  mutate(lag = factor(lag)) |>
+  ggplot(aes(x=lag, y=acc)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  geom_hline(yintercept=0.5, linetype=2, color="gray") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  labs(x="Lag (ms)", y="Accuracy") +
+  facet_wrap(~target, labeller=as_labeller(c(t1acc="T1", t2t1acc="T2|T1")))
+```
+
+# Effects of Anxiety
+
+Here's a scatterplot of T2|T1 accuracy as a function of trait anxiety, separating out each of the two lags, with the best fit line for each.
+
+```{r ScatterplotT2AccByLagAndPROMISAFaceted, fig.height=4, fig.width=10}
+ab.data |>
+  mutate(lag = factor(lag)) |>
+  ggplot(aes(x=promisa, y=t2t1acc)) +
+  geom_point(size=1) +
+  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+  labs(x="Anxiety", y="T2|T1 Accuracy") +
+  guides(color=guide_legend(title="Lag (ms)")) +
+  facet_wrap(~lag)
+
+```
+
+Here's the same data but with the two lags on the same graph.
+
+```{r ScatterplotT2AccByLagAndPROMISA, fig.height=4, fig.width=8}
+ab.data |>
+  mutate(lag = factor(lag)) |>
+  ggplot(aes(x=promisa, y=t2t1acc, color=lag)) +
+  geom_point(size=1) +
+  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+  scale_color_manual(values=c("black","red")) +
+  labs(x="Anxiety", y="T2|T1 Accuracy") +
+  guides(color=guide_legend(title="Lag (ms)")) +
+  theme(legend.position="inside",
+        legend.position.inside=c(0.9, 0.9))
+
+```
+
+These lines seem to be diverging, which is intriguing!
+
+A linear model on the 300-ms line shows no reliable slope at 300 ms ($p = .22$), but on 750 ms it shows a reliably positive slope; $b = 0.0016, t(193) = 2.06, p = .041, R^2 = .021$. This suggests that anxiety doesn't affect performance during the blink, but does predict better performance after it.
+
+# Summary of Data
+
+Here's the first 10 rows of the dataset analyzed above:
+
+```{r PreviewData, results='asis'}
+ab.data |>
+  head(10) |>
+  kable()
+```
+
+The `sub` column indicates subject ID, unique for each participant. The columns labeled `promisa`, `bsam`, `sias6`, and `promisd` refer to the four surveys that participants completed after the experiment, three measuring different types of anxiety and one measuring depression:
+
+* PROMIS-A: Measure of anxiety over the previous week, which we're treating as a proxy for trait anxiety. This is the main one we're focused on, and is the basis for the plots above.
+* BSAM: Measure of current anxiety, which we're using to measure state anxiety.
+* SIAS-6: Measure of social anxiety.
+* PROMIS-D: Measure of depression over the previous week.
+
+We calculated the sum of each survey to get a single measure of each construct. We also collected demographics.
+
+Hopefully the other columns are self explanatory.
+
+# Your Mission...
+
+...should you choose to accept it...
+
+We'd like to analyze the interaction between anxiety and lag, with lag treated as a within-subjects categorical variable and anxiety as a between-subjects continuous variable. I'm pretty sure this isn't doable with `lm`, and I couldn't figure out a way with `glm`. Can you figure it out?
+
+We also have two other experimental variables that we want to analyze separately from lag, but maybe this is a good place to start?
+
+```{r SaveData}
+write.csv(ab.data, "RSVPLG02-AttentionalBlink.csv", row.names=FALSE)
+```
