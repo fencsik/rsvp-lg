@@ -23,9 +23,9 @@ One thing we're looking at is the effect of anxiety on a phenomenon called the *
 
 # Setup Data
 
-Data setup code left here for reference:
+Prepare AB data
 
-```{r ExtractABData, echo=TRUE}
+```{r ExtractABData}
 # extract T1 accuracy
 rsvpData |>
   filter(trial_type == "exp",
