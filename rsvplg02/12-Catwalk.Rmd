@@ -1,0 +1,156 @@
+---
+title: 'RSVPLG02: Modeling'
+author: "David E. Fencsik"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, cache=TRUE)
+library(tidyverse)
+library(rstatix)
+library(lme4)
+library(lmerTest)
+theme_set(theme_classic())
+this_file = "12-Catwalk"
+source_file = "02-FilterData"
+dataFile = sprintf("%s.RData", source_file)
+load(dataFile)
+```
+
+# Kitchen Sink Model
+
+## Prepare data
+
+```{r extractdata1}
+rsvpData |>
+  filter(trial_type == "exp",
+         t1_acc >= 0,
+         t2_acc >= 0) |>
+  mutate(t1_level=str_to_title(t1_level),
+         t2_level=str_to_title(t2_level),
+         switch_type=factor(case_when(
+           t1_level == t2_level ~ "Repeat",
+           t1_level != t2_level ~ "Switch",
+           .default = NA)),
+         t2_level=factor(t2_level),
+         lag = factor(lag)) |>
+  filter(t1_acc == 1) |>
+  group_by(sub, t2_level, switch_type, lag) |>
+  summarize(acc = mean(t2_acc),
+            .groups="drop") -> x
+
+surveyData |>
+  select(sub,
+         bsam=sumbsam, sias6=sumsias6,
+         promisd=sumpromisd, promisa=sumpromisa) |>
+  right_join(x,
+             by=join_by(sub),
+             unmatched="error",
+             relationship="one-to-many") -> x
+
+summary(x)
+```
+
+## Plot overall data
+
+Plot experimental variables
+
+```{r lineplots, fig.height=4, fig.width=8}
+x |>
+  group_by(switch_type, t2_level, lag) |>
+  summarize(acc = mean(acc), .groups="drop") |>
+  ggplot(aes(x=switch_type, y=acc, group=t2_level, color = t2_level)) +
+  geom_line(linewidth=1.25) +
+  geom_point(size=3, shape=21, fill="white", stroke=2) +
+  labs(x="Switch Condition", y="T2|T1 Accuracy") +
+  theme(legend.position="inside",
+        legend.position.inside=c(0.55, 0.2),
+        legend.title=element_blank()) +
+  facet_wrap(~lag)
+```
+
+Plot accuracy as a function of trait anxiety (PROMIS-A total) for each of the 4 conditions separately by the two lags
+
+```{r scatterplots, fig.height=4, fig.width=8}
+x |>
+  group_by(switch_type, t2_level, lag, promisa) |>
+  summarize(acc = mean(acc), .groups="drop") |>
+  ggplot(aes(x=promisa, y=acc, group=interaction(t2_level, switch_type),
+             color=t2_level, linetype=switch_type)) +
+  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+  labs(x="Anxiety", y="T2|T1 Accuracy") +
+  guides(linetype=guide_legend(override.aes=list(color="black"))) +
+  theme(legend.title=element_blank()) +
+  # theme(legend.position="inside",
+  #       legend.position.inside=c(0.55, 0.2),
+  #       legend.title=element_blank()) +
+  facet_wrap(~lag)
+```
+
+# Modeling
+
+## Kitchen Sink
+
+Run the kitchen sink model with all four variables---switch type, T2 level, lag, and anxiety---as fixed effects.
+
+```{r kitchensink}
+options(width=150)
+model_ks = lmer(acc ~ switch_type * t2_level * lag * scale(promisa) + (1 | sub),
+                data=x)
+summary(model_ks)
+```
+
+I need to think about what the interactions with lag mean, but for now I want to move on to focusing on the questions we actually want to ask
+
+## Focus Switching Effects
+
+```{r focusswitchingmodels}
+# basic model
+options(width=150)
+model1 = lmer(acc ~ switch_type * t2_level * scale(promisa) + (1 | sub),
+              data=x)
+summary(model1)
+
+# add variable slope for switch_type
+model2 = lmer(acc ~ switch_type * t2_level * scale(promisa) + (1 + switch_type | sub),
+              data=x)
+summary(model2) # model2 is a better fit
+
+# compare model1 and model2: reliable so keep variable switch_type
+anova(model1, model2)
+
+# remove switch_type and add variable slope for t2_level, which makes the model singular
+model3 = lmer(acc ~ switch_type * t2_level * scale(promisa) + (1 + t2_level | sub),
+              data=x)
+summary(model3)
+
+anova(model2, model3)
+```
+
+```{r fitsateachlevel}
+options(width=150)
+
+# Run the models I want to run looking at effect of switch on
+# anxiety effect separately for each level
+
+# global
+model_global1 = lmer(acc ~ switch_type * scale(promisa) + (1 | sub),
+                     data=x, subset=t2_level=="Global")
+summary(model_global1)
+model_global2 = lmer(acc ~ switch_type * scale(promisa) + (1 + switch_type | sub),
+                     data=x, subset=t2_level=="Global")
+summary(model_global2)
+anova(model_global1, model_global2) # 1 is better
+
+# local
+model_local1 = lmer(acc ~ switch_type * scale(promisa) + (1 | sub),
+                    data=x, subset=t2_level=="Local")
+summary(model_local1)
+model_local2 = lmer(acc ~ switch_type * scale(promisa) + (1 + switch_type | sub),
+                    data=x, subset=t2_level=="Local")
+summary(model_local2)
+anova(model_local1, model_local2) # 2 is better
+
+
+```
