@@ -1,0 +1,9 @@
+row,t1_level,t2_level,t2_lag
+1,local,local,300
+2,local,local,750
+3,local,global,300
+4,local,global,750
+5,global,local,300
+6,global,local,750
+7,global,global,300
+8,global,global,750
