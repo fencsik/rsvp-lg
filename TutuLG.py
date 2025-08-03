@@ -28,6 +28,9 @@ par.n_mask_files = 4
 par.mask_file_prefix = 'mask-'
 par.mask_file_ext = 'png'
 
+par.font = 'Arial'
+par.font_size = 24
+
 par.feedback_color_correct = 'green'
 par.feedback_color_error = 'red'
 par.color_space = 'rgb255'
@@ -328,7 +331,7 @@ def InitializeStimuli():
     par.feedback = Feedback(par.win)
     par.TextBox = visual.TextBox2(
         par.win, text='',
-        font='Arial', letterHeight=24, alignment='center',
+        font=par.font, letterHeight=par.font_size, alignment='center',
         colorSpace=par.color_space, color=par.foreground_color)
 
 def InitializeResponses():
