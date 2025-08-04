@@ -746,7 +746,7 @@ def ProcessResponse(keys=None, correct_responses=None, allowed_responses=None):
     if keys == None:
         return {
             'acc': -5, 'rt': 0, 'resp': 'none',
-            'fdbk': 'NO RESPONSE', 'fdbk_color': par.feedback_color_error}
+            'fdbk': None, 'fdbk_color': None}
     elif keys[0].name == par.quit_key:
         par.end_experiment = True
         return {
