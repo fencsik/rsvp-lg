@@ -38,10 +38,6 @@ par.color_space = 'rgb255'
 par.foreground_color = [0, 0, 0]
 par.background_color = [200, 200, 200]
 par.quit_key = 'escape'
-par.responses = {
-    'present': 'slash',
-    'absent':  'z'
-    }
 
 # timing setup
 par.dur_pre_trial = 0.5
@@ -414,9 +410,6 @@ def InitializeBlock():
         par.main_trial_handler = CreateTrialHandler(par.n_trials_per_cell)
         par.n_trials_main = par.n_trials_per_cell * par.n_cells
         par.n_trials = par.n_trials_warmup + par.n_trials_main
-    par.trial_count = {}
-    par.correct_count = {}
-    par.correct_rt_sum = {}
 
 def PresentStartMessages():
     par.TextBox.setText('Press any button to begin %d trials' % (par.n_trials))
@@ -719,17 +712,6 @@ def CheckForBreak():
 
 def EndTrial():
     pass
-
-########################################################################
-# Drawing Routines
-########################################################################
-
-def DrawSearchDisplay(setsize, stim, xy, orientations):
-    for i in range(setsize):
-        s = par.stim_images[stim[i]]
-        s.setPos(xy[i])
-        s.setOri(orientations[i])
-        s.draw()
 
 ########################################################################
 # Support Functions
