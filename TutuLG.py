@@ -506,6 +506,16 @@ def RunTrial():
         return
 
 def InitializeTrial():
+    par.data_handler.AddData('trial', par.trial)
+    par.data_handler.AddData('trialtime', time.strftime("%Y%m%d-%H%M%S"))
+    par.data_handler.AddData('t1_level', par.t1_level)
+    par.data_handler.AddData('t2_level', par.t2_level)
+    par.data_handler.AddData('t2_lag', par.t2_lag)
+
+    InitializeTrialStimuli()
+    InitializeTrialMasks()
+
+def InitializeTrialStimuli():
     global par
     target1 = par.rng.choice(par.target_letters)
     target2 = par.rng.choice(par.target_letters)
@@ -526,6 +536,34 @@ def InitializeTrial():
         stim2_file = '{}-{}.{}'.format(
             target2, distractor2, par.stim_file_ext)
 
+    par.stim1_image.setImage(os.path.join(par.stim_dir, stim1_file))
+    par.stim2_image.setImage(os.path.join(par.stim_dir, stim2_file))
+
+    par.data_handler.AddData('t1', target1)
+    par.data_handler.AddData('t2', target2)
+    par.data_handler.AddData('distractor1', distractor1)
+    par.data_handler.AddData('distractor2', distractor2)
+    par.data_handler.AddData('stimfile1', stim1_file)
+    par.data_handler.AddData('stimfile2', stim2_file)
+
+    InitializeTrialResponses(target1, target2)
+
+def InitializeTrialResponses(target1, target2):
+    global par
+    if target1.lower() != target1.upper():
+        par.t1_correct_response = [target1.lower(), target1.upper()]
+    else:
+        par.t1_correct_response = target1
+    if target2.lower() != target2.upper():
+        par.t2_correct_response = [target2.lower(), target2.upper()]
+    else:
+        par.t2_correct_response = target2
+
+    par.data_handler.AddData('t1_corr', ''.join(par.t1_correct_response))
+    par.data_handler.AddData('t2_corr', ''.join(par.t2_correct_response))
+
+def InitializeTrialMasks():
+    global par
     mask1_file = '{}{}.{}'.format(
         par.mask_file_prefix,
         par.rng.choice(par.n_mask_files) + 1,
@@ -535,35 +573,11 @@ def InitializeTrial():
         par.rng.choice(par.n_mask_files) + 1,
         par.mask_file_ext)
 
-    par.stim1_image.setImage(os.path.join(par.stim_dir, stim1_file))
-    par.stim2_image.setImage(os.path.join(par.stim_dir, stim2_file))
     par.mask1_image.setImage(os.path.join(par.stim_dir, mask1_file))
     par.mask2_image.setImage(os.path.join(par.stim_dir, mask2_file))
 
-    par.data_handler.AddData('trial', par.trial)
-    par.data_handler.AddData('trialtime', time.strftime("%Y%m%d-%H%M%S"))
-    par.data_handler.AddData('t1_level', par.t1_level)
-    par.data_handler.AddData('t2_level', par.t2_level)
-    par.data_handler.AddData('t2_lag', par.t2_lag)
-    par.data_handler.AddData('t1', target1)
-    par.data_handler.AddData('t2', target2)
-    par.data_handler.AddData('distractor1', distractor1)
-    par.data_handler.AddData('distractor2', distractor2)
-    par.data_handler.AddData('stimfile1', stim1_file)
-    par.data_handler.AddData('stimfile2', stim2_file)
     par.data_handler.AddData('maskfile1', mask1_file)
     par.data_handler.AddData('maskfile2', mask2_file)
-
-    if target1.lower() != target1.upper():
-        par.t1_correct_response = [target1.lower(), target1.upper()]
-    else:
-        par.t1_correct_response = target1
-    if target2.lower() != target2.upper():
-        par.t2_correct_response = [target2.lower(), target2.upper()]
-    else:
-        par.t2_correct_response = target2
-    par.data_handler.AddData('t1_corr', ''.join(par.t1_correct_response))
-    par.data_handler.AddData('t2_corr', ''.join(par.t2_correct_response))
 
 def PresentCue():
     par.win.clearBuffer()
