@@ -245,7 +245,12 @@ def PresentDialog():
 
 def ProcessDialog(dlg_info):
     global par
-    par.subject = int(dlg_info['Participant'])
+    try:
+        par.subject = int(dlg_info['Participant'])
+    except ValueError as ve:
+        print('\n\n***** Participant ID must be an integer ({}) *****'.format(
+            dlg_info['Participant']))
+        core.quit()
     par.exp_initials = dlg_info['Experimenter Initials']
     par.block_type = dlg_info['Block Type']
     if dlg_info['Cue'] == 'Cue':
