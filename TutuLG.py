@@ -33,6 +33,7 @@ par.font_size = 24
 
 par.feedback_color_correct = 'green'
 par.feedback_color_error = 'red'
+par.feedback_spacing = 100
 par.color_space = 'rgb255'
 par.foreground_color = [0, 0, 0]
 par.background_color = [200, 200, 200]
@@ -112,29 +113,47 @@ class Fixation:
 
 class Feedback:
     def __init__(self, win):
-        self.TextBox = visual.TextBox2(
-            win, '', font='Arial', letterHeight=18,
-            alignment='center', autoDraw=False,
-            colorSpace=par.color_space)
+        self.default_color = par.foreground_color
+        self.titleBox = visual.TextBox2(
+            win, '', pos=(0, par.feedback_spacing),
+            font=par.font, letterHeight=par.font_size,
+            color=self.default_color, colorSpace=par.color_space,
+            alignment='center', autoDraw=False)
+        self.t1Box = visual.TextBox2(
+            win, '', pos=(0, 0),
+            font=par.font, letterHeight=par.font_size,
+            color=self.default_color, colorSpace=par.color_space,
+            alignment='center', autoDraw=False)
+        self.t2Box = visual.TextBox2(
+            win, '', pos=(0, -par.feedback_spacing),
+            font=par.font, letterHeight=par.font_size,
+            color=self.default_color, colorSpace=par.color_space,
+            alignment='center', autoDraw=False)
 
-    def prepare(self, trial=None, accText=None, rt=None, color=None):
-        text=''
+    def prepare(self, trial=None,
+                    t1AccText=None, t1Color=None,
+                    t2AccText=None, t2Color=None):
+        self.titleBox.setText('')
+        self.t1Box.setText('')
+        self.t2Box.setText('')
+        self.titleBox.setColor(self.default_color)
+        self.t1Box.setColor(self.default_color)
+        self.t2Box.setColor(self.default_color)
         if trial != None:
-            text += 'Trial {}'.format(trial)
-        if accText != None:
-            if text != '':
-                text += '\n\n'
-            text += accText
-        if rt != None:
-            if text != '':
-                text += '\n\n'
-            text += 'Response time = {} ms'.format(round(rt * 1000))
-        self.TextBox.setText(text)
-        if color != None:
-            self.TextBox.setColor(color)
+            self.titleBox.setText('Trial {}'.format(trial))
+        if t1AccText != None:
+            self.t1Box.setText('Target 1: {}'.format(t1AccText))
+        if t2AccText != None:
+            self.t2Box.setText('Target 2: {}'.format(t2AccText))
+        if t1Color != None:
+            self.t1Box.setColor(t1Color)
+        if t2Color != None:
+            self.t2Box.setColor(t2Color)
 
     def draw(self):
-        self.TextBox.draw()
+        self.titleBox.draw()
+        self.t1Box.draw()
+        self.t2Box.draw()
 
 class DataHandler:
     def __init__(self, filename, output_type="csv"):
@@ -333,30 +352,36 @@ def InitializeStimuli():
         par.win, text='',
         font=par.font, letterHeight=par.font_size, alignment='center',
         colorSpace=par.color_space, color=par.foreground_color)
+    par.t1_response_prompt = visual.TextBox2(
+        par.win, text='1st target: Did you see ' + ' or '.join(par.target_letters) + '?',
+        font=par.font, letterHeight=par.font_size, alignment='center',
+        colorSpace=par.color_space, color=par.foreground_color,
+        autoDraw=False)
+    par.t2_response_prompt = visual.TextBox2(
+        par.win, text='2nd target: Did you see ' + ' or '.join(par.target_letters) + '?',
+        font=par.font, letterHeight=par.font_size, alignment='center',
+        colorSpace=par.color_space, color=par.foreground_color,
+        autoDraw=False)
 
 def InitializeResponses():
     global par
     par.kb = keyboard.Keyboard()
 
     # set up allowed responses
-    allowed_responses = list()
-    for k, v in par.responses.items():
-        if len(v) == 1 and v.lower() != v.upper():
-            allowed_responses.extend([v.lower(), v.upper()])
+    par.t1_allowed_responses = list()
+    par.t2_allowed_responses = list()
+    for c in par.target_letters:
+        if c.lower() != c.upper():
+            x = [c.lower(), c.upper()]
         else:
-            allowed_responses.append(v)
-    allowed_responses.append('escape')
-    par.allowed_responses = allowed_responses
+            x = [c]
+        par.t1_allowed_responses.extend(x)
+        par.t2_allowed_responses.extend(x)
+    par.t1_allowed_responses.append(par.quit_key)
+    par.t2_allowed_responses.append(par.quit_key)
 
-    # set up reversed responses for data recording
-    r = {}
-    for k, v in par.responses.items():
-        if isinstance(v, (list, tuple)):
-            for v1 in v:
-                r[v1] = k
-        else:
-            r[v] = k
-    par.rev_responses = r
+    par.t1_correct_count = 0
+    par.t2_correct_count = 0
 
 def quit_on_error(str):
     print(str)
@@ -373,8 +398,8 @@ def CreateTrialHandler(n_reps):
 def InitializeBlock():
     global par
     par.trial = 0
-    par.present_t1 = True
-    par.present_t2 = True
+    par.test_t1 = True
+    par.test_t2 = True
     if par.block_type.startswith('Practice'):
         par.warmup_trial_handler = None
         par.main_trial_handler = CreateTrialHandler(
@@ -382,7 +407,7 @@ def InitializeBlock():
         par.n_trials_main = par.n_trials_practice
         par.n_trials = par.n_trials_main
         if par.block_type == 'Practice1':
-            par.present_t2 = False
+            par.test_t2 = False
     else:
         par.warmup_trial_handler = CreateTrialHandler(
             np.ceil(par.n_trials_warmup / par.n_cells))
@@ -404,25 +429,18 @@ def PresentStartMessages():
         return
 
 def PresentFinalMessages():
-    completed_trials = 0
-    for k, v in par.trial_count.items():
-        completed_trials += v
     performance_summary = ''
-    for k in par.trial_count:
-        if k not in par.correct_count or k not in par.correct_rt_sum:
-            continue
-        acc = 100 * par.correct_count[k] / par.trial_count[k]
-        if par.correct_count[k] > 0:
-            rt = 1000 * par.correct_rt_sum[k] / par.correct_count[k]
-        else:
-            rt = 0
-        performance_summary += \
-          '\n\nTarget %s: Accuracy = %0.1f%%, Average RT = %0.0f ms' % (k, acc, rt)
+    if par.trial > 0:
+        performance_summary += 'Completed {} trials'.format(par.trial)
+    if par.test_t1:
+        performance_summary += '\n\n\nTarget 1 Accuracy = {}%'.format(
+            np.round(1000 * par.t1_correct_count / par.trial) / 10.0)
+    if par.test_t2:
+        performance_summary += '\n\n\nTarget 2 Accuracy = {}%'.format(
+            np.round(1000 * par.t2_correct_count / par.trial) / 10.0)
     print(performance_summary)
-    s = 'Completed %d trials\n' % (completed_trials)
-    s += performance_summary
-    s += '\n\n\nPlease let the experimenter know that you are done\n\n\nThank you!'
-    par.TextBox.setText(s)
+    performance_summary += '\n\n\nPlease let the experimenter know you are done.\n\n\nThank you!'
+    par.TextBox.setText(performance_summary)
     par.win.clearBuffer()
     par.TextBox.draw()
     par.win.flip()
@@ -484,8 +502,10 @@ def RunTrial():
     PreTrialPause()
     PresentFixation()
     PresentStimSequence()
+    CollectResponses()
     if par.end_experiment:
         return
+    PresentFeedback()
     PostTrialPause()
     CheckForBreak()
     EndTrial()
@@ -541,7 +561,16 @@ def InitializeTrial():
     par.data_handler.AddData('maskfile1', mask1_file)
     par.data_handler.AddData('maskfile2', mask2_file)
 
-    # par.correct_response = par.responses[par.trial_target_status]
+    if target1.lower() != target1.upper():
+        par.t1_correct_response = [target1.lower(), target1.upper()]
+    else:
+        par.t1_correct_response = target1
+    if target2.lower() != target2.upper():
+        par.t2_correct_response = [target2.lower(), target2.upper()]
+    else:
+        par.t2_correct_response = target2
+    par.data_handler.AddData('t1_corr', ''.join(par.t1_correct_response))
+    par.data_handler.AddData('t2_corr', ''.join(par.t2_correct_response))
 
 def PresentCue():
     par.win.clearBuffer()
@@ -604,48 +633,61 @@ def PresentStimSequence():
     par.win.flip()
     core.wait(par.dur_response_gap)
 
-def CollectResponse():
+def CollectResponses():
     global par
-    par.kb.clock.reset()
-    keys = par.kb.waitKeys(keyList=par.allowed_responses)
-    par.response_dict = ProcessResponse(
-        keys, par.correct_response, par.allowed_responses)
-    par.data_handler.AddData('resp', par.response_dict['resp'])
-    par.data_handler.AddData(
-        'rresp',
-        par.rev_responses.get(par.response_dict['resp'], 'none'))
-    par.data_handler.AddData('acc', par.response_dict['acc'])
-    par.data_handler.AddData('rt', par.response_dict['rt'])
+    if par.test_t1:
+        rd = CollectResponse(
+            par.t1_response_prompt,
+            par.t1_correct_response,
+            par.t1_allowed_responses)
+        par.data_handler.AddData('t1_res', rd['resp'])
+        par.data_handler.AddData('t1_acc', rd['acc'])
+        par.data_handler.AddData('t1_rt', rd['rt'])
+        par.t1_response_dict = rd
+        if rd['acc'] == 1:
+            par.t1_correct_count += 1
+    else:
+        par.t1_response_dict = ProcessResponse(None)
+    if par.test_t2:
+        rd = CollectResponse(
+            par.t2_response_prompt,
+            par.t2_correct_response,
+            par.t2_allowed_responses)
+        par.data_handler.AddData('t2_res', rd['resp'])
+        par.data_handler.AddData('t2_acc', rd['acc'])
+        par.data_handler.AddData('t2_rt', rd['rt'])
+        par.t2_response_dict = rd
+        if rd['acc'] == 1:
+            par.t2_correct_count += 1
+    else:
+        par.t2_response_dict = ProcessResponse(None)
     if par.end_experiment:
         return
 
+def CollectResponse(prompt, correct_response, allowed_responses):
+    par.win.clearBuffer()
+    prompt.draw()
+    par.win.flip()
+    par.kb.clock.reset()
+    keys = par.kb.waitKeys(keyList=allowed_responses)
+    response_dict = ProcessResponse(
+        keys, correct_response, allowed_responses)
+    par.win.clearBuffer()
+    par.win.flip()
+    return response_dict
+
 def SaveData():
     par.data_handler.OutputLine()
-    acc = par.response_dict['acc']
-    rt = par.response_dict['rt']
-    if par.trial_target in par.trial_count:
-        # already started counting for this target
-        par.trial_count[par.trial_target] += 1
-    else:
-        # first trial with this target
-        par.trial_count[par.trial_target] = 1
-        par.correct_count[par.trial_target] = 0
-        par.correct_rt_sum[par.trial_target] = 0
-    if acc == 1 and par.trial_target in par.correct_count:
-        par.correct_count[par.trial_target] += 1
-    if acc == 1 and par.trial_target in par.correct_rt_sum:
-        par.correct_rt_sum[par.trial_target] += rt
     # pause
     core.wait(par.dur_response_gap)
-    par.win.clearBuffer()
 
 def PresentFeedback():
-    rd = par.response_dict
+    rd1 = par.t1_response_dict
+    rd2 = par.t2_response_dict
     par.feedback.prepare(
         par.trial,
-        rd['fdbk'],
-        rd['rt'],
-        rd['fdbk_color'])
+        rd1['fdbk'], rd1['fdbk_color'],
+        rd2['fdbk'], rd2['fdbk_color'])
     par.win.clearBuffer()
     par.feedback.draw()
     par.win.flip()
