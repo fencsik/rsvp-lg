@@ -615,7 +615,7 @@ def PresentStimSequence():
     par.win.flip()
     par.win.clearBuffer()
     par.stim2_image.draw()
-    core.wait(par.t2_lag - (par.dur_stim + par.dur_pre_mask + par.dur_mask))
+    core.wait(par.t2_lag / 1000 - (par.dur_stim + par.dur_pre_mask + par.dur_mask))
     # reveal stim 2 and pre draw post stim blank
     par.win.flip()
     par.win.clearBuffer()
