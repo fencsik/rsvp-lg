@@ -813,7 +813,7 @@ def ProcessResponse(keys=None, correct_responses=None, allowed_responses=None):
         'fdbk': fdbk, 'fdbk_color': fdbk_color}
 
 ########################################################################
-# Test Code
+# Set up and run experiment, then quit cleanly
 ########################################################################
 
 Initialize()
