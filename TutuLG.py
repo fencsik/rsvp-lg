@@ -496,6 +496,7 @@ def RunTrial():
     PresentFixation()
     PresentStimSequence()
     CollectResponses()
+    SaveData()
     if par.end_experiment:
         return
     PresentFeedback()
