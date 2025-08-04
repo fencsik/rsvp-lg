@@ -586,7 +586,7 @@ def PresentCue():
     par.win.clearBuffer()
     par.cue.draw()
     par.win.flip()
-    clock.wait(par.dur_cue)
+    clock.wait(par.dur_cue - par.pre_flip_window)
 
 def PresentFixation():
     par.stim1_image.draw()
@@ -599,7 +599,7 @@ def PresentFixation():
     par.fixation.draw()
     par.win.flip()
     par.win.clearBuffer()
-    clock.wait(par.dur_fixation)
+    clock.wait(par.dur_fixation - par.pre_flip_window)
 
 def PresentStimSequence():
     # post fixation blank
@@ -711,7 +711,7 @@ def SaveData():
     # output line
     par.data_handler.OutputLine()
     # pause
-    clock.wait(par.dur_response_gap)
+    clock.wait(par.dur_response_gap - par.pre_flip_window)
 
 def PresentFeedback():
     rd1 = par.t1_response_dict
@@ -723,17 +723,17 @@ def PresentFeedback():
     par.win.clearBuffer()
     par.feedback.draw()
     par.win.flip()
-    clock.wait(par.dur_feedback)
+    clock.wait(par.dur_feedback - par.pre_flip_window)
 
 def PreTrialPause():
     par.win.clearBuffer()
     par.win.flip()
-    clock.wait(par.dur_pre_trial)
+    clock.wait(par.dur_pre_trial - par.pre_flip_window)
 
 def PostTrialPause():
     par.win.clearBuffer()
     par.win.flip()
-    clock.wait(par.dur_post_trial)
+    clock.wait(par.dur_post_trial - par.pre_flip_window)
 
 def CheckForBreak():
     if par.trial % par.break_every == 0 and par.n_trials - par.trial > 5:
