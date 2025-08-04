@@ -838,9 +838,12 @@ def AdjustDurationSettings():
     global par
     frame_rate = par.win.monitorFramePeriod
     for s in dir(par):
-        if s.startswith('dur_'):
-            n_frames = np.round(getattr(par, s) / frame_rate)
-            setattr(par, s, frame_rate * n_frames)
+        if not s.startswith('dur_'):
+            continue
+        x = getattr(par, s)
+        if x == 0:
+            continue
+        setattr(par, s, frame_rate * np.round(x / frame_rate))
 
 def ProcessResponse(keys=None, correct_responses=None, allowed_responses=None):
     global par
