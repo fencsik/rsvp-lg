@@ -57,7 +57,7 @@ par.dur_post_trial = 0.5
 
 import psychopy
 psychopy.useVersion('2024.2.4')
-from psychopy import core, visual, data, gui, info
+from psychopy import core, visual, clock, data, gui, info
 from psychopy.hardware import keyboard
 import numpy as np
 import os, re, time
@@ -584,7 +584,7 @@ def PresentCue():
     par.win.clearBuffer()
     par.cue.draw()
     par.win.flip()
-    core.wait(par.dur_cue)
+    clock.wait(par.dur_cue)
 
 def PresentFixation():
     par.stim1_image.draw()
@@ -597,7 +597,7 @@ def PresentFixation():
     par.fixation.draw()
     par.win.flip()
     par.win.clearBuffer()
-    core.wait(par.dur_fixation)
+    clock.wait(par.dur_fixation)
 
 def PresentStimSequence():
     # post fixation blank
@@ -689,7 +689,7 @@ def CollectResponse(prompt, correct_response, allowed_responses):
 def SaveData():
     par.data_handler.OutputLine()
     # pause
-    core.wait(par.dur_response_gap)
+    clock.wait(par.dur_response_gap)
 
 def PresentFeedback():
     rd1 = par.t1_response_dict
@@ -701,17 +701,17 @@ def PresentFeedback():
     par.win.clearBuffer()
     par.feedback.draw()
     par.win.flip()
-    core.wait(par.dur_feedback)
+    clock.wait(par.dur_feedback)
 
 def PreTrialPause():
     par.win.clearBuffer()
     par.win.flip()
-    core.wait(par.dur_pre_trial)
+    clock.wait(par.dur_pre_trial)
 
 def PostTrialPause():
     par.win.clearBuffer()
     par.win.flip()
-    core.wait(par.dur_post_trial)
+    clock.wait(par.dur_post_trial)
 
 def CheckForBreak():
     if par.trial % par.break_every == 0 and par.n_trials - par.trial > 5:
