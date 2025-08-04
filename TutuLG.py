@@ -648,9 +648,6 @@ def CollectResponses():
             par.t1_response_prompt,
             par.t1_correct_response,
             par.t1_allowed_responses)
-        par.data_handler.AddData('t1_res', rd['resp'])
-        par.data_handler.AddData('t1_acc', rd['acc'])
-        par.data_handler.AddData('t1_rt', rd['rt'])
         par.t1_response_dict = rd
         if rd['acc'] == 1:
             par.t1_correct_count += 1
@@ -661,14 +658,19 @@ def CollectResponses():
             par.t2_response_prompt,
             par.t2_correct_response,
             par.t2_allowed_responses)
-        par.data_handler.AddData('t2_res', rd['resp'])
-        par.data_handler.AddData('t2_acc', rd['acc'])
-        par.data_handler.AddData('t2_rt', rd['rt'])
         par.t2_response_dict = rd
         if rd['acc'] == 1:
             par.t2_correct_count += 1
     else:
         par.t2_response_dict = ProcessResponse(None)
+
+    par.data_handler.AddData('t1_resp', par.t1_response_dict['resp'])
+    par.data_handler.AddData('t1_acc', par.t1_response_dict['acc'])
+    par.data_handler.AddData('t1_rt', par.t1_response_dict['rt'])
+    par.data_handler.AddData('t2_resp', par.t2_response_dict['resp'])
+    par.data_handler.AddData('t2_acc', par.t2_response_dict['acc'])
+    par.data_handler.AddData('t2_rt', par.t2_response_dict['rt'])
+
     if par.end_experiment:
         return
 
