@@ -385,10 +385,6 @@ def InitializeResponses():
     par.t1_correct_count = 0
     par.t2_correct_count = 0
 
-def quit_on_error(str):
-    print(str)
-    core.quit()
-
 ########################################################################
 # Block-Level Code
 ########################################################################
