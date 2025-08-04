@@ -619,16 +619,16 @@ def PresentStimSequence():
     par.win.clearBuffer()
     par.stim1_image.draw()
     WaitUntil(tStartT1 - par.pre_flip_window)
-    par.win.flip()
+    par.actual_t1_onset = par.win.flip()
     # clear T1
     par.win.clearBuffer()
     WaitUntil(tEndT1 - par.pre_flip_window)
-    par.win.flip()
+    par.actual_t1_offset = par.win.flip()
     # mask1
     par.win.clearBuffer()
     par.mask1_image.draw()
     WaitUntil(tStartMask1 - par.pre_flip_window)
-    par.win.flip()
+    par.actual_mask1_onset = par.win.flip()
     # clear mask1
     par.win.clearBuffer()
     WaitUntil(tEndMask1 - par.pre_flip_window)
@@ -637,16 +637,16 @@ def PresentStimSequence():
     par.win.clearBuffer()
     par.stim2_image.draw()
     WaitUntil(tStartT2 - par.pre_flip_window)
-    par.win.flip()
+    par.actual_t2_onset = par.win.flip()
     # clear T2
     par.win.clearBuffer()
     WaitUntil(tEndT2 - par.pre_flip_window)
-    par.win.flip()
+    par.actual_t2_offset = par.win.flip()
     # mask2
     par.win.clearBuffer()
     par.mask2_image.draw()
     WaitUntil(tStartMask2 - par.pre_flip_window)
-    par.win.flip()
+    par.actual_mask2_onset = par.win.flip()
     # clear mask2
     par.win.clearBuffer()
     WaitUntil(tEndMask2 - par.pre_flip_window)
@@ -700,6 +700,14 @@ def CollectResponse(prompt, correct_response, allowed_responses):
     return response_dict
 
 def SaveData():
+    # save timing data
+    par.data_handler.AddData('t1_dur', par.actual_t1_offset - par.actual_t1_onset)
+    par.data_handler.AddData('t2_dur', par.actual_t2_offset - par.actual_t2_onset)
+    par.data_handler.AddData('t1mask_soa', par.actual_mask1_onset - par.actual_t1_onset)
+    par.data_handler.AddData('t2mask_soa', par.actual_mask2_onset - par.actual_t2_onset)
+    par.data_handler.AddData('t1t2_soa', par.actual_t2_onset - par.actual_t1_onset)
+
+    # output line
     par.data_handler.OutputLine()
     # pause
     clock.wait(par.dur_response_gap)
