@@ -318,7 +318,8 @@ def InitializeGraphics():
     par.win.mouseVisible = False
 
     # update timings to get as close to frame rate as possible
-    AdjustDurations(par.win.monitorFramePeriod)
+    AdjustDurationSettings()
+    par.pre_flip_window = par.win.monitorFramePeriod * 0.5
 
 def InitializeStimuli():
     global par
@@ -602,44 +603,56 @@ def PresentFixation():
 def PresentStimSequence():
     # post fixation blank
     par.win.flip()
-    # draw stim 1 to back buffer during post-fixation blank
+
+    # set up timing
+    t0 = clock.getTime()
+    tStartT1 = t0 + par.dur_post_fixation
+    tEndT1 = tStartT1 + par.dur_stim
+    tStartMask1 = tEndT1 + par.dur_pre_mask
+    tEndMask1 = tStartMask1 + par.dur_mask
+    tStartT2 = tStartT1 + AdjustDuration(par.t2_lag / 1000)
+    tEndT2 = tStartT2 + par.dur_stim
+    tStartMask2 = tEndT2 + par.dur_pre_mask
+    tEndMask2 = tStartMask2 + par.dur_mask
+    tEndStimuli = tEndMask2 + par.dur_response_gap
+    # T1
     par.win.clearBuffer()
     par.stim1_image.draw()
-    core.wait(par.dur_post_fixation)
-    # reveal stim 1 and clear buffer in prep for post stim blank
+    WaitUntil(tStartT1 - par.pre_flip_window)
     par.win.flip()
+    # clear T1
     par.win.clearBuffer()
-    core.wait(par.dur_stim)
-    # reveal post stim blank and draw mask
+    WaitUntil(tEndT1 - par.pre_flip_window)
     par.win.flip()
+    # mask1
     par.win.clearBuffer()
     par.mask1_image.draw()
-    core.wait(par.dur_pre_mask)
-    # reveal mask and clear buffer for post mask blank (lag)
+    WaitUntil(tStartMask1 - par.pre_flip_window)
     par.win.flip()
+    # clear mask1
     par.win.clearBuffer()
-    core.wait(par.dur_mask)
-    # reveal post mask blank and draw stim 2
+    WaitUntil(tEndMask1 - par.pre_flip_window)
     par.win.flip()
+    # T2
     par.win.clearBuffer()
     par.stim2_image.draw()
-    core.wait(par.t2_lag / 1000 - (par.dur_stim + par.dur_pre_mask + par.dur_mask))
-    # reveal stim 2 and pre draw post stim blank
+    WaitUntil(tStartT2 - par.pre_flip_window)
     par.win.flip()
+    # clear T2
     par.win.clearBuffer()
-    core.wait(par.dur_stim)
-    # reveal post stim blank and draw mask
+    WaitUntil(tEndT2 - par.pre_flip_window)
     par.win.flip()
+    # mask2
     par.win.clearBuffer()
     par.mask2_image.draw()
-    core.wait(par.dur_pre_mask)
-    # reveal mask and clear buffer for post mask blank (lag)
+    WaitUntil(tStartMask2 - par.pre_flip_window)
     par.win.flip()
+    # clear mask2
     par.win.clearBuffer()
-    core.wait(par.dur_mask)
-    # hide mask
+    WaitUntil(tEndMask2 - par.pre_flip_window)
     par.win.flip()
-    core.wait(par.dur_response_gap)
+    # pre-response pause
+    WaitUntil(tEndStimuli - par.pre_flip_window)
 
 def CollectResponses():
     global par
@@ -734,12 +747,26 @@ def EndTrial():
 # Support Functions
 ########################################################################
 
-def AdjustDurations(frame_rate):
+def WaitUntil(t):
+    """WaitUntil(t)
+
+    Wait until clock.getTime() gets to t. Uses clock.wait().
+    """
+
+    twait = t - clock.getTime()
+    clock.wait(twait)
+
+def AdjustDuration(t):
+    frame_rate = par.win.monitorFramePeriod
+    return frame_rate * np.round(t / frame_rate)
+
+def AdjustDurationSettings():
     global par
+    frame_rate = par.win.monitorFramePeriod
     for s in dir(par):
         if s.startswith('dur_'):
             n_frames = np.round(getattr(par, s) / frame_rate)
-            setattr(par, s, frame_rate * (n_frames - .75))
+            setattr(par, s, frame_rate * n_frames)
 
 def ProcessResponse(keys=None, correct_responses=None, allowed_responses=None):
     global par
