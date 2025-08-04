@@ -67,19 +67,61 @@ import os, re, time
 ########################################################################
 
 class Cue:
-    def __init__(self, stim_images):
-        self.cue_images = stim_images
-        self.pos = [0, 2 * par.stim_size[1]]
-        self.stim = None
+    def __init__(self, win):
+        self.global_size = par.stim_size
+        self.local_size = [28, 36]
+        self.color = par.foreground_color
+        self.thickness = 5
+        self.CreateCues(win)
 
-    def set(self, stim):
-        self.stim = stim
+    def CreateCues(self, win):
+        self.global_cue = visual.Rect(
+            win, pos=[0, self.global_size[1]], size=self.global_size,
+            lineWidth=self.thickness, lineColor=self.color, fillColor=None,
+            colorSpace=par.color_space)
+        self.local_cue = visual.Rect(
+            win, pos=[0, 2 * self.local_size[1]], size=self.local_size,
+            lineWidth=self.thickness, lineColor=self.color, fillColor=None,
+            colorSpace=par.color_space)
 
-    def draw(self):
-        img = self.cue_images[self.stim]
-        img.setOri(0)
-        img.setPos(self.pos)
-        img.draw()
+    def draw(self, cue):
+        if cue[0].lower() == 'g':
+            self.global_cue.draw()
+        else:
+            self.local_cue.draw()
+
+class TwoCues(Cue):
+    def CreateCues(self, win):
+        self.global_cue1 = visual.Rect(
+            win, pos=[-self.global_size[0], self.global_size[1]],
+            size=self.global_size, lineWidth=self.thickness,
+            lineColor=self.color, fillColor=None,
+            colorSpace=par.color_space)
+        self.local_cue1 = visual.Rect(
+            win, pos=[-self.global_size[0], self.global_size[1]],
+            size=self.local_size, lineWidth=self.thickness,
+            lineColor=self.color, fillColor=None,
+            colorSpace=par.color_space)
+        self.global_cue2 = visual.Rect(
+            win, pos=[self.global_size[0], self.global_size[1]],
+            size=self.global_size, lineWidth=self.thickness,
+            lineColor=self.color, fillColor=None,
+            colorSpace=par.color_space)
+        self.local_cue2 = visual.Rect(
+            win, pos=[self.global_size[0], self.global_size[1]],
+            size=self.local_size, lineWidth=self.thickness,
+            lineColor=self.color, fillColor=None,
+            colorSpace=par.color_space)
+
+    def draw(self, cue1, cue2):
+        if cue1[0].lower() == 'g':
+            self.global_cue1.draw()
+        else:
+            self.local_cue1.draw()
+        if cue2[0].lower() == 'g':
+            self.global_cue2.draw()
+        else:
+            self.local_cue2.draw()
 
 class Fixation:
     def __init__(self, win):
@@ -253,10 +295,13 @@ def ProcessDialog(dlg_info):
         core.quit()
     par.exp_initials = dlg_info['Experimenter Initials']
     par.block_type = dlg_info['Block Type']
-    if dlg_info['Cue'] == 'Cue':
-        par.show_cue = True
+    c = dlg_info['Cue']
+    if c == 'Cue One':
+        par.cue_type = 1
+    elif c == 'Cue Both':
+        par.cue_type = 2
     else:
-        par.show_cue = False
+        par.cue_type = None
 
 def GetDataFileName():
     return os.path.join('data', u'%s-Data-%03d.csv' %
@@ -347,7 +392,6 @@ def InitializeStimuli():
     par.mask2_image.autoDraw = False
 
     # set up other trial objects
-    par.cue = Cue(None)
     par.fixation = Fixation(par.win)
     par.feedback = Feedback(par.win)
     par.TextBox = visual.TextBox2(
@@ -412,6 +456,17 @@ def InitializeBlock():
         par.main_trial_handler = CreateTrialHandler(par.n_trials_per_cell)
         par.n_trials_main = par.n_trials_per_cell * par.n_cells
         par.n_trials = par.n_trials_warmup + par.n_trials_main
+
+    # initialize cues, which depend the tasks being run
+    if par.cue_type == 2 and par.test_t1 and par.test_t2:
+        # only present two cues if it was requested and both targets are being tested
+        par.cue = TwoCues(par.win)
+    elif par.cue_type in (1, 2):
+        # either just one cue requested or only one target is being tested
+        par.cue_type = 1
+        par.cue = Cue(par.win)
+    else:
+        par.cue = None
 
 def PresentStartMessages():
     par.TextBox.setText('Press any button to begin %d trials' % (par.n_trials))
@@ -495,6 +550,7 @@ def RunExperiment():
 def RunTrial():
     InitializeTrial()
     PreTrialPause()
+    PresentCue()
     PresentFixation()
     PresentStimSequence()
     CollectResponses()
@@ -582,9 +638,19 @@ def InitializeTrialMasks():
     par.data_handler.AddData('maskfile1', mask1_file)
     par.data_handler.AddData('maskfile2', mask2_file)
 
+def DrawCue():
+    if par.cue_type == 1:
+        par.cue.draw(par.t1_level)
+    elif par.cue_type == 2:
+        par.cue.draw(par.t1_level, par.t2_level)
+    else:
+        return
+
 def PresentCue():
+    if par.cue_type is None or par.dur_cue == 0:
+        return
     par.win.clearBuffer()
-    par.cue.draw()
+    DrawCue()
     par.win.flip()
     clock.wait(par.dur_cue - par.pre_flip_window)
 
@@ -594,8 +660,7 @@ def PresentFixation():
     par.mask1_image.draw()
     par.mask2_image.draw()
     par.win.clearBuffer()
-    #if par.show_cue:
-    #    par.cue.draw()
+    DrawCue()
     par.fixation.draw()
     par.win.flip()
     par.win.clearBuffer()
