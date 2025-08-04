@@ -60,7 +60,7 @@ psychopy.useVersion('2024.2.4')
 from psychopy import core, visual, data, gui, info
 from psychopy.hardware import keyboard
 import numpy as np
-import math, os, random, re, time
+import os, re, time
 
 ########################################################################
 # Support Classes
