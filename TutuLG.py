@@ -284,7 +284,7 @@ def PresentDialog():
     dlg_info = {
         'Participant': '999',
         'Experimenter Initials': 'DEF',
-        'Block Type': ['Practice1', 'Practice2', 'Experiment'],
+        'Block Type': ['Demo', 'Practice1', 'Practice2', 'Experiment'],
         'Cue': ['Cue One', 'Cue Both', 'No Cues'],
         'Version': par.version
         }
@@ -455,7 +455,19 @@ def InitializeBlock():
     par.trial = 0
     par.test_t1 = True
     par.test_t2 = True
-    if par.block_type.startswith('Practice'):
+    par.demo_run = False
+    if par.block_type == 'Demo':
+        par.demo_run = True
+        par.warmup_trial_handler = None
+        par.main_trial_handler = CreateTrialHandler(
+            np.ceil(par.n_trials_practice / par.n_cells))
+        par.n_trials_main = par.n_trials_practice
+        par.n_trials = par.n_trials_main
+        par.test_t2 = False
+        par.dur_stim = AdjustDuration(0.1)
+        par.dur_pre_mask = AdjustDuration(0.1)
+        par.dur_mask = AdjustDuration(0.5)
+    elif par.block_type.startswith('Practice'):
         par.warmup_trial_handler = None
         par.main_trial_handler = CreateTrialHandler(
             np.ceil(par.n_trials_practice / par.n_cells))
@@ -581,6 +593,8 @@ def InitializeTrial():
     par.data_handler.AddData('trialtime', time.strftime("%Y%m%d-%H%M%S"))
     par.data_handler.AddData('t1_level', par.t1_level)
     par.data_handler.AddData('t2_level', par.t2_level)
+    if par.demo_run:
+        par.t2_lag = 750
     par.data_handler.AddData('t2_lag', par.t2_lag)
 
     InitializeTrialStimuli()
