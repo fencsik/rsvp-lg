@@ -349,7 +349,7 @@ def InitializeDataFile():
     par.data_handler.AddData('ver', par.version)
     par.data_handler.AddData('modtime', par.modtime)
     par.data_handler.AddData('sub', par.subject)
-    par.data_handler.AddData('blocktyp', par.block_type)
+    par.data_handler.AddData('blocktype', par.block_type)
     par.data_handler.AddData('cuetype', par.cue_type)
 
 def GetScreenResolution():
@@ -543,14 +543,14 @@ def RunExperiment():
         return
 
     # run warmup trials
-    par.data_handler.AddData('trialtyp', 'warmup')
+    par.data_handler.AddData('trialtype', 'warmup')
     RunTrialGroup(par.warmup_trial_handler, par.n_trials_warmup)
 
     if par.end_experiment:
         return
 
     # run experimental trials
-    par.data_handler.AddData('trialtyp', 'main')
+    par.data_handler.AddData('trialtype', 'main')
     RunTrialGroup(par.main_trial_handler, par.n_trials_main)
 
     PresentFinalMessages()
