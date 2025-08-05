@@ -287,6 +287,7 @@ def PresentDialog():
         'Block Type': ['Demo', 'Practice', 'Experiment'],
         'Targets': ['T1', 'Both'],
         'Cue': ['Cue One', 'Cue Both', 'No Cues'],
+        'Mode': ['Automatic', 'Self Paced'],
         'Version': par.version
         }
     dlg = gui.DlgFromDict(
@@ -317,6 +318,11 @@ def ProcessDialog(dlg_info):
         par.cue_type = 2
     else:
         par.cue_type = 0
+    par.mode = dlg_info['Mode']
+    if par.mode == 'Self Paced':
+        par.self_paced = True
+    else:
+        par.self_paced = False
 
 def GetDataFileName():
     return os.path.join('data', u'%s-Data-%03d.csv' %
@@ -355,6 +361,7 @@ def InitializeDataFile():
     par.data_handler.AddData('blocktype', par.block_type)
     par.data_handler.AddData('targets', par.targets)
     par.data_handler.AddData('cuetype', par.cue_type)
+    par.data_handler.AddData('mode', par.mode)
 
 def GetScreenResolution():
     # identify screen resolution based on the computer
@@ -422,6 +429,11 @@ def InitializeStimuli():
         autoDraw=False)
     par.t2_response_prompt = visual.TextBox2(
         par.win, text='2nd target: Did you see ' + ' or '.join(par.target_letters) + '?',
+        font=par.font, letterHeight=par.font_size, alignment='center',
+        colorSpace=par.color_space, color=par.foreground_color,
+        autoDraw=False)
+    par.self_paced_prompt = visual.TextBox2(
+        par.win, text='Press any button to begin the next trial',
         font=par.font, letterHeight=par.font_size, alignment='center',
         colorSpace=par.color_space, color=par.foreground_color,
         autoDraw=False)
@@ -578,7 +590,12 @@ def RunExperiment():
 def RunTrial():
     InitializeTrial()
     PreTrialPause()
-    PresentCue()
+    if par.self_paced:
+        PresentCueWithSelfPacing()
+    else:
+        PresentCue()
+    if par.end_experiment:
+        return
     PresentFixation()
     PresentStimSequence()
     CollectResponses()
@@ -671,6 +688,18 @@ def InitializeTrialMasks():
 def DrawCue():
     if par.cue is not None:
         par.cue.draw(par.t1_level, par.t2_level)
+
+def PresentCueWithSelfPacing():
+    par.win.clearBuffer()
+    if par.dur_cue > 0:
+        DrawCue()
+    par.self_paced_prompt.setText(
+        'Press any button to begin trial {}'.format(par.trial))
+    par.self_paced_prompt.draw()
+    par.win.flip()
+    keys = par.kb.waitKeys()
+    if keys[0].name == par.quit_key:
+        par.end_experiment = True
 
 def PresentCue():
     if par.dur_cue == 0:
