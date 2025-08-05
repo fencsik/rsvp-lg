@@ -284,14 +284,16 @@ def PresentDialog():
     dlg_info = {
         'Participant': '999',
         'Experimenter Initials': 'DEF',
-        'Block Type': ['Demo', 'Practice1', 'Practice2', 'Experiment'],
+        'Block Type': ['Demo', 'Practice', 'Experiment'],
+        'Targets': ['T1', 'Both'],
         'Cue': ['Cue One', 'Cue Both', 'No Cues'],
         'Version': par.version
         }
     dlg = gui.DlgFromDict(
         dlg_info, title=EXPERIMENT,
-        order=['Participant', 'Experimenter Initials', 'Block Type', 'Cue'],
-        fixed='Version')
+        order=['Participant', 'Experimenter Initials',
+                   'Block Type', 'Targets', 'Cue'],
+        fixed=['Version'])
     if not dlg.OK:
         print('Dialog box canceled')
         core.quit()
@@ -307,6 +309,7 @@ def ProcessDialog(dlg_info):
         core.quit()
     par.exp_initials = dlg_info['Experimenter Initials']
     par.block_type = dlg_info['Block Type']
+    par.targets = dlg_info['Targets']
     c = dlg_info['Cue']
     if c == 'Cue One':
         par.cue_type = 1
@@ -350,6 +353,7 @@ def InitializeDataFile():
     par.data_handler.AddData('modtime', par.modtime)
     par.data_handler.AddData('sub', par.subject)
     par.data_handler.AddData('blocktype', par.block_type)
+    par.data_handler.AddData('targets', par.targets)
     par.data_handler.AddData('cuetype', par.cue_type)
 
 def GetScreenResolution():
@@ -453,8 +457,6 @@ def CreateTrialHandler(n_reps):
 def InitializeBlock():
     global par
     par.trial = 0
-    par.test_t1 = True
-    par.test_t2 = True
     par.demo_run = False
     if par.block_type == 'Demo':
         par.demo_run = True
@@ -463,24 +465,26 @@ def InitializeBlock():
             np.ceil(par.n_trials_practice / par.n_cells))
         par.n_trials_main = par.n_trials_practice
         par.n_trials = par.n_trials_main
-        par.test_t2 = False
         par.dur_stim = AdjustDuration(0.1)
         par.dur_pre_mask = AdjustDuration(0.1)
         par.dur_mask = AdjustDuration(0.5)
-    elif par.block_type.startswith('Practice'):
+    elif par.block_type == 'Practice':
         par.warmup_trial_handler = None
         par.main_trial_handler = CreateTrialHandler(
             np.ceil(par.n_trials_practice / par.n_cells))
         par.n_trials_main = par.n_trials_practice
         par.n_trials = par.n_trials_main
-        if par.block_type == 'Practice1':
-            par.test_t2 = False
     else:
         par.warmup_trial_handler = CreateTrialHandler(
             np.ceil(par.n_trials_warmup / par.n_cells))
         par.main_trial_handler = CreateTrialHandler(par.n_trials_per_cell)
         par.n_trials_main = par.n_trials_per_cell * par.n_cells
         par.n_trials = par.n_trials_warmup + par.n_trials_main
+
+    par.test_t1 = True
+    par.test_t2 = True
+    if par.targets == 'T1':
+        par.test_t2 = False
 
     # initialize cues, which depend the tasks being run
     if par.cue_type == 2 and par.test_t1 and par.test_t2:
