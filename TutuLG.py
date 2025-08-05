@@ -67,61 +67,73 @@ import os, re, time
 ########################################################################
 
 class Cue:
-    def __init__(self, win):
+    """
+    Mode can be 1 (show cue for T1 only), 2 (show cue for T2 only),
+    or 3 (show cues for both)
+    """
+    def __init__(self, win, mode):
         self.global_size = par.stim_size
         self.local_size = [28, 36]
         self.color = par.foreground_color
         self.thickness = 5
-        self.CreateCues(win)
 
-    def CreateCues(self, win):
-        self.global_cue = visual.Rect(
+        if mode == 1:
+            self.CreateOneCue(win)
+            self.draw = self.draw1
+        elif mode == 2:
+            self.CreateOneCue(win)
+            self.draw = self.draw2
+        elif mode == 3:
+            self.CreateTwoCues(win)
+            self.draw = self.draw3
+        else:
+            s = 'invalid cue mode request ({})'.format(mode)
+            raise ValueError(s)
+
+    def CreateOneCue(self, win):
+        self.cue = {}
+        self.cue['global'] = visual.Rect(
             win, pos=[0, self.global_size[1]], size=self.global_size,
             lineWidth=self.thickness, lineColor=self.color, fillColor=None,
             colorSpace=par.color_space)
-        self.local_cue = visual.Rect(
+        self.cue['local'] = visual.Rect(
             win, pos=[0, 2 * self.local_size[1]], size=self.local_size,
             lineWidth=self.thickness, lineColor=self.color, fillColor=None,
             colorSpace=par.color_space)
 
-    def draw(self, cue):
-        if cue[0].lower() == 'g':
-            self.global_cue.draw()
-        else:
-            self.local_cue.draw()
-
-class TwoCues(Cue):
-    def CreateCues(self, win):
-        self.global_cue1 = visual.Rect(
+    def CreateTwoCues(self, win):
+        self.cue1 = {}
+        self.cue2 = {}
+        self.cue1['global'] = visual.Rect(
             win, pos=[-self.global_size[0], self.global_size[1]],
             size=self.global_size, lineWidth=self.thickness,
             lineColor=self.color, fillColor=None,
             colorSpace=par.color_space)
-        self.local_cue1 = visual.Rect(
+        self.cue1['local'] = visual.Rect(
             win, pos=[-self.global_size[0], self.global_size[1]],
             size=self.local_size, lineWidth=self.thickness,
             lineColor=self.color, fillColor=None,
             colorSpace=par.color_space)
-        self.global_cue2 = visual.Rect(
+        self.cue2['global'] = visual.Rect(
             win, pos=[self.global_size[0], self.global_size[1]],
             size=self.global_size, lineWidth=self.thickness,
             lineColor=self.color, fillColor=None,
             colorSpace=par.color_space)
-        self.local_cue2 = visual.Rect(
+        self.cue2['local'] = visual.Rect(
             win, pos=[self.global_size[0], self.global_size[1]],
             size=self.local_size, lineWidth=self.thickness,
             lineColor=self.color, fillColor=None,
             colorSpace=par.color_space)
 
-    def draw(self, cue1, cue2):
-        if cue1[0].lower() == 'g':
-            self.global_cue1.draw()
-        else:
-            self.local_cue1.draw()
-        if cue2[0].lower() == 'g':
-            self.global_cue2.draw()
-        else:
-            self.local_cue2.draw()
+    def draw1(self, level1, level2):
+        self.cue[level1.lower()].draw()
+
+    def draw2(self, level1, level2):
+        self.cue[level2.lower()].draw()
+
+    def draw3(self, level1, level2):
+        self.cue1[level1.lower()].draw()
+        self.cue2[level2.lower()].draw()
 
 class Fixation:
     def __init__(self, win):
@@ -460,11 +472,10 @@ def InitializeBlock():
     # initialize cues, which depend the tasks being run
     if par.cue_type == 2 and par.test_t1 and par.test_t2:
         # only present two cues if it was requested and both targets are being tested
-        par.cue = TwoCues(par.win)
-    elif par.cue_type in (1, 2):
-        # either just one cue requested or only one target is being tested
-        par.cue_type = 1
-        par.cue = Cue(par.win)
+        par.cue = Cue(par.win, 3)
+    elif par.cue_type == 1 or (par.cue_type == 2 and par.test_t1):
+        # either just 1 cue requested, or both cues but only T1 is being tested
+        par.cue = Cue(par.win, 1)
     else:
         par.cue = None
 
@@ -639,15 +650,11 @@ def InitializeTrialMasks():
     par.data_handler.AddData('maskfile2', mask2_file)
 
 def DrawCue():
-    if par.cue_type == 1:
-        par.cue.draw(par.t1_level)
-    elif par.cue_type == 2:
+    if par.cue is not None:
         par.cue.draw(par.t1_level, par.t2_level)
-    else:
-        return
 
 def PresentCue():
-    if par.cue_type is None or par.dur_cue == 0:
+    if par.dur_cue == 0:
         return
     par.win.clearBuffer()
     DrawCue()
