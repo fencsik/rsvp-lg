@@ -313,7 +313,7 @@ def ProcessDialog(dlg_info):
     elif c == 'Cue Both':
         par.cue_type = 2
     else:
-        par.cue_type = None
+        par.cue_type = 0
 
 def GetDataFileName():
     return os.path.join('data', u'%s-Data-%03d.csv' %
@@ -350,6 +350,7 @@ def InitializeDataFile():
     par.data_handler.AddData('modtime', par.modtime)
     par.data_handler.AddData('sub', par.subject)
     par.data_handler.AddData('blocktyp', par.block_type)
+    par.data_handler.AddData('cuetype', par.cue_type)
 
 def GetScreenResolution():
     # identify screen resolution based on the computer
