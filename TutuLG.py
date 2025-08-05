@@ -479,7 +479,7 @@ def InitializeBlock():
         par.n_trials = par.n_trials_main
         par.dur_stim = AdjustDuration(0.1)
         par.dur_pre_mask = AdjustDuration(0.1)
-        par.dur_mask = AdjustDuration(0.5)
+        par.dur_mask = AdjustDuration(0.1)
     elif par.block_type == 'Practice':
         par.warmup_trial_handler = None
         par.main_trial_handler = CreateTrialHandler(
