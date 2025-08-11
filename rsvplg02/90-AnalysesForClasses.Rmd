@@ -174,5 +174,5 @@ Export just the first 100 participants to create a demo dataset
 jasp_export |>
   arrange(sub) |>
   slice_head(n=100) |>
-  write.csv(file="RSVPLG02-JASP-Subset.csv", row.names=FALSE)
+  write.csv(file="RSVPLG02-JASP-Subset-20250811.csv", row.names=FALSE)
 ```
