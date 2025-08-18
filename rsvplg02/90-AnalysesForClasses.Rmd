@@ -166,7 +166,7 @@ write.csv(jasp_export, sprintf("RSVPLG02-JASP-%s.csv", Sys.Date()),
           row.names=FALSE)
 ```
 
-# Export a Subset
+# Export a Subset for Students
 
 Export just the first 100 participants to create a demo dataset
 
@@ -175,4 +175,15 @@ jasp_export |>
   arrange(sub) |>
   slice_head(n=100) |>
   write.csv(file="RSVPLG02-JASP-Subset-20250811.csv", row.names=FALSE)
+```
+
+# Export a Subset for the Instructor
+
+Export a random 150 participants to create a demo dataset for the instructor
+
+```{r savesample}
+jasp_export |>
+  slice_sample(n=120) |>
+  arrange(sub) |>
+  write.csv(file="RSVPLG02-JASP-Sample-20250818.csv", row.names=FALSE)
 ```
