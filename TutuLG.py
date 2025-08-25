@@ -282,8 +282,8 @@ def InitializeGeneral():
 
 def PresentDialog():
     dlg_info = {
-        'Participant': '999',
-        'Experimenter Initials': 'DEF',
+        'Participant': '',
+        'Experimenter Initials': '',
         'Block Type': ['Introduction', 'Practice', 'Experiment'],
         'Targets': ['T1', 'Both'],
         'Cue': ['Cue One', 'Cue Both', 'No Cues'],
