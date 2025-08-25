@@ -284,7 +284,7 @@ def PresentDialog():
     dlg_info = {
         'Participant': '999',
         'Experimenter Initials': 'DEF',
-        'Block Type': ['Demo', 'Practice', 'Experiment'],
+        'Block Type': ['Introduction', 'Practice', 'Experiment'],
         'Targets': ['T1', 'Both'],
         'Cue': ['Cue One', 'Cue Both', 'No Cues'],
         'Mode': ['Automatic', 'Self Paced'],
@@ -470,7 +470,7 @@ def InitializeBlock():
     global par
     par.trial = 0
     par.demo_run = False
-    if par.block_type == 'Demo':
+    if par.block_type == 'Introduction':
         par.demo_run = True
         par.warmup_trial_handler = None
         par.main_trial_handler = CreateTrialHandler(
