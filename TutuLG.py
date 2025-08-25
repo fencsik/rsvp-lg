@@ -12,8 +12,8 @@ class ExperimentSettings:
     pass
 par = ExperimentSettings()
 
-par.n_trials_per_cell = 20
-par.n_trials_practice = 8
+par.n_trials_per_cell = 15
+par.n_trials_practice = 16
 par.n_trials_warmup = 5
 par.break_every = 25
 
