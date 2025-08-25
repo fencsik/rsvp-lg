@@ -286,15 +286,15 @@ def PresentDialog():
         'Experimenter Initials': '',
         'Block Type': ['Introduction', 'Practice', 'Experiment'],
         'Targets': ['T1', 'Both'],
-        'Cue': ['Cue One', 'Cue Both', 'No Cues'],
-        'Mode': ['Automatic', 'Self Paced'],
+        'Cue': 'Cue One', #['Cue One', 'Cue Both', 'No Cues'],
+        'Mode': 'Automatic', #['Automatic', 'Self Paced'],
         'Version': par.version
         }
     dlg = gui.DlgFromDict(
         dlg_info, title=EXPERIMENT,
         order=['Participant', 'Experimenter Initials',
                    'Block Type', 'Targets', 'Cue'],
-        fixed=['Version'])
+        fixed=['Cue', 'Mode', 'Version'])
     if not dlg.OK:
         print('Dialog box canceled')
         core.quit()
