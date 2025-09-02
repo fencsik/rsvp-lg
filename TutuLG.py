@@ -36,7 +36,7 @@ par.feedback_color_error = 'red'
 par.feedback_spacing = 100
 par.color_space = 'rgb255'
 par.foreground_color = [0, 0, 0]
-par.background_color = [200, 200, 200]
+par.background_color = [150, 150, 150]
 par.quit_key = 'escape'
 
 # timing setup
