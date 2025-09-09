@@ -37,6 +37,7 @@ par.feedback_spacing = 100
 par.color_space = 'rgb255'
 par.foreground_color = [0, 0, 0]
 par.background_color = [150, 150, 150]
+par.cue_color = [255, 255, 255]
 par.quit_key = 'escape'
 
 # timing setup
@@ -74,7 +75,7 @@ class Cue:
     def __init__(self, win, mode):
         self.global_size = par.stim_size
         self.local_size = [28, 36]
-        self.color = par.foreground_color
+        self.color = par.cue_color
         self.thickness = 5
 
         if mode == 1:
