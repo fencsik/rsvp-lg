@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 EXPERIMENT = 'RSVPLG03'
-VERSION = '1.0'
+VERSION = '1.0.1'
 
 ########################################################################
 # Settings
