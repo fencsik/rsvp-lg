@@ -149,7 +149,7 @@ cat(sprintf("\"%s\"", paste(colnames(surveyData), collapse="\", \"")))
 Save the raw task data to a CSV file for sharing
 
 ```{r saversvp}
-write.csv(rsvpData, sprintf("RSVPLG01-RawTaskData-%s.csv", Sys.Date()),
+write.csv(rsvpData, sprintf("RSVPLG02-RawTaskData-%s.csv", Sys.Date()),
           row.names=FALSE)
 ```
 
