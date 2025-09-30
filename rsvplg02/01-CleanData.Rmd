@@ -74,7 +74,18 @@ surveyData = surveyData[surveyData$sub < 900, ]
 5. Remove minors
 
 ```{r cleandata5}
-print("We're allowed to use data from minors in this study")
+surveyData |>
+  drop_na(age) |>
+  filter(age < 18) |>
+  pull(sub) -> minors
+if (length(minors) > 0) {
+  print("Minors detected in data and will be removed:")
+  print(sort(minors))
+  surveyData |>
+    filter(!(sub %in% minors)) -> surveyData
+} else {
+  print("No minors detected in data")
+}
 ```
 
 6. Recode demographic values
