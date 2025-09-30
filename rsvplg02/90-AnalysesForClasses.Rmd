@@ -162,7 +162,7 @@ jasp_export |> summary()
 # Export Data
 
 ```{r, savefile}
-write.csv(jasp_export, sprintf("RSVPLG02-JASP-%s.csv", Sys.Date()),
+write.csv(jasp_export, sprintf("RSVPLG02-JASP-Full-%s.csv", Sys.Date()),
           row.names=FALSE)
 ```
 
