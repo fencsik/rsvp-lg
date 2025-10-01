@@ -187,3 +187,21 @@ jasp_export |>
   arrange(sub) |>
   write.csv(file="RSVPLG02-JASP-Sample-20250818.csv", row.names=FALSE)
 ```
+
+# Export two fuller datasets
+
+Export two samples that have most of the participants but not all, separately for students and for the instructor
+
+```{r savetwofulversions}
+jasp_export |>
+  summarize(n = n()) |>
+  pull(n) -> num_sub
+
+for (i in 1:2) {
+  jasp_export |>
+    slice_sample(n = ceiling(0.9 * num_sub)) |>
+    arrange(sub) |>
+    write.csv(file=sprintf("RSVPLG02-JASP-Full-20259-%d.csv", i),
+              row.names=FALSE)
+}
+```
