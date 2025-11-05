@@ -14,7 +14,7 @@ par = ExperimentSettings()
 
 par.n_trials_per_cell = 12
 par.n_trials_practice = 16
-par.n_trials_warmup = 5
+par.n_trials_warmup = 4
 par.break_every = 25
 
 par.stim_size = [190, 250]
