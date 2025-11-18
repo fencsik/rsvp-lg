@@ -60,6 +60,40 @@ rsvpData |>
             .groups="drop") -> x
 ```
 
+Generate violin plots of overall repeating and switching
+
+```{r ViolinPlotsBySwitch, fig.height=4, fig.width=4}
+x |>
+  group_by(sub, switch_type) |>
+  summarize(t2t1acc = mean(t2t1acc), .groups="drop") |>
+  ggplot(aes(x=switch_type, y=t2t1acc)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  geom_hline(yintercept=0.5, linetype=2, color="gray") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  labs(x="Switch Condition", y="T2|T1 Accuracy") +
+  scale_x_discrete(labels=c("noswitch"="No Switch", "switch"="Switch"))
+```
+
+Generate violin plots of switch costs
+
+```{r ViolinPlotsSwitchCost, fig.height=4, fig.width=3}
+x |>
+  group_by(sub, switch_type) |>
+  summarize(t2t1acc = mean(t2t1acc), .groups="drop") |>
+  pivot_wider(names_from=switch_type,
+              values_from=t2t1acc) |>
+  mutate(cost = noswitch - switch) -> switch.cost
+
+switch.cost |>
+  ggplot(aes(x="", y=cost)) +
+  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  geom_hline(yintercept=0, linetype=2, color="gray") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  labs(x="", y="No Switch - Switch")
+```
+
 Generate violin plots of overall repeating and switching separated by level
 
 ```{r ViolinPlotsByLevelAndSwitch, fig.height=4, fig.width=8}
