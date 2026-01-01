@@ -1,0 +1,96 @@
+---
+title: "RSVPLG03: Gather Data Files"
+author: "David Fencsik"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=TRUE)
+library(tidyverse)
+
+this_file = "00-GatherData"
+```
+
+# Purpose
+
+Gather all the individual RSVP data files and the survey data and save them as an R binary
+
+# Load Data Files
+
+## Combine Individual RSVP Data Files
+
+Gather all the files in the data/ directory and all subdirectories together into one data frame, making sure that the headings match.
+
+```{r, gatherdatacode, echo=FALSE}
+GatherData = function(dir=NULL, columns=NULL) {
+
+    if (is.null(dir) || !dir.exists(dir)) return (NULL)
+
+    fileList = list.files(path=dir, pattern="\\.csv$", full.names=TRUE,
+                          recursive=TRUE, ignore.case=TRUE, no..=TRUE)
+    allData = NULL
+    for (fileName in fileList) {
+        df = read.csv(fileName)
+        if (is.null(columns)) {
+            columns = names(df)
+        }
+        if (!all(columns %in% names(df))) {
+            warning("Skipping file due to missing columns: ", fileName)
+            next
+        }
+        if (is.null(allData)) {
+            allData = df[columns]
+        } else {
+            allData = rbind(allData, df[columns])
+        }
+    }
+    return(allData)
+}
+```
+
+```{r loadrsvp1}
+dataDir = "data"
+rsvpData = GatherData(dataDir)
+sprintf("Gathered data files in %s together", dataDir)
+sprintf("Data consists of %d rows and %d columns",
+        dim(rsvpData)[1], dim(rsvpData)[2])
+print("Columns:")
+cat(sprintf("\"%s\"", paste(colnames(rsvpData), collapse="\", \"")))
+```
+
+## Load Survey Data
+
+Load the survey CSV file
+
+```{r loadsurvey1}
+surveyFile = "SurveyDataRaw.csv"
+surveyData = read.csv(surveyFile)
+sprintf("Loaded survey data file %s", surveyFile)
+sprintf("Data consists of %d rows and %d columns",
+        dim(surveyData)[1], dim(surveyData)[2])
+print("Columns:")
+cat(sprintf("\"%s\"", paste(colnames(surveyData), collapse="\", \"")))
+```
+
+# Save Data
+
+## Raw Task Data CSV File
+
+Save the raw task data to a CSV file for sharing
+
+```{r saversvp}
+write.csv(rsvpData, sprintf("RSVPLG03-RawTaskData-%s.csv", Sys.Date()),
+          row.names=FALSE)
+```
+
+## Combined Data R File
+
+Save both the task data and the survey data to an R binary file
+
+```{r savedata}
+save(rsvpData, surveyData, file=sprintf("%s.RData", this_file))
+```
