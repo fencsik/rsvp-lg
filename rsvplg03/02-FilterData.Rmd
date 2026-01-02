@@ -1,0 +1,75 @@
+---
+title: "RSVPLG03: Filter Data"
+author: "David Fencsik"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+this_file = "02-FilterData"
+```
+
+# Optionally Remove Participants
+
+## Load data files
+
+```{r, loaddata}
+rsvpData = read.csv("rsvpData.csv")
+surveyData = read.csv("surveyData.csv")
+rsvpAggregate = read.csv("rsvpAggregate.csv")
+```
+
+## Number of Particants Before Filtering
+
+```{r, preOutlierRemovalSummary}
+print(length(unique(surveyData$sub)))
+print(length(unique(rsvpAggregate$sub)))
+
+subRSVP = sort(unique(rsvpAggregate$sub))
+subSurvey = sort(unique(surveyData$sub))
+subCommon = intersect(subRSVP, subSurvey)
+sprintf("Subjects in RSVP data set but not Survey data set: %s",
+        paste(setdiff(subRSVP, subSurvey), collapse=", "))
+sprintf("Subjects in Survey data set but not RSVP data set: %s",
+        paste(setdiff(subSurvey, subRSVP), collapse=", "))
+```
+
+## Remove participants with low accuracy
+
+Remove participants with accuracy below 60% on either T1 or T2
+
+```{r, lowaccuracy}
+runFilter = TRUE
+if (runFilter) {
+  rsvpData |>
+    filter(blocktype == "Experiment", trialtype == "main",
+           t1_acc >= 0, t2_acc >= 0) |>
+    group_by(sub) |>
+    summarize(t1 = mean(t1_acc),
+              t2 = mean(t2_acc)) |>
+    filter(t1 > .6 & t2 > .6) |>
+    pull(sub) -> sub.to.keep
+
+  rsvpData = rsvpData |>
+    filter(sub %in% sub.to.keep)
+  surveyData = surveyData |>
+    filter(sub %in% sub.to.keep)
+  rsvpAggregate = rsvpAggregate |>
+    filter(sub %in% sub.to.keep)
+}
+```
+
+## Number of Particants After Filtering
+
+```{r, postOutlierRemovalSummary}
+print(length(unique(surveyData$sub)))
+print(length(unique(rsvpAggregate$sub)))
+```
+
+## Save data
+
+```{r, savedata}
+save(rsvpData, surveyData, rsvpAggregate, file=sprintf("%s.RData", this_file))
+```
