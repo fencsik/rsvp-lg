@@ -190,6 +190,23 @@ ab.data |>
         legend.position.inside=c(0.9, 0.15))
 ```
 
+Linear fit of lag 300 data above. Runs a regression of the effect of STICSA on T2|T1 accuracy at lag 300
+
+```{r RegressionSwitchCostBySTICSAlag300}
+fit = lm(t2t1acc ~ sticsa, data=ab.data, subset=(lag == 300))
+summary(fit)
+confint(fit, 'sticsa', level=0.95)
+```
+
+Same as above but for lag 750.
+
+```{r RegressionSwitchCostBySTICSAlag750}
+fit = lm(t2t1acc ~ sticsa, data=ab.data, subset=(lag == 750))
+summary(fit)
+confint(fit, 'sticsa', level=0.95)
+```
+
+First rows of the data file:
 ```{r PreviewData, results='asis'}
 ab.data |>
   head(10) |>
