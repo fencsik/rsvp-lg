@@ -1,0 +1,203 @@
+---
+title: "RSVPLG03: Switch-Cost Analyses"
+author: "David Fencsik"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(ggpubr)
+library(rstatix)
+this_file = "08-Switching"
+source_file = "02-FilterData"
+dataFile = sprintf("%s.RData", source_file)
+```
+
+# Summary
+
+The purpose of this analysis is to look at switch costs, starting with whether there is any evidence of switching between scopes.
+
+# Load data files
+
+```{r, loaddata1, include=FALSE}
+load(dataFile)
+```
+
+# Local vs. Global Trials
+
+T1 accuracy as a function of level
+
+```{r T1accbylevel, fig.height=4, fig.width=4}
+rsvpData |>
+  filter(blocktype == "Experiment",
+         trialtype == "main",
+         t1_acc >= 0,
+         t2_acc >= 0) |>
+  group_by(sub, t1_level) |>
+  summarize(t1acc = mean(t1_acc),
+            .groups="drop") -> x
+
+x |>
+  ggplot(aes(x=t1_level, y=t1acc)) +
+  geom_violin(quantile.linetype=1, quantile.color="gray") +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  geom_hline(yintercept=0.5, linetype=2, color="gray") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  labs(x="T1 Level", y="T1 Accuracy") +
+  scale_x_discrete(labels=c("global"="Global", "local"="Local"))
+```
+
+T2|T1 accuracy as a function of level
+
+```{r T2accbylevel, fig.height=4, fig.width=4}
+rsvpData |>
+  filter(blocktype == "Experiment",
+         trialtype == "main",
+         t1_acc == 1,
+         t2_acc >= 0) |>
+  group_by(sub, t2_level) |>
+  summarize(t2t1acc = mean(t2_acc),
+            .groups="drop") -> x
+
+x |>
+  ggplot(aes(x=t2_level, y=t2t1acc)) +
+  geom_violin(quantile.linetype=1, quantile.color="gray") +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  geom_hline(yintercept=0.5, linetype=2, color="gray") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  labs(x="T2 Level", y="T2|T1 Accuracy") +
+  scale_x_discrete(labels=c("global"="Global", "local"="Local"))
+```
+
+# Switch vs. Repeat Trials
+
+Prepare data
+
+```{r filterdata}
+rsvpData |>
+  filter(blocktype == "Experiment",
+         trialtype == "main",
+         t1_acc >= 0,
+         t2_acc >= 0) |>
+  mutate(switch_type=case_when(
+           t1_level == t2_level ~ "noswitch",
+           t1_level != t2_level ~ "switch",
+           .default = NA)) |>
+  filter(t1_acc == 1) |>
+  group_by(sub, t2_level, switch_type) |>
+  summarize(t2t1acc = mean(t2_acc),
+            .groups="drop") -> x
+
+summary(x)
+```
+
+Generate violin plots of overall repeating and switching
+
+```{r ViolinPlotsBySwitch, fig.height=4, fig.width=4}
+x |>
+  group_by(sub, switch_type) |>
+  summarize(t2t1acc = mean(t2t1acc), .groups="drop") |>
+  ggplot(aes(x=switch_type, y=t2t1acc)) +
+  geom_violin(quantile.linetype=1, quantile.color="gray") +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  geom_hline(yintercept=0.5, linetype=2, color="gray") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  labs(x="Switch Condition", y="T2|T1 Accuracy") +
+  scale_x_discrete(labels=c("noswitch"="No Switch", "switch"="Switch"))
+```
+
+Generate violin plots of switch costs
+
+```{r ViolinPlotsSwitchCost, fig.height=4, fig.width=3}
+x |>
+  group_by(sub, switch_type) |>
+  summarize(t2t1acc = mean(t2t1acc), .groups="drop") |>
+  pivot_wider(names_from=switch_type,
+              values_from=t2t1acc) |>
+  mutate(cost = noswitch - switch) -> switch.cost
+
+switch.cost |>
+  ggplot(aes(x="", y=cost)) +
+  geom_violin(quantile.linetype=1, quantile.color="gray") +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  geom_hline(yintercept=0, linetype=2, color="gray") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  labs(x="", y="No Switch - Switch")
+```
+
+Generate violin plots of overall repeating and switching separated by level
+
+```{r ViolinPlotsByLevelAndSwitch, fig.height=4, fig.width=8}
+x |>
+  ggplot(aes(x=switch_type, y=t2t1acc)) +
+  geom_violin(quantile.linetype=1, quantile.color="gray") +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  geom_hline(yintercept=0.5, linetype=2, color="gray") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  labs(x="Switch Condition", y="T2|T1 Accuracy") +
+  scale_x_discrete(labels=c("noswitch"="No Switch", "switch"="Switch")) +
+  facet_wrap(~t2_level, labeller=as_labeller(c(global="T2 Global", local="T2 Local")))
+```
+
+Generate violin plots of switch costs separated by level
+
+```{r ViolinPlotsSwitchCostByLevel, fig.height=4, fig.width=4}
+x |>
+  pivot_wider(names_from=switch_type,
+              values_from=t2t1acc) |>
+  mutate(cost = noswitch - switch) -> switch.cost
+
+switch.cost |>
+  ggplot(aes(x=t2_level, y=cost)) +
+  geom_violin(quantile.linetype=1, quantile.color="gray") +
+  geom_jitter(width=.15, height=0, color="black", shape="circle open") +
+  geom_hline(yintercept=0, linetype=2, color="gray") +
+  stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
+  labs(x="T2 Level", y="No Switch - Switch") +
+  scale_x_discrete(labels=c("global"="Global", "local"="Local"))
+```
+
+Add survey totals to switch.cost data
+
+```{r AddSurveysToSwitchCost}
+surveyData |>
+  select(sub, bsam, cesdr, sias6, sticsa) |>
+  right_join(switch.cost,
+             by=join_by(sub),
+             unmatched="error",
+             relationship="one-to-many") -> switch.cost
+```
+
+Plot local and global switch cost as a function of STICSA total
+
+```{r ScatterplotSwitchCostByLevelAndPROMISA}
+switch.cost |>
+  mutate(t2_level = factor(t2_level, levels=c("global", "local"),
+                           labels=c("Global", "Local"))) |>
+  ggplot(aes(x=sticsa, y=cost, color=t2_level)) +
+  geom_point(size=1) +
+  geom_smooth(method="lm", formula=y~x, se=FALSE) +
+  scale_color_manual(values=c("black","red")) +
+  labs(x="Anxiety", y="No Switch - Switch (T2|T1 Accuracy)") +
+  guides(color=guide_legend(title="T2 Level")) +
+  theme(legend.position="inside",
+        legend.position.inside=c(0.9, 0.9))
+```
+
+Linear fit of global data above. Runs a regression of the effect of PROMIS-A on the difference score for just T2 global.
+
+```{r RegressionSwitchCostBySTICSAforGlobal}
+fit = lm(cost ~ sticsa, data=switch.cost, subset=(t2_level == "global"))
+summary(fit)
+confint(fit, 'sticsa', level=0.95)
+```
+
+Same as above but for T2 local.
+
+```{r RegressionSwitchCostBySTICSAforLocal}
+fit = lm(cost ~ sticsa, data=switch.cost, subset=(t2_level == "local"))
+summary(fit)
+confint(fit, 'sticsa', level=0.95)
+```
