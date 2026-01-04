@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = FALSE)
 library(tidyverse)
 library(ggpubr)
 library(rstatix)
+theme_set(theme_classic())
 this_file = "08-Switching"
 source_file = "02-FilterData"
 dataFile = sprintf("%s.RData", source_file)
