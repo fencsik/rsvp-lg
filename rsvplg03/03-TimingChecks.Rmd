@@ -1,0 +1,62 @@
+---
+title: "RSVPLG03: Timing Checks"
+author: "David Fencsik, Amanda Morrison"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=TRUE)
+library(tidyverse)
+theme_set(theme_classic())
+this_file = "03-TimingChecks"
+source_file = "00-GatherData"
+```
+
+# Purpose
+
+Check various aspects of timing
+
+# Load Data
+
+```{r loaddata}
+load(sprintf("%s.RData", source_file))
+```
+
+# Stimulus Display Timing
+
+```{r stimdisplaytiming1, fig.height=4, fig.width=8}
+rsvpData |>
+  ggplot(aes(x=t1_dur, fill=blocktype)) +
+  geom_density(alpha=0.5) +
+  geom_vline(xintercept=c(.05, .05 - 1/75, 0.1, 0.1 - 1/75)) +
+  ylim(0,1000)
+
+rsvpData |>
+  ggplot(aes(x=t2_dur, fill=blocktype)) +
+  geom_density(alpha=0.5) +
+  geom_vline(xintercept=c(.05, .05 - 1/75, 0.1, 0.1 - 1/75)) +
+  ylim(0,1000)
+
+rsvpData |>
+  ggplot(aes(x=t1mask_soa, fill=blocktype)) +
+  geom_density(alpha=0.5) +
+  geom_vline(xintercept=c(.1, .1 - 1/75, 0.2, 0.2 - 1/75)) +
+  ylim(0,1000)
+
+rsvpData |>
+  ggplot(aes(x=t2mask_soa, fill=blocktype)) +
+  geom_density(alpha=0.5) +
+  geom_vline(xintercept=c(.1, .1 - 1/75, 0.2, 0.2 - 1/75)) +
+  ylim(0,1000)
+
+rsvpData |>
+#  drop_na(t2_lag) |>
+  mutate(t2_lag = factor(t2_lag)) |>
+  ggplot(aes(x=t1t2_soa, fill=t2_lag)) +
+  geom_density(alpha=0.5) +
+  coord_cartesian(ylim=c(0, 1000))
+```
