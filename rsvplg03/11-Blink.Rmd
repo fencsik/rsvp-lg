@@ -116,7 +116,7 @@ ab.data |>
                values_to = "acc") |>
   mutate(lag = factor(lag)) |>
   ggplot(aes(x=lag, y=acc)) +
-  geom_violin(draw_quantiles=c(.25, .5, .75)) +
+  geom_violin(quantile.linetype=1, quantile.color="gray") +
   geom_jitter(width=.15, height=0, color="black", shape="circle open") +
   geom_hline(yintercept=0.5, linetype=2, color="gray") +
   stat_summary(fun=mean, geom="point", color="red", shape="cross", size=5) +
