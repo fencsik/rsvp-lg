@@ -61,6 +61,31 @@ if (runFilter) {
 }
 ```
 
+## Remove participants with low accuracy by level
+
+Remove participants with accuracy below 60% on either global or local T1
+
+```{r, lowaccuracybyt1level}
+runFilter = TRUE
+if (runFilter) {
+  rsvpData |>
+    filter(blocktype == "Experiment", trialtype == "main",
+           t1_acc >= 0, t2_acc >= 0) |>
+    group_by(sub, t1_level) |>
+    summarize(t1 = mean(t1_acc),
+              .groups="drop") |>
+    filter(t1 < .6) |>
+    pull(sub) -> sub.to.drop
+
+  rsvpData = rsvpData |>
+    filter(!(sub %in% sub.to.drop))
+  surveyData = surveyData |>
+    filter(!(sub %in% sub.to.drop))
+  rsvpAggregate = rsvpAggregate |>
+    filter(!(sub %in% sub.to.drop))
+}
+```
+
 ## Number of Particants After Filtering
 
 ```{r, postOutlierRemovalSummary}
