@@ -173,7 +173,7 @@ surveyData |>
 
 Plot local and global switch cost as a function of STICSA total
 
-```{r ScatterplotSwitchCostByLevelAndPROMISA}
+```{r ScatterplotSwitchCostByLevelAndAnxiety}
 switch.cost |>
   mutate(t2_level = factor(t2_level, levels=c("global", "local"),
                            labels=c("Global", "Local"))) |>
@@ -187,7 +187,7 @@ switch.cost |>
         legend.position.inside=c(0.9, 0.9))
 ```
 
-Linear fit of global data above. Runs a regression of the effect of PROMIS-A on the difference score for just T2 global.
+Linear fit of global data above. Runs a regression of the effect of trait anxiety (STICSA) on the difference score for just T2 global.
 
 ```{r RegressionSwitchCostBySTICSAforGlobal}
 fit = lm(cost ~ sticsa, data=switch.cost, subset=(t2_level == "global"))
