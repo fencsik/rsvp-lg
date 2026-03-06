@@ -3,3 +3,5 @@
 *.RData
 RSVPLG*JASP*.csv
 RSVPLG*Data*.csv
+*_files
+10-PlotsForPosters.md
