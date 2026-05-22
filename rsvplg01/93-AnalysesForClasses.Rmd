@@ -27,11 +27,11 @@ Generate a wide data set for import into JASP that has columns for T2 accuracy f
 jasp_export = rsvpAggregate |>
   select(!t2acc) |>
   rename(t2acc = t2t1acc) |>
-  filter(t2_lag > 0) |>
+  filter(lag > 0) |>
   mutate(t1_level = ifelse(t1_level == "global", "G", "L"),
          t2_level = ifelse(t2_level == "global", "G", "L"),
-         t2_lag = t2_lag * 150,
-         iv_names = paste("t2acc", t1_level, t2_level, t2_lag, sep="")) |>
+         lag = lag * 150,
+         iv_names = paste("t2acc", t1_level, t2_level, lag, sep="")) |>
   pivot_wider(names_from=iv_names,
               values_from=t2acc,
               id_cols=c("sub", "gender", "age",
