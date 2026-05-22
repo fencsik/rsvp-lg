@@ -23,6 +23,14 @@
 703,"local","global",750,0.766666666666667,0.9,1,19,"male","Pacific Islander","Associate's degree",13,59,13,51
 703,"local","local",300,0.8,0.433333333333333,0.458333333333333,19,"male","Pacific Islander","Associate's degree",13,59,13,51
 703,"local","local",750,0.9,0.733333333333333,0.703703703703704,19,"male","Pacific Islander","Associate's degree",13,59,13,51
+704,"global","global",300,0.466666666666667,0.333333333333333,0.142857142857143,18,"female","Latinx","Some college",NA,59,8,47
+704,"global","global",750,0.666666666666667,0.533333333333333,0.5,18,"female","Latinx","Some college",NA,59,8,47
+704,"global","local",300,0.466666666666667,0.866666666666667,0.714285714285714,18,"female","Latinx","Some college",NA,59,8,47
+704,"global","local",750,0.533333333333333,0.866666666666667,0.75,18,"female","Latinx","Some college",NA,59,8,47
+704,"local","global",300,0.933333333333333,0.733333333333333,0.714285714285714,18,"female","Latinx","Some college",NA,59,8,47
+704,"local","global",750,1,0.666666666666667,0.666666666666667,18,"female","Latinx","Some college",NA,59,8,47
+704,"local","local",300,1,0.866666666666667,0.866666666666667,18,"female","Latinx","Some college",NA,59,8,47
+704,"local","local",750,0.933333333333333,1,1,18,"female","Latinx","Some college",NA,59,8,47
 705,"global","global",300,0.966666666666667,0.566666666666667,0.551724137931034,24,"male","Other","Bachelor's degree",13,39,3,50
 705,"global","global",750,1,0.6,0.6,24,"male","Other","Bachelor's degree",13,39,3,50
 705,"global","local",300,0.9,0.5,0.481481481481481,24,"male","Other","Bachelor's degree",13,39,3,50
@@ -487,6 +495,14 @@
 773,"local","global",750,0.875,0.583333333333333,0.571428571428571,22,"female","Latinx","Bachelor's degree",11,44,9,41
 773,"local","local",300,0.958333333333333,0.833333333333333,0.826086956521739,22,"female","Latinx","Bachelor's degree",11,44,9,41
 773,"local","local",750,0.875,0.958333333333333,1,22,"female","Latinx","Bachelor's degree",11,44,9,41
+774,"global","global",300,1,0.75,0.75,36,"female","Latinx","Bachelor's degree",12,22,6,43
+774,"global","global",750,0.958333333333333,0.958333333333333,0.956521739130435,36,"female","Latinx","Bachelor's degree",12,22,6,43
+774,"global","local",300,1,0.666666666666667,0.666666666666667,36,"female","Latinx","Bachelor's degree",12,22,6,43
+774,"global","local",750,1,0.833333333333333,0.833333333333333,36,"female","Latinx","Bachelor's degree",12,22,6,43
+774,"local","global",300,0.958333333333333,0.375,0.347826086956522,36,"female","Latinx","Bachelor's degree",12,22,6,43
+774,"local","global",750,0.958333333333333,0.458333333333333,0.478260869565217,36,"female","Latinx","Bachelor's degree",12,22,6,43
+774,"local","local",300,0.958333333333333,0.708333333333333,0.739130434782609,36,"female","Latinx","Bachelor's degree",12,22,6,43
+774,"local","local",750,1,0.916666666666667,0.916666666666667,36,"female","Latinx","Bachelor's degree",12,22,6,43
 775,"global","global",300,0.666666666666667,0.375,0.25,23,"female","Latinx","Bachelor's degree",18,37,6,59
 775,"global","global",750,0.666666666666667,0.541666666666667,0.5625,23,"female","Latinx","Bachelor's degree",18,37,6,59
 775,"global","local",300,0.5,0.666666666666667,0.75,23,"female","Latinx","Bachelor's degree",18,37,6,59
@@ -727,3 +743,267 @@
 805,"local","global",750,0.958333333333333,0.625,0.652173913043478,48,"female","White","Bachelor's degree",15,70,8,58
 805,"local","local",300,1,0.75,0.75,48,"female","White","Bachelor's degree",15,70,8,58
 805,"local","local",750,0.916666666666667,0.833333333333333,0.909090909090909,48,"female","White","Bachelor's degree",15,70,8,58
+806,"global","global",300,0.958333333333333,0.625,0.652173913043478,19,"female","Latinx","Associate's degree",15,22,7,31
+806,"global","global",750,0.958333333333333,0.916666666666667,0.91304347826087,19,"female","Latinx","Associate's degree",15,22,7,31
+806,"global","local",300,0.916666666666667,0.625,0.681818181818182,19,"female","Latinx","Associate's degree",15,22,7,31
+806,"global","local",750,0.958333333333333,0.75,0.782608695652174,19,"female","Latinx","Associate's degree",15,22,7,31
+806,"local","global",300,0.958333333333333,0.625,0.608695652173913,19,"female","Latinx","Associate's degree",15,22,7,31
+806,"local","global",750,1,0.625,0.625,19,"female","Latinx","Associate's degree",15,22,7,31
+806,"local","local",300,1,0.833333333333333,0.833333333333333,19,"female","Latinx","Associate's degree",15,22,7,31
+806,"local","local",750,0.958333333333333,0.916666666666667,0.91304347826087,19,"female","Latinx","Associate's degree",15,22,7,31
+807,"global","global",300,0.708333333333333,0.416666666666667,0.470588235294118,24,"nonbinary","African-American","Bachelor's degree",9,33,7,35
+807,"global","global",750,0.916666666666667,0.75,0.772727272727273,24,"nonbinary","African-American","Bachelor's degree",9,33,7,35
+807,"global","local",300,0.958333333333333,0.625,0.652173913043478,24,"nonbinary","African-American","Bachelor's degree",9,33,7,35
+807,"global","local",750,0.833333333333333,0.75,0.85,24,"nonbinary","African-American","Bachelor's degree",9,33,7,35
+807,"local","global",300,0.833333333333333,0.666666666666667,0.7,24,"nonbinary","African-American","Bachelor's degree",9,33,7,35
+807,"local","global",750,0.958333333333333,0.666666666666667,0.695652173913043,24,"nonbinary","African-American","Bachelor's degree",9,33,7,35
+807,"local","local",300,0.958333333333333,0.75,0.739130434782609,24,"nonbinary","African-American","Bachelor's degree",9,33,7,35
+807,"local","local",750,0.833333333333333,1,1,24,"nonbinary","African-American","Bachelor's degree",9,33,7,35
+808,"global","global",300,0.833333333333333,1,1,18,"female","African-American","High school diploma or GED",15,42,4,40
+808,"global","global",750,0.916666666666667,0.833333333333333,0.818181818181818,18,"female","African-American","High school diploma or GED",15,42,4,40
+808,"global","local",300,0.833333333333333,0.75,0.7,18,"female","African-American","High school diploma or GED",15,42,4,40
+808,"global","local",750,1,0.833333333333333,0.833333333333333,18,"female","African-American","High school diploma or GED",15,42,4,40
+808,"local","global",300,0.916666666666667,0.416666666666667,0.454545454545455,18,"female","African-American","High school diploma or GED",15,42,4,40
+808,"local","global",750,0.916666666666667,0.583333333333333,0.545454545454545,18,"female","African-American","High school diploma or GED",15,42,4,40
+808,"local","local",300,1,0.75,0.75,18,"female","African-American","High school diploma or GED",15,42,4,40
+808,"local","local",750,0.916666666666667,0.916666666666667,1,18,"female","African-American","High school diploma or GED",15,42,4,40
+809,"global","global",300,0.875,0.791666666666667,0.904761904761905,20,"female","White","Bachelor's degree",10,64,16,50
+809,"global","global",750,0.791666666666667,0.958333333333333,0.947368421052632,20,"female","White","Bachelor's degree",10,64,16,50
+809,"global","local",300,0.875,0.666666666666667,0.714285714285714,20,"female","White","Bachelor's degree",10,64,16,50
+809,"global","local",750,0.916666666666667,0.708333333333333,0.681818181818182,20,"female","White","Bachelor's degree",10,64,16,50
+809,"local","global",300,0.958333333333333,0.583333333333333,0.565217391304348,20,"female","White","Bachelor's degree",10,64,16,50
+809,"local","global",750,0.958333333333333,0.583333333333333,0.565217391304348,20,"female","White","Bachelor's degree",10,64,16,50
+809,"local","local",300,0.916666666666667,0.916666666666667,0.954545454545455,20,"female","White","Bachelor's degree",10,64,16,50
+809,"local","local",750,1,0.958333333333333,0.958333333333333,20,"female","White","Bachelor's degree",10,64,16,50
+810,"global","global",300,0.666666666666667,0.75,0.75,23,"female","African-American","Bachelor's degree",16,60,16,49
+810,"global","global",750,0.666666666666667,0.666666666666667,0.875,23,"female","African-American","Bachelor's degree",16,60,16,49
+810,"global","local",300,0.916666666666667,0.833333333333333,0.909090909090909,23,"female","African-American","Bachelor's degree",16,60,16,49
+810,"global","local",750,0.666666666666667,0.833333333333333,0.875,23,"female","African-American","Bachelor's degree",16,60,16,49
+810,"local","global",300,0.916666666666667,0.75,0.727272727272727,23,"female","African-American","Bachelor's degree",16,60,16,49
+810,"local","global",750,0.75,0.666666666666667,0.555555555555556,23,"female","African-American","Bachelor's degree",16,60,16,49
+810,"local","local",300,0.666666666666667,0.416666666666667,0.5,23,"female","African-American","Bachelor's degree",16,60,16,49
+810,"local","local",750,0.75,0.5,0.666666666666667,23,"female","African-American","Bachelor's degree",16,60,16,49
+811,"global","global",300,1,1,1,23,"male","Latinx","Associate's degree",19,69,11,61
+811,"global","global",750,1,1,1,23,"male","Latinx","Associate's degree",19,69,11,61
+811,"global","local",300,1,0.25,0.25,23,"male","Latinx","Associate's degree",19,69,11,61
+811,"global","local",750,0.916666666666667,0.666666666666667,0.727272727272727,23,"male","Latinx","Associate's degree",19,69,11,61
+811,"local","global",300,0.75,0.583333333333333,0.666666666666667,23,"male","Latinx","Associate's degree",19,69,11,61
+811,"local","global",750,0.833333333333333,0.5,0.5,23,"male","Latinx","Associate's degree",19,69,11,61
+811,"local","local",300,0.916666666666667,0.916666666666667,0.909090909090909,23,"male","Latinx","Associate's degree",19,69,11,61
+811,"local","local",750,0.916666666666667,0.666666666666667,0.727272727272727,23,"male","Latinx","Associate's degree",19,69,11,61
+812,"global","global",300,0.916666666666667,0.833333333333333,0.909090909090909,21,"female","White","Bachelor's degree",16,24,11,33
+812,"global","global",750,0.916666666666667,1,1,21,"female","White","Bachelor's degree",16,24,11,33
+812,"global","local",300,1,0.583333333333333,0.583333333333333,21,"female","White","Bachelor's degree",16,24,11,33
+812,"global","local",750,1,0.583333333333333,0.583333333333333,21,"female","White","Bachelor's degree",16,24,11,33
+812,"local","global",300,0.666666666666667,1,1,21,"female","White","Bachelor's degree",16,24,11,33
+812,"local","global",750,0.666666666666667,0.75,0.75,21,"female","White","Bachelor's degree",16,24,11,33
+812,"local","local",300,0.583333333333333,0.5,0.428571428571429,21,"female","White","Bachelor's degree",16,24,11,33
+812,"local","local",750,0.583333333333333,0.5,0.428571428571429,21,"female","White","Bachelor's degree",16,24,11,33
+813,"global","global",300,1,0.916666666666667,0.916666666666667,20,"male","East Asian","Associate's degree",14,43,11,51
+813,"global","global",750,1,0.958333333333333,0.958333333333333,20,"male","East Asian","Associate's degree",14,43,11,51
+813,"global","local",300,1,0.541666666666667,0.541666666666667,20,"male","East Asian","Associate's degree",14,43,11,51
+813,"global","local",750,1,0.458333333333333,0.458333333333333,20,"male","East Asian","Associate's degree",14,43,11,51
+813,"local","global",300,0.958333333333333,0.416666666666667,0.434782608695652,20,"male","East Asian","Associate's degree",14,43,11,51
+813,"local","global",750,0.958333333333333,0.666666666666667,0.652173913043478,20,"male","East Asian","Associate's degree",14,43,11,51
+813,"local","local",300,1,0.791666666666667,0.791666666666667,20,"male","East Asian","Associate's degree",14,43,11,51
+813,"local","local",750,1,0.916666666666667,0.916666666666667,20,"male","East Asian","Associate's degree",14,43,11,51
+814,"global","global",300,0.916666666666667,0.916666666666667,0.909090909090909,20,"female","Latinx","Bachelor's degree",10,59,4,52
+814,"global","global",750,0.916666666666667,0.916666666666667,0.954545454545455,20,"female","Latinx","Bachelor's degree",10,59,4,52
+814,"global","local",300,0.875,0.583333333333333,0.571428571428571,20,"female","Latinx","Bachelor's degree",10,59,4,52
+814,"global","local",750,1,0.666666666666667,0.666666666666667,20,"female","Latinx","Bachelor's degree",10,59,4,52
+814,"local","global",300,0.833333333333333,0.791666666666667,0.8,20,"female","Latinx","Bachelor's degree",10,59,4,52
+814,"local","global",750,0.875,0.958333333333333,1,20,"female","Latinx","Bachelor's degree",10,59,4,52
+814,"local","local",300,0.875,0.583333333333333,0.571428571428571,20,"female","Latinx","Bachelor's degree",10,59,4,52
+814,"local","local",750,0.708333333333333,0.625,0.588235294117647,20,"female","Latinx","Bachelor's degree",10,59,4,52
+815,"global","global",300,0.916666666666667,0.875,0.909090909090909,21,"female","Latinx","Bachelor's degree",12,40,8,51
+815,"global","global",750,0.916666666666667,1,1,21,"female","Latinx","Bachelor's degree",12,40,8,51
+815,"global","local",300,0.958333333333333,0.541666666666667,0.565217391304348,21,"female","Latinx","Bachelor's degree",12,40,8,51
+815,"global","local",750,0.916666666666667,0.833333333333333,0.863636363636364,21,"female","Latinx","Bachelor's degree",12,40,8,51
+815,"local","global",300,0.875,0.583333333333333,0.571428571428571,21,"female","Latinx","Bachelor's degree",12,40,8,51
+815,"local","global",750,0.875,0.708333333333333,0.666666666666667,21,"female","Latinx","Bachelor's degree",12,40,8,51
+815,"local","local",300,0.916666666666667,0.833333333333333,0.863636363636364,21,"female","Latinx","Bachelor's degree",12,40,8,51
+815,"local","local",750,1,0.916666666666667,0.916666666666667,21,"female","Latinx","Bachelor's degree",12,40,8,51
+816,"global","global",300,1,0.958333333333333,0.958333333333333,19,"male","African-American","Associate's degree",7,20,1,23
+816,"global","global",750,0.958333333333333,1,1,19,"male","African-American","Associate's degree",7,20,1,23
+816,"global","local",300,1,0.583333333333333,0.583333333333333,19,"male","African-American","Associate's degree",7,20,1,23
+816,"global","local",750,0.958333333333333,0.75,0.739130434782609,19,"male","African-American","Associate's degree",7,20,1,23
+816,"local","global",300,1,0.583333333333333,0.583333333333333,19,"male","African-American","Associate's degree",7,20,1,23
+816,"local","global",750,0.958333333333333,0.541666666666667,0.521739130434783,19,"male","African-American","Associate's degree",7,20,1,23
+816,"local","local",300,1,0.791666666666667,0.791666666666667,19,"male","African-American","Associate's degree",7,20,1,23
+816,"local","local",750,0.958333333333333,0.916666666666667,0.91304347826087,19,"male","African-American","Associate's degree",7,20,1,23
+817,"global","global",300,1,0.958333333333333,0.958333333333333,19,"female","Middle Eastern","High school diploma or GED",11,73,8,73
+817,"global","global",750,0.875,0.791666666666667,0.857142857142857,19,"female","Middle Eastern","High school diploma or GED",11,73,8,73
+817,"global","local",300,0.833333333333333,0.583333333333333,0.6,19,"female","Middle Eastern","High school diploma or GED",11,73,8,73
+817,"global","local",750,0.958333333333333,0.791666666666667,0.826086956521739,19,"female","Middle Eastern","High school diploma or GED",11,73,8,73
+817,"local","global",300,0.916666666666667,0.583333333333333,0.590909090909091,19,"female","Middle Eastern","High school diploma or GED",11,73,8,73
+817,"local","global",750,0.958333333333333,0.916666666666667,0.91304347826087,19,"female","Middle Eastern","High school diploma or GED",11,73,8,73
+817,"local","local",300,0.791666666666667,0.708333333333333,0.684210526315789,19,"female","Middle Eastern","High school diploma or GED",11,73,8,73
+817,"local","local",750,0.833333333333333,0.958333333333333,0.95,19,"female","Middle Eastern","High school diploma or GED",11,73,8,73
+818,"global","global",300,0.75,0.791666666666667,0.888888888888889,23,"female","Latinx","Associate's degree",18,61,2,47
+818,"global","global",750,0.875,0.75,0.714285714285714,23,"female","Latinx","Associate's degree",18,61,2,47
+818,"global","local",300,0.75,0.583333333333333,0.5,23,"female","Latinx","Associate's degree",18,61,2,47
+818,"global","local",750,0.833333333333333,0.75,0.75,23,"female","Latinx","Associate's degree",18,61,2,47
+818,"local","global",300,0.791666666666667,0.541666666666667,0.473684210526316,23,"female","Latinx","Associate's degree",18,61,2,47
+818,"local","global",750,0.875,0.75,0.761904761904762,23,"female","Latinx","Associate's degree",18,61,2,47
+818,"local","local",300,0.666666666666667,0.75,0.875,23,"female","Latinx","Associate's degree",18,61,2,47
+818,"local","local",750,0.75,0.875,0.944444444444444,23,"female","Latinx","Associate's degree",18,61,2,47
+819,"global","global",300,0.958333333333333,0.958333333333333,1,35,"male","White","Bachelor's degree",15,27,3,32
+819,"global","global",750,1,1,1,35,"male","White","Bachelor's degree",15,27,3,32
+819,"global","local",300,1,0.625,0.625,35,"male","White","Bachelor's degree",15,27,3,32
+819,"global","local",750,0.958333333333333,0.666666666666667,0.695652173913043,35,"male","White","Bachelor's degree",15,27,3,32
+819,"local","global",300,0.875,0.541666666666667,0.476190476190476,35,"male","White","Bachelor's degree",15,27,3,32
+819,"local","global",750,0.916666666666667,0.583333333333333,0.545454545454545,35,"male","White","Bachelor's degree",15,27,3,32
+819,"local","local",300,0.916666666666667,0.916666666666667,0.909090909090909,35,"male","White","Bachelor's degree",15,27,3,32
+819,"local","local",750,1,0.875,0.875,35,"male","White","Bachelor's degree",15,27,3,32
+820,"global","global",300,0.75,0.875,0.888888888888889,20,"male","Filipino","Some college",7,25,9,26
+820,"global","global",750,1,0.875,0.875,20,"male","Filipino","Some college",7,25,9,26
+820,"global","local",300,0.958333333333333,0.541666666666667,0.521739130434783,20,"male","Filipino","Some college",7,25,9,26
+820,"global","local",750,0.958333333333333,0.583333333333333,0.565217391304348,20,"male","Filipino","Some college",7,25,9,26
+820,"local","global",300,0.833333333333333,0.458333333333333,0.5,20,"male","Filipino","Some college",7,25,9,26
+820,"local","global",750,0.833333333333333,0.625,0.55,20,"male","Filipino","Some college",7,25,9,26
+820,"local","local",300,0.833333333333333,0.625,0.65,20,"male","Filipino","Some college",7,25,9,26
+820,"local","local",750,0.833333333333333,0.875,0.9,20,"male","Filipino","Some college",7,25,9,26
+821,"global","global",300,1,0.958333333333333,0.958333333333333,21,"male","Latinx","Bachelor's degree",11,58,10,50
+821,"global","global",750,1,1,1,21,"male","Latinx","Bachelor's degree",11,58,10,50
+821,"global","local",300,0.958333333333333,0.625,0.652173913043478,21,"male","Latinx","Bachelor's degree",11,58,10,50
+821,"global","local",750,1,0.416666666666667,0.416666666666667,21,"male","Latinx","Bachelor's degree",11,58,10,50
+821,"local","global",300,0.583333333333333,0.791666666666667,0.857142857142857,21,"male","Latinx","Bachelor's degree",11,58,10,50
+821,"local","global",750,0.458333333333333,1,1,21,"male","Latinx","Bachelor's degree",11,58,10,50
+821,"local","local",300,0.583333333333333,0.5,0.571428571428571,21,"male","Latinx","Bachelor's degree",11,58,10,50
+821,"local","local",750,0.541666666666667,0.458333333333333,0.538461538461538,21,"male","Latinx","Bachelor's degree",11,58,10,50
+822,"global","global",300,0.958333333333333,0.958333333333333,1,NA,"female","African-American","Bachelor's degree",16,36,1,35
+822,"global","global",750,0.958333333333333,1,1,NA,"female","African-American","Bachelor's degree",16,36,1,35
+822,"global","local",300,1,0.75,0.75,NA,"female","African-American","Bachelor's degree",16,36,1,35
+822,"global","local",750,0.916666666666667,0.583333333333333,0.636363636363636,NA,"female","African-American","Bachelor's degree",16,36,1,35
+822,"local","global",300,0.875,0.75,0.80952380952381,NA,"female","African-American","Bachelor's degree",16,36,1,35
+822,"local","global",750,0.708333333333333,0.708333333333333,0.705882352941177,NA,"female","African-American","Bachelor's degree",16,36,1,35
+822,"local","local",300,0.875,0.916666666666667,0.904761904761905,NA,"female","African-American","Bachelor's degree",16,36,1,35
+822,"local","local",750,0.875,0.791666666666667,0.80952380952381,NA,"female","African-American","Bachelor's degree",16,36,1,35
+823,"global","global",300,1,0.958333333333333,0.958333333333333,22,"female","White","Bachelor's degree",18,40,2,42
+823,"global","global",750,0.958333333333333,0.958333333333333,0.956521739130435,22,"female","White","Bachelor's degree",18,40,2,42
+823,"global","local",300,0.958333333333333,0.75,0.782608695652174,22,"female","White","Bachelor's degree",18,40,2,42
+823,"global","local",750,0.958333333333333,0.791666666666667,0.782608695652174,22,"female","White","Bachelor's degree",18,40,2,42
+823,"local","global",300,0.916666666666667,0.666666666666667,0.636363636363636,22,"female","White","Bachelor's degree",18,40,2,42
+823,"local","global",750,0.916666666666667,0.458333333333333,0.409090909090909,22,"female","White","Bachelor's degree",18,40,2,42
+823,"local","local",300,0.916666666666667,0.833333333333333,0.863636363636364,22,"female","White","Bachelor's degree",18,40,2,42
+823,"local","local",750,1,0.916666666666667,0.916666666666667,22,"female","White","Bachelor's degree",18,40,2,42
+824,"global","global",300,0.958333333333333,0.791666666666667,0.782608695652174,21,"male","Latinx","Master's degree",20,56,2,49
+824,"global","global",750,1,0.75,0.75,21,"male","Latinx","Master's degree",20,56,2,49
+824,"global","local",300,0.916666666666667,0.458333333333333,0.454545454545455,21,"male","Latinx","Master's degree",20,56,2,49
+824,"global","local",750,1,0.541666666666667,0.541666666666667,21,"male","Latinx","Master's degree",20,56,2,49
+824,"local","global",300,0.875,0.583333333333333,0.619047619047619,21,"male","Latinx","Master's degree",20,56,2,49
+824,"local","global",750,0.875,0.708333333333333,0.714285714285714,21,"male","Latinx","Master's degree",20,56,2,49
+824,"local","local",300,1,0.833333333333333,0.833333333333333,21,"male","Latinx","Master's degree",20,56,2,49
+824,"local","local",750,0.958333333333333,0.916666666666667,0.91304347826087,21,"male","Latinx","Master's degree",20,56,2,49
+825,"global","global",300,1,0.958333333333333,0.958333333333333,18,"female","Latinx","Some college",17,43,13,52
+825,"global","global",750,1,0.958333333333333,0.958333333333333,18,"female","Latinx","Some college",17,43,13,52
+825,"global","local",300,1,0.625,0.625,18,"female","Latinx","Some college",17,43,13,52
+825,"global","local",750,1,0.708333333333333,0.708333333333333,18,"female","Latinx","Some college",17,43,13,52
+825,"local","global",300,0.875,0.583333333333333,0.571428571428571,18,"female","Latinx","Some college",17,43,13,52
+825,"local","global",750,0.958333333333333,0.666666666666667,0.652173913043478,18,"female","Latinx","Some college",17,43,13,52
+825,"local","local",300,0.958333333333333,0.875,0.91304347826087,18,"female","Latinx","Some college",17,43,13,52
+825,"local","local",750,0.916666666666667,0.791666666666667,0.818181818181818,18,"female","Latinx","Some college",17,43,13,52
+826,"global","global",300,0.833333333333333,0.75,0.8,20,"male","Filipino","Some college",16,26,8,35
+826,"global","global",750,1,0.916666666666667,0.916666666666667,20,"male","Filipino","Some college",16,26,8,35
+826,"global","local",300,1,0.375,0.375,20,"male","Filipino","Some college",16,26,8,35
+826,"global","local",750,0.958333333333333,0.625,0.608695652173913,20,"male","Filipino","Some college",16,26,8,35
+826,"local","global",300,0.625,0.708333333333333,0.533333333333333,20,"male","Filipino","Some college",16,26,8,35
+826,"local","global",750,0.666666666666667,0.875,0.875,20,"male","Filipino","Some college",16,26,8,35
+826,"local","local",300,0.625,0.416666666666667,0.533333333333333,20,"male","Filipino","Some college",16,26,8,35
+826,"local","local",750,0.708333333333333,0.541666666666667,0.588235294117647,20,"male","Filipino","Some college",16,26,8,35
+827,"global","global",300,1,0.875,0.875,19,"female","Latinx","Some college",14,36,13,39
+827,"global","global",750,1,1,1,19,"female","Latinx","Some college",14,36,13,39
+827,"global","local",300,1,0.708333333333333,0.708333333333333,19,"female","Latinx","Some college",14,36,13,39
+827,"global","local",750,1,0.75,0.75,19,"female","Latinx","Some college",14,36,13,39
+827,"local","global",300,1,0.75,0.75,19,"female","Latinx","Some college",14,36,13,39
+827,"local","global",750,0.958333333333333,0.541666666666667,0.521739130434783,19,"female","Latinx","Some college",14,36,13,39
+827,"local","local",300,1,0.958333333333333,0.958333333333333,19,"female","Latinx","Some college",14,36,13,39
+827,"local","local",750,0.958333333333333,0.958333333333333,1,19,"female","Latinx","Some college",14,36,13,39
+828,"global","global",300,0.916666666666667,0.708333333333333,0.681818181818182,21,"male","Filipino","High school diploma or GED",12,21,1,21
+828,"global","global",750,0.916666666666667,0.916666666666667,0.954545454545455,21,"male","Filipino","High school diploma or GED",12,21,1,21
+828,"global","local",300,0.916666666666667,0.541666666666667,0.545454545454545,21,"male","Filipino","High school diploma or GED",12,21,1,21
+828,"global","local",750,0.958333333333333,0.458333333333333,0.434782608695652,21,"male","Filipino","High school diploma or GED",12,21,1,21
+828,"local","global",300,0.958333333333333,0.583333333333333,0.608695652173913,21,"male","Filipino","High school diploma or GED",12,21,1,21
+828,"local","global",750,0.791666666666667,0.666666666666667,0.631578947368421,21,"male","Filipino","High school diploma or GED",12,21,1,21
+828,"local","local",300,0.791666666666667,0.75,0.736842105263158,21,"male","Filipino","High school diploma or GED",12,21,1,21
+828,"local","local",750,0.75,0.791666666666667,0.777777777777778,21,"male","Filipino","High school diploma or GED",12,21,1,21
+829,"global","global",300,0.958333333333333,0.583333333333333,0.608695652173913,20,"male","Filipino","Some college",16,77,7,63
+829,"global","global",750,0.958333333333333,0.75,0.782608695652174,20,"male","Filipino","Some college",16,77,7,63
+829,"global","local",300,0.958333333333333,0.416666666666667,0.434782608695652,20,"male","Filipino","Some college",16,77,7,63
+829,"global","local",750,0.916666666666667,0.875,0.863636363636364,20,"male","Filipino","Some college",16,77,7,63
+829,"local","global",300,0.875,0.5,0.523809523809524,20,"male","Filipino","Some college",16,77,7,63
+829,"local","global",750,0.958333333333333,0.791666666666667,0.782608695652174,20,"male","Filipino","Some college",16,77,7,63
+829,"local","local",300,0.958333333333333,0.875,0.869565217391304,20,"male","Filipino","Some college",16,77,7,63
+829,"local","local",750,0.958333333333333,0.833333333333333,0.869565217391304,20,"male","Filipino","Some college",16,77,7,63
+830,"global","global",300,1,0.666666666666667,0.666666666666667,19,"female","Filipino","Some college",16,56,14,49
+830,"global","global",750,0.958333333333333,0.916666666666667,0.91304347826087,19,"female","Filipino","Some college",16,56,14,49
+830,"global","local",300,0.958333333333333,0.708333333333333,0.695652173913043,19,"female","Filipino","Some college",16,56,14,49
+830,"global","local",750,0.916666666666667,0.791666666666667,0.863636363636364,19,"female","Filipino","Some college",16,56,14,49
+830,"local","global",300,0.875,0.666666666666667,0.666666666666667,19,"female","Filipino","Some college",16,56,14,49
+830,"local","global",750,0.708333333333333,0.916666666666667,0.882352941176471,19,"female","Filipino","Some college",16,56,14,49
+830,"local","local",300,0.75,0.625,0.611111111111111,19,"female","Filipino","Some college",16,56,14,49
+830,"local","local",750,0.833333333333333,0.625,0.65,19,"female","Filipino","Some college",16,56,14,49
+831,"global","global",300,0.875,0.916666666666667,0.952380952380952,26,"male","White","Bachelor's degree",12,28,2,31
+831,"global","global",750,1,1,1,26,"male","White","Bachelor's degree",12,28,2,31
+831,"global","local",300,0.958333333333333,0.583333333333333,0.608695652173913,26,"male","White","Bachelor's degree",12,28,2,31
+831,"global","local",750,0.958333333333333,0.833333333333333,0.869565217391304,26,"male","White","Bachelor's degree",12,28,2,31
+831,"local","global",300,0.916666666666667,0.625,0.636363636363636,26,"male","White","Bachelor's degree",12,28,2,31
+831,"local","global",750,0.958333333333333,0.625,0.608695652173913,26,"male","White","Bachelor's degree",12,28,2,31
+831,"local","local",300,0.833333333333333,0.833333333333333,0.9,26,"male","White","Bachelor's degree",12,28,2,31
+831,"local","local",750,0.916666666666667,0.958333333333333,1,26,"male","White","Bachelor's degree",12,28,2,31
+832,"global","global",300,0.791666666666667,0.708333333333333,0.842105263157895,18,"female","African-American","Associate's degree",14,53,3,37
+832,"global","global",750,0.875,0.875,0.904761904761905,18,"female","African-American","Associate's degree",14,53,3,37
+832,"global","local",300,0.75,0.333333333333333,0.277777777777778,18,"female","African-American","Associate's degree",14,53,3,37
+832,"global","local",750,0.666666666666667,0.541666666666667,0.5625,18,"female","African-American","Associate's degree",14,53,3,37
+832,"local","global",300,0.541666666666667,0.833333333333333,0.923076923076923,18,"female","African-American","Associate's degree",14,53,3,37
+832,"local","global",750,0.541666666666667,0.916666666666667,0.923076923076923,18,"female","African-American","Associate's degree",14,53,3,37
+832,"local","local",300,0.583333333333333,0.583333333333333,0.571428571428571,18,"female","African-American","Associate's degree",14,53,3,37
+832,"local","local",750,0.458333333333333,0.416666666666667,0.454545454545455,18,"female","African-American","Associate's degree",14,53,3,37
+833,"global","global",300,0.916666666666667,0.916666666666667,0.909090909090909,19,"male","SE Asian","Associate's degree",6,31,3,25
+833,"global","global",750,0.916666666666667,0.875,0.863636363636364,19,"male","SE Asian","Associate's degree",6,31,3,25
+833,"global","local",300,0.791666666666667,0.541666666666667,0.526315789473684,19,"male","SE Asian","Associate's degree",6,31,3,25
+833,"global","local",750,0.916666666666667,0.625,0.636363636363636,19,"male","SE Asian","Associate's degree",6,31,3,25
+833,"local","global",300,0.666666666666667,0.541666666666667,0.5,19,"male","SE Asian","Associate's degree",6,31,3,25
+833,"local","global",750,0.791666666666667,0.833333333333333,0.842105263157895,19,"male","SE Asian","Associate's degree",6,31,3,25
+833,"local","local",300,1,0.666666666666667,0.666666666666667,19,"male","SE Asian","Associate's degree",6,31,3,25
+833,"local","local",750,0.875,0.916666666666667,0.952380952380952,19,"male","SE Asian","Associate's degree",6,31,3,25
+834,"global","global",300,0.791666666666667,0.708333333333333,0.736842105263158,18,"female","African-American","Some college",13,29,0,26
+834,"global","global",750,0.625,0.708333333333333,0.666666666666667,18,"female","African-American","Some college",13,29,0,26
+834,"global","local",300,0.75,0.541666666666667,0.611111111111111,18,"female","African-American","Some college",13,29,0,26
+834,"global","local",750,0.75,0.375,0.388888888888889,18,"female","African-American","Some college",13,29,0,26
+834,"local","global",300,0.625,0.791666666666667,0.733333333333333,18,"female","African-American","Some college",13,29,0,26
+834,"local","global",750,0.666666666666667,0.833333333333333,0.9375,18,"female","African-American","Some college",13,29,0,26
+834,"local","local",300,0.666666666666667,0.541666666666667,0.6875,18,"female","African-American","Some college",13,29,0,26
+834,"local","local",750,0.666666666666667,0.5,0.5,18,"female","African-American","Some college",13,29,0,26
+835,"global","global",300,0.958333333333333,0.875,0.91304347826087,18,"female","African-American","Some college",8,42,0,36
+835,"global","global",750,0.916666666666667,1,1,18,"female","African-American","Some college",8,42,0,36
+835,"global","local",300,0.916666666666667,0.833333333333333,0.818181818181818,18,"female","African-American","Some college",8,42,0,36
+835,"global","local",750,0.958333333333333,0.833333333333333,0.826086956521739,18,"female","African-American","Some college",8,42,0,36
+835,"local","global",300,0.75,0.708333333333333,0.777777777777778,18,"female","African-American","Some college",8,42,0,36
+835,"local","global",750,0.958333333333333,0.916666666666667,0.956521739130435,18,"female","African-American","Some college",8,42,0,36
+835,"local","local",300,0.875,0.625,0.666666666666667,18,"female","African-American","Some college",8,42,0,36
+835,"local","local",750,0.875,0.75,0.714285714285714,18,"female","African-American","Some college",8,42,0,36
+836,"global","global",300,0.958333333333333,0.875,0.869565217391304,22,"female","Middle Eastern","Some college",11,21,0,24
+836,"global","global",750,0.833333333333333,0.875,0.95,22,"female","Middle Eastern","Some college",11,21,0,24
+836,"global","local",300,0.916666666666667,0.416666666666667,0.409090909090909,22,"female","Middle Eastern","Some college",11,21,0,24
+836,"global","local",750,0.958333333333333,0.75,0.739130434782609,22,"female","Middle Eastern","Some college",11,21,0,24
+836,"local","global",300,1,0.333333333333333,0.333333333333333,22,"female","Middle Eastern","Some college",11,21,0,24
+836,"local","global",750,0.916666666666667,0.458333333333333,0.5,22,"female","Middle Eastern","Some college",11,21,0,24
+836,"local","local",300,0.916666666666667,0.708333333333333,0.772727272727273,22,"female","Middle Eastern","Some college",11,21,0,24
+836,"local","local",750,0.875,0.875,0.904761904761905,22,"female","Middle Eastern","Some college",11,21,0,24
+837,"global","global",300,0.916666666666667,0.625,0.681818181818182,21,"female","Latinx","Associate's degree",17,26,4,35
+837,"global","global",750,0.958333333333333,0.875,0.91304347826087,21,"female","Latinx","Associate's degree",17,26,4,35
+837,"global","local",300,1,0.5,0.5,21,"female","Latinx","Associate's degree",17,26,4,35
+837,"global","local",750,1,0.833333333333333,0.833333333333333,21,"female","Latinx","Associate's degree",17,26,4,35
+837,"local","global",300,0.916666666666667,0.5,0.454545454545455,21,"female","Latinx","Associate's degree",17,26,4,35
+837,"local","global",750,0.875,0.833333333333333,0.904761904761905,21,"female","Latinx","Associate's degree",17,26,4,35
+837,"local","local",300,0.958333333333333,0.666666666666667,0.695652173913043,21,"female","Latinx","Associate's degree",17,26,4,35
+837,"local","local",750,0.958333333333333,0.916666666666667,0.91304347826087,21,"female","Latinx","Associate's degree",17,26,4,35
+838,"global","global",300,0.875,0.833333333333333,0.857142857142857,18,"female","Filipino","Some college",14,77,11,48
+838,"global","global",750,0.916666666666667,0.958333333333333,1,18,"female","Filipino","Some college",14,77,11,48
+838,"global","local",300,0.958333333333333,0.5,0.521739130434783,18,"female","Filipino","Some college",14,77,11,48
+838,"global","local",750,0.875,0.666666666666667,0.666666666666667,18,"female","Filipino","Some college",14,77,11,48
+838,"local","global",300,0.666666666666667,0.958333333333333,1,18,"female","Filipino","Some college",14,77,11,48
+838,"local","global",750,0.625,0.916666666666667,0.933333333333333,18,"female","Filipino","Some college",14,77,11,48
+838,"local","local",300,0.708333333333333,0.625,0.588235294117647,18,"female","Filipino","Some college",14,77,11,48
+838,"local","local",750,0.625,0.666666666666667,0.6,18,"female","Filipino","Some college",14,77,11,48
