@@ -35,10 +35,12 @@ names(surveyData) = tolower(names(surveyData))
 names(surveyData)[names(surveyData) == "id"] = "sub"
 ```
 
-2. Remove data lines that have NA values from a crash or empty survey responses, and participants with incomplete experimental data (none yet)
+2. Remove data lines that have NA values from a crash or empty survey responses, and participants with incomplete experimental data (808 only has one experimental block)
 
 ```{r cleandata2}
-rsvpData |> drop_na(sub) -> rsvpData
+rsvpData |>
+  drop_na(sub) |>
+  filter (sub != 808) -> rsvpData
 surveyData |> drop_na(sub) -> surveyData
 ```
 
