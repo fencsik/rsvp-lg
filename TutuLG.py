@@ -376,6 +376,8 @@ def GetScreenResolution():
     elif 'GoldenChild' in comp:
         # larger laptop
         return [1792, 1120]
+    elif 'Stranger' in comp:
+        return [1512, 982]
     else:
         # default
         print('COMPUTER NOT IDENTIFIED: DEFAULT RESOLUTION SET')
